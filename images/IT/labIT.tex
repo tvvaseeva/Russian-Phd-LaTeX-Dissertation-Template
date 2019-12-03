@@ -1,0 +1,104 @@
+\documentclass[tikz,border=2mm]{standalone}
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage[russian]{babel}
+\usetikzlibrary{positioning}
+
+\begin{document}
+\begin{tikzpicture}[block/.style={rounded corners=5, minimum width=3.5cm, minimum height=1.5cm, draw,align=center},font=\sffamily]
+
+\path   (-1,21.115) node[block, fill = lightgray] (A) {\textbf{ГОСТ}\\\textbf{13109-67}} 
+        (-1,19.115) node[block, fill = lightgray] (B) {\textbf{ГОСТ}\\\textbf{13109-87}}
+        (-1,17.115) node[block, dashed] (C) {\textbf{ГОСТ}\\\textbf{13109-97}};
+\draw[->,>=stealth,very thick](A.south) -- (B.north);
+\draw[->,>=stealth,very thick](B.south) -- (C.north);
+\draw[thick] ($(A.north west)+(-0.3,0.6)$)  rectangle ($(C.south east)+(0.3,-0.6)$);
+
+\draw[->,>=stealth,very thick](1.05,19.115) -- (2.312,19.115);
+
+\path   (5,22) node[block, fill = lightgray] (J1) {\textbf{ГОСТ}\\\textbf{P 51317.4.30-2008}\\(28.10.2009-\\01.01.2014)}
+        (9,22) node[block, dashed] (K) {\textbf{ГОСТ}\\\textbf{30804.4.30-2013}\\Изменение\\10.04.2018}
+        (14,22) node[block, draw=white] (L) {\textbf{Методы измерений}\\\textbf{показателей качества}\\\textbf{электрической энергии}};
+\draw[->,>=stealth,very thick](J1.east) -- (K.west);
+\draw[thick] ($(J1.north west)+(-0.3,0.6)$)  rectangle ($(L.south east)+(0.6,-0.6)$);
+
+\path   (5,19) node[block, fill = lightgray] (J2) {\textbf{ГОСТ}\\\textbf{P 51317.4.7-2008}\\(6.10.2009-\\01.01.2014)}
+        (9,19) node[block, dashed] (K) {\textbf{ГОСТ}\\\textbf{30804.4.7-2013}\\Изменение\\10.04.2018}
+        (14,19) node[block, draw=white] (L) {
+            \textbf{Общее руководство по}\\
+            \textbf{средствам измерений и}\\
+            \textbf{измерениям гармоник и}\\
+            \textbf{интергармоник для систем}\\
+            \textbf{электроснабжения и}\\
+            \textbf{подключаемых к ним}\\
+            \textbf{технических средств}};
+\draw[->,>=stealth,very thick](J2.east) -- (K.west);
+\draw[thick] ($(J2.north west)+(-0.3,0.6)$)  rectangle ($(L.south east)+(0.25,0.05)$);
+
+\path   (5,16) node[block, fill = lightgray] (J3) {\textbf{ГОСТ}\\\textbf{P 54149-2010}\\(10.01.2012-\\30.06.2014)}
+        (9,16) node[block, dashed] (K) {\textbf{ГОСТ}\\\textbf{32144-2013}\\Изменение\\10.04.2018}
+        (14,16) node[block, draw=white] (L) {
+            \textbf{Нормы качества}\\
+            \textbf{электрической энергии в}\\
+            \textbf{системах}\\
+            \textbf{электроснабжения общего}\\
+            \textbf{назначения}};
+\draw[->,>=stealth,very thick](J3.east) -- (K.west);
+\draw[thick] ($(J3.north west)+(-0.3,0.45)$)  rectangle ($(L.south east)+(0.3,-0.2)$);
+
+\draw [decorate,decoration={brace,amplitude=5pt}] (2.5,14.73) -- (2.5,23.5);
+
+\path   (5,13.36) node[block, dashed] (J) {\textbf{ГОСТ}\\\textbf{P 8.655-2009}\\(от 12.11.2009)}
+        (9,13.36) node[block, dashed] (K) {\textbf{ГОСТ}\\\textbf{P 8.655-2009}\\\textbf{Изменения 1}\\(01.11.2016)}
+        (14,13.36) node[block, draw=white] (L) {
+            \textbf{Средства изменений}\\
+            \textbf{показателей качества}\\
+            \textbf{электрической энергии.}\\
+            \textbf{Общие технические}\\
+            \textbf{требования}};
+\draw[->,>=stealth,very thick](J.east) -- (K.west);
+\draw[thick] ($(J.north west)+(-0.3,0.45)$)  rectangle ($(L.south east)+(0.5,-0.2)$);
+
+\path   (8,10.65) node[block, dashed] (J) {\textbf{ГОСТ}\\\textbf{P 51317.4.15-2012}\\Изменение\\10.04.2018}
+        (14,10.65) node[block, draw=white] (L) {
+            \textbf{Фликерметр.}\\
+            \textbf{Технические}\\
+            \textbf{требования и}\\
+            \textbf{методы испытаний}};
+\draw[thick] ($(J.north west)+(-3.3,0.35)$)  rectangle ($(L.south east)+(0.85,-0.3)$);
+
+\path (-1,10.65) node [block, fill = lightgray] (O) {\textbf{ГОСТ}\\\textbf{P 51317.4.15-99}\\(21.03.2000-\\01.01.2013)};
+\draw[->,>=stealth,very thick](O.east) -- ($(J.west)+(-3.3,0)$);
+
+\path   (4.8,7.9) node[block, dashed, minimum width=3cm, minimum height=0] (J) {\textbf{ГОСТ}\\\textbf{P 53333-2008}\\(27.05.2009-\\01.01.2014)}
+        (8.3,7.9) node[block, dashed, minimum width=3cm, minimum height=0] (K) {\textbf{ГОСТ}\\\textbf{32145-2013}\\(22.05.2014-\\01.01.2015)}
+        (11.8,7.9) node[block, dashed, minimum width=3cm, minimum height=0] (M) {\textbf{ГОСТ}\\\textbf{33073-2014}\\Изменение\\10.04.2018)}
+        (15,7.9) node[block, draw=white] (L) {
+            \textbf{\footnotesizeКонтроль и}\\[-3pt]
+            \textbf{\footnotesizeмониторинг}\\[-3pt]
+            \textbf{\footnotesizeкачества}\\[-3pt]
+            \textbf{\footnotesizeэлектрической}\\[-3pt]
+            \textbf{\footnotesizeэнергии в системах}\\[-3pt]
+            \textbf{\footnotesizeэлектроснабжения}\\[-3pt]
+            \textbf{\footnotesizeобщего назначения}};
+\draw[->,>=stealth,very thick](J.east) -- (K.west);
+\draw[->,>=stealth,very thick](K.east) -- (M.west);
+\draw[thick] ($(J.north west)+(-0.35,0.45)$)  rectangle ($(L.south east)+(-.1,-0.2)$);
+
+\path (-1,7.9) node [block, fill = lightgray] (O) {\textbf{РД}\\\textbf{153-34.0-15.501-00}\\(01.01.2001-\\01.01.2006)};
+\draw[->,>=stealth,very thick](O.east) -- ($(J.west)+(-0.35,0)$);
+
+\path   (6.4,5.1) node[block, dashed] (J) {\textbf{ГОСТ}\\\textbf{P 8.622-2013}\\Изменение\\10.04.2018}
+        (12.8,5.1) node[block, draw=white] (L) {
+            \textbf{Испытательное оборудование для}\\
+            \textbf{определения коэффициента проникания}\\
+            \textbf{тест-аэрозоля через средства}\\
+            \textbf{индивидуальной защиты органов}\\
+            \textbf{дыхания. Методика аттестации}};
+\draw[thick] ($(J.north west)+(-1.7,0.35)$)  rectangle ($(L.south east)+(0.3,-0.2)$);
+
+\path (-1,5.1) node [block, fill = lightgray] (O) {\textbf{РД}\\\textbf{153-34.0-15.502-00}\\(01.08.2002-\\01.08.2006)};
+\draw[->,>=stealth,very thick](O.east) -- ($(J.west)+(-1.7,0)$);
+
+\end{tikzpicture}
+\end{document}
