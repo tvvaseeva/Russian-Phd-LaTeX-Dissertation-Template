@@ -1,0 +1,35 @@
+
+\documentclass[tikz, border=10mm]{standalone}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\begin{document}
+	\begin{tikzpicture}
+	[LinePre/.style={<-,shorten <=0pt, >=stealth,thick}]
+	\node at (-7,-5) [shade, top color=white,bottom color=black!10,,shape=rectangle,minimum height=2cm,minimum width=3cm,draw,thick,align=center,name=acp] {АЦП}
+		  edge [LinePre] (-10,-5) (acp);	
+	\node at (-3,-5) [shade, top color=white,bottom color=black!10,label=15:$f_{0}$,shape=rectangle,minimum height=2cm,minimum width=3cm,draw,thick,align=center,name=acp2] {Метод обнаружения\\ основной частоты}
+		  edge [LinePre] (acp);
+	\node at (4,-5) [shade, top color=white,bottom color=black!10,shape=rectangle,,draw,diamond, aspect=2, draw, text badly centered, inner sep=0pt,align=center,name=formul] {Если $|f_{0}(k)-f_{0}(k-1)|<0,03\% f_{0}$? \\(ГОСТ 30804.4.7-2013)} 
+		  edge [LinePre] node [left] {} (acp2);
+	\node at (4,-1) [shade, top color=white,bottom color=black!10,shape=rectangle,minimum height=2cm,minimum width=3cm,draw,thick,align=center,name=No] {Нет}
+	      edge [LinePre] (formul);
+	\node at (4,-9) [shade, top color=white,bottom color=black!10,shape=rectangle,,minimum height=2cm,minimum width=3cm,draw,thick,align=center,name=Yes] {Да}
+		  edge [LinePre]  (formul);
+	\node at (8,-9) [shade, top color=white,bottom color=black!10,shape=rectangle,minimum height=2cm,minimum width=3cm,draw,thick,align=center,name=Spectral] {Спектральный\\ Анализ}
+		  edge [LinePre]  (Yes);
+	\node at (8,-1) [shade, top color=white,bottom color=black!10,,shape=rectangle,minimum height=2cm,minimum width=3cm,draw,thick,align=center,name=Yes] {Потеря\\ синхронизации}
+		  edge [LinePre]  (No);
+	\node at (-4,-2) [shade, top color=white,bottom color=black!10,,label=10:~~~~~~$N$,shape=rectangle,minimum height=1cm,minimum width=4cm,draw,thick,align=center,name=Cicle] {$f_{s}=\frac{N\times f_{0}}{\textrm{Цикл выборки}}$};
+	\draw [LinePre, ->] (-7,-2) -- (-7,-4);
+	\draw (-7,-2) -- (-6,-2);
+	\draw [LinePre, ->] (-0.5,-2) -- (-2,-2);
+	\draw [LinePre, ->] (-0.5,-2.25) -- (-2,-2.25);
+	\draw [LinePre] (1,-0.5) -- (0,-0.5);
+	\draw (-0.5,-2.25) -- (-0.5,-5);
+	\end{tikzpicture} 
+\end{document}
+
+
+%%	\path (1,-5) node [draw,diamond, aspect=2] {АЦП};

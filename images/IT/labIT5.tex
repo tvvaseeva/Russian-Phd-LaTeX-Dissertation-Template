@@ -1,0 +1,68 @@
+\documentclass[11pt]{article}
+\usepackage{lipsum}
+\usepackage[utf8x]{inputenc}
+\usepackage[russian]{babel}
+\setlength{\parindent}{0pt}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{width=10cm,compat=1.12}
+\definecolor{myblue}{HTML}{08088A} 
+\begin{document}
+	\begin{tikzpicture}
+	\begin{axis}[
+	title=Двухтактовое окно для интергармоники 90 Гц,
+	width=13cm,
+	height=5cm,
+	ybar,
+	ytick distance=0.2,
+	xtick distance=30,
+	xmin=0,
+	xmax=150,
+	ymin=0,
+	ymax=1,
+	enlarge x limits=0.125,
+	bar width=35pt,
+	y grid style={densely dotted, line cap=round},
+	ylabel={Амплитуда},
+	]
+	\addplot [fill=myblue] coordinates { 
+		(60,1)
+		(90,0.5)
+	};
+	\end{axis}
+	\node at (12,2.8) {а)};
+	\end{tikzpicture} 
+	\begin{tikzpicture}
+	\begin{axis}[
+	title=Двухтактовое окно для интергармоники 100 Гц,
+	width=13cm,
+	height=5cm,
+	ybar,
+	ytick distance=0.2,
+	xtick distance=30,
+	xmin=0,
+	xmax=180,
+	ymin=0,
+	ymax=1,
+	enlarge x limits=0.125,
+	bar width=35pt,
+	ylabel={Амплитуда},
+	xlabel={Частота (Гц)}
+	]
+	\addplot [fill=myblue] coordinates { 
+		(0,0.08)
+		(30,0.1)
+		(60,1)
+		(90,0.5)
+		(120,0.2)
+		(150,0.1)
+		(180,0.06)
+	};
+	\end{axis}
+	\node at (12,2.8) {б)};
+	\end{tikzpicture}
+	\begin{tikzpicture}
+	\node at (-10,-6) {Рис. 1 спектр промежуточных гармоник. а) синхронный анализ.};
+	\node at (-12,-6.5) {б) конструкция-хронологический анализ.};
+	\end{tikzpicture}
+\end{document}

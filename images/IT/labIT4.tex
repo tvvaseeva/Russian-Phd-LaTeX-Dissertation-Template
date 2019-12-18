@@ -1,0 +1,56 @@
+\documentclass[10pt, a4paper, openany]{book}
+\usepackage[cp1251]{inputenc}
+\usepackage[T2A]{fontenc}
+\usepackage[russian]{babel}
+\usepackage{tikz}
+\pagenumbering{gobble}
+\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{arrows.meta, arrows}
+\usepackage{lscape}
+\begin{document}
+\begin{landscape}
+		\begin{tikzpicture}[>=Stealth]
+		\node (a) at (2,3) [draw, align=center] {Гармонические и\\интергармонические измерения};
+		\node (b1) at (-2,1) [draw, align=center] {методы пакетной обработки\\ сигналов (широкополосная\\ синхронизаци для гармоник)};
+		\node (b2) at (8.5,0) [draw, align=left] {методы рекурсивного\\ (адаптивного) динамического анализа\\ 1.выбрать подходящую модель.\\ 2.выбрать подходящий порядок.\\ оценки на основе частоты выборки.\\
+		3.подставить оценочные значения в\\ спектральные выражения.\\};
+		\node (b3) at (8.5,-4) [draw, align=left] {Основная цель - повысить скорость\\ сходимости и обеспечить\\ подходящую числовую\\ стабильность\\ 
+	1.ADALINE.\\ 2.Фильтрация Калмана (Kalman\\ filtering).\\3.EPLL.\\4.другие.};
+		\node (b4) at (-6,-1.5) [draw, align=left] {Передискретизация (resampling):\\1.оценка основной частоты.\\2.управление АЦП для повторной\\выборки данных.};
+		\node (b5) at (2,-1.5) [draw, align=left] {интерполяризция(реконструкция)\\1.оценка основной частоты\\2.реконструкция на основе\\исходных данных.};
+		\node (c1) at (-8,-3.5) [draw, align=center] {Синхронизация\\};
+		\node (c2) at (-3.5,-3.5) [draw, align=center] {Потеря\\синхронизации};
+		\node (c3) at (-8.5,-7) [draw, align=left] {Основная цель - точнее
+		определить\\основную частоту и предотвратить\\гармонические, \\интергармонические, фликкерские,\\ шумовые и др. помехи.\\1.пересечения нулевого уровня\\(zero-crossing).\\2.FDI.\\3.chirp-z.\\4.PLL.\\5.другие.};
+		\node (c4) at (-2.5,-5.1) [draw, align=center] {Окна или другие методы\\
+		(параметрические методы и т.д.)};
+		\node (d1) at (-3.25,-7.5) [draw, align=left] {Уменьшение ошибки\\1.Хэннинга(Hanning).\\2.Хэмминга(Hamming).\\3.Блекмана(Blackman).\\4.Гаусса(Gaussian).\\5.другие.};
+		\node (d2) at (1,-7.9) [draw, align=left] {Высокое разрешение\\1.ESPRIT.\\2.Prony\\3.SVD.\\4.метод собственного\\анализа (eigen-analysis\\method).\\5.другие.};
+		\node (d3) at (7,-8.9) [draw, align=left] {Основная цель состоит в том, чтобы\\уменьшить ошибки реконструкции\\и предотвратить вмешательства\\1.метод Ньютона(Newton's\\method).\\2.многочлен.\\3.кубическийсплайн(cubic spline).\\4.RBFNN\\5.ANN\\6.другие.};
+		\draw[->] (node cs:name=a,anchor=south)
+		|- (0,2) -| (node cs:name=b2,anchor=north);
+		\draw[->] (node cs:name=a,anchor=south)
+		|- (0,2) -| (node cs:name=b1,anchor=north);
+		\draw[->] (node cs:name=b2,anchor=south)
+		|- (8.5,-2) -- (node cs:name=b3,anchor=north);
+		\draw[->] (node cs:name=b1,anchor=south)
+		|- (-6,0) -- (node cs:name=b4,anchor=north);
+		\draw[->] (node cs:name=b1,anchor=south)
+		|- (2,0) -- (node cs:name=b5,anchor=north);
+		\draw[->] (node cs:name=b4,anchor=south)
+		|- (-8,-2.65) -- (node cs:name=c1,anchor=north);
+		\draw[->] (node cs:name=b4,anchor=south)
+		|- (-3.5,-2.65) -- (node cs:name=c2,anchor=north);
+		\draw[->] (node cs:name=c1,anchor=south)
+	-- (node cs:name=c3,anchor=78);
+		\draw[->] (node cs:name=c2,anchor=south)
+	 -- (node cs:name=c4,anchor=154);
+		\draw[->] (node cs:name=c4,anchor=south)
+		|- (-3.25,-5.8) -- (node cs:name=d1,anchor=north);
+		\draw[->] (node cs:name=c4,anchor=south)
+		|- (1,-5.8) -- (node cs:name=d2,anchor=north);
+		\draw[->] (node cs:name=b5,anchor=south)
+		|- (5.15,-3.8) -- (node cs:name=d3,anchor=130);
+		\end{tikzpicture}
+	\end{landscape}
+\end{document}
