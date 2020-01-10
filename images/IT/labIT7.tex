@@ -1,0 +1,31 @@
+
+\documentclass[10pt,a4paper]{article} \usepackage[cp1251]{inputenc} \usepackage[english,russian]{babel} \usepackage{tikz}
+\begin{document}
+	\pagestyle{empty} % нумерация выключена
+	\begin{tikzpicture}
+	[pre/.style={->,shorten >=0pt, >=stealth,semithick}, post/.style={<-,shorten <=0pt, >=stealth,semithick},pred/.style={->,shorten <=0pt, >=stealth,semithick}]
+	\node at (1,0) [draw, align=center, name=a1, minimum height=1cm] {Предварительная \\ обработка} edge [post] node [above, align=center] {Вход \\напряжения} (-3,0);
+	\node at (1,-1) [minimum height=1cm] {Измерительная часть СИ};
+	\node at (1,-2) [draw, align=center, name=a2, minimum height=1cm] {Предварительная \\обработка}
+	edge [post] node [above, align=center] {Токовый \\вход} (-3,-2);
+	\node at (5,2) [shape=rectangle,draw, align=center, name=a3, minimum height=1cm] {Генерирование частоты \\дискретизации};
+	\node at (5,-1) [draw, align=center, name=a4, minimum height=1cm]  {Дискретизация};
+	\node at (8,-1) [draw, align=center, name=a5, minimum height=1cm]  {Дискретное \\ преобразование \\ Фурье} edge [post] (a4) edge [pre] node [above]{Выход 1} (11,-1);
+	\node at (8,-3) [draw, align=center, name=a6, minimum height=1cm]  {Группирование};
+	\node at (8,-5) [draw, align=center, name=a7, minimum height=1cm]  {Сглаживание} edge [post] (a6);
+	\node at (8,-7) [draw, align=center, name=a8, minimum height=1cm]  {Проверка\\ соответствия} edge [post] (a7); \node at (10,-5.7) {Выход 2а};
+	\node at (10,-6.5) {$Y_{g,h}$}; \node at (10,-8.5) {Выход 3а};
+	\node at (9,-9.5) {(проходит/не проходит)};
+	\draw (a1.north) [pre] ++ (right:0mm)|- (a3.west);
+	\draw (a1.east) [pre] ++ (right:5mm)|- (3.65,-0.8);
+	\draw (a1.east) -- ++ (right:5mm)|- (3.65,-0.8);
+	\draw (a2.east) [pre] ++ (right:5mm)|- (3.65,-1.2);
+	\draw (a2.east) -- ++ (right:5mm)|- (3.65,-1.2);
+	\draw (a5.east) --  ++ (right:3mm)|- ++(down:12mm) |- node [right] {$a_{k},b_{k},Y_{С,k}$}  ++(left:16.72mm) |- (a6.north);
+	\draw (a6.north) [post] ++ (down:0mm)|- (8,-2.2);
+	\draw (2,-4) -- node [above, align=center]{Значение активной \\ мощности} (7.5,-4);
+	\draw (7.5,-4.5) [post]++ (right:0mm)|-  (7.5,-4);
+	\draw (a8.north) [pre] ++(right:0mm)|- (11,-6);
+	\draw (a8.south) [pre] ++(right:0mm)|- (11,-9);
+	\end{tikzpicture}
+\end{document}

@@ -1,0 +1,20 @@
+\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[russian]{babel}
+\pgfplotsset{compat=1.13}
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[title=2-х цикловая интергармоника 90 Гц, xtick=data, ymin=0, ymax=1, ybar, width=\textwidth,height=50mm, /pgf/number format/1000 sep={}, ylabel= {Амплитуда}, legend style={ anchor=south, legend columns=-1}, every node near coord/.append style={font=\tiny}, nodes near coords align={vertical}, bar width=30pt]
+\addplot
+coordinates {(0,0.00) (30,0.0) (60,1) (90,0.4) (120,0.0) (150,0.0)};
+\end{axis}
+\end{tikzpicture}
+
+\begin{tikzpicture}
+\begin{axis}[title=2-х цикловая интергармоника 100 Гц, xtick=data, ymin=0, ymax=1, ybar, width=290pt, width=\textwidth, height=50mm, /pgf/number format/1000 sep={}, ylabel= {Амлитуда}, xlabel= {Частота (Гц)}, legend style={at={(0.5,-0.25)}, anchor=south, <- changed legend columns=-1 <- commented}, every node near coord/.append style={font=\tiny}, nodes near coords align={vertical}, ybar=0pt, bar width=30pt]
+\addplot
+coordinates {(0,0.05) (30,0.1) (60,1) (90,0.4) (120,0.2) (150,0.1) (180,0.05)};
+\end{axis}
+\end{tikzpicture}
+Фиг. 1. Спектр с интергамониками. (а) Синхронизированный анализ. (б) Десинхронизированный анализ.
+\end{document}
