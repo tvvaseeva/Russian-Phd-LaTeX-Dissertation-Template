@@ -749,8 +749,56 @@ $\sigma^2$ – дисперсия белого гауссовского шума
 
 Был предложен алгоритм интерполяции (interpolation) для обеспечения точной оценки частоты. Описанный алгоритм основан на заполнении нулями и методах подгонки основного лепестка (main-lobe). Это легко понять, и обладает преимуществом практической простоты. Стоимость – это увеличение вычислений для БПФ (FFT). Новый алгоритм совместим с большинством классических окон, не требует знания спектра окна данных (data window) и не требует каких-либо предварительных расчетов. С помощью компьютерного моделирования (computer simulations) была продемонстрирована эффективность предложенного алгоритма для различных окон. Влияние систематической ошибки (systematic error) и белого Гауссового шума (white Gaussian noise) на точность частотных оценок (frequency estimations) также было изучено. Кроме того, обсуждалась проблема IPE в традиционных алгоритмах интерполяции. Результаты моделирования показывают, что предлагаемый алгоритм обладает внутренней устойчивостью к IPE и более высокой устойчивостью к аддитивному шуму (additive noise), чем предыдущие алгоритмы интерполяции.
 
+Согласно определению в уравнениях \labelcref{eq:equation31} и \labelcref{eq:equation32}, имеем
 
+\begin{equation}
+\label{eq:equation62}
+\gamma_1 = \frac{\left| X(l-1)\right|}{\left| X(l)\right|} = \frac{\sin \pi({\delta + \varepsilon})}{\sin \pi \delta} \cdot \frac{h(\delta)}{h(\delta + \varepsilon)}
+\end{equation}
 
+\begin{equation}
+\label{eq:equation63}
+\gamma_2 = \frac{\left| X(l+1)\right|}{\left| X(l)\right|} = \frac{\sin \pi({\delta - \varepsilon})}{\sin \pi \delta} \cdot \frac{h(\delta)}{h(\delta - \varepsilon)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation64}
+\gamma = \frac{\left| X(l+1)\right|}{\left| X(l-1)\right|} = \frac{\sin \pi({\delta - \varepsilon})}{\sin \pi ({\delta + \varepsilon})} \cdot \frac{h({\delta + \varepsilon})}{h(\delta - \varepsilon)}
+\end{equation}
+
+Знаем $\gamma_1$, является монотонно убывающей функцией и $\gamma_2$, $\gamma$ является монотонно возрастающей функцией в зависимости от $\delta$ в диапазоне $[-0.5;0.5]$. Итак, можем получить
+
+\begin{equation}
+\label{eq:equation65}
+\gamma_{1 max} = \gamma_1 (\delta = - 0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 - 2 \varepsilon)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation66}
+\gamma_{1 min} = \gamma_1 (\delta = 0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 + 2 \varepsilon)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation67}
+\gamma_{2 max} = \gamma_2 (\delta = 0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 - 2 \varepsilon)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation68}
+\gamma_{2 min} = \gamma_2 (\delta = -0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 + 2 \varepsilon)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation69}
+\gamma_{max} = \gamma(\delta = 0,5) = \frac{1,5+ \varepsilon}{1,5 - \varepsilon}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation70}
+\gamma_{min} = \gamma(\delta = -0,5) = \frac{1,5 - \varepsilon}{1,5 + \varepsilon}
+\end{equation}
+
+Согласно бесконечному представлению Эйлера функции синуса:
 
 %\chapter{Длинное название главы, в которой мы смотрим на~примеры того, как будут верстаться изображения и~списки}\label{ch:ch2}
 %
