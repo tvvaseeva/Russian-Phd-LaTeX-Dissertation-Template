@@ -800,6 +800,77 @@ $\sigma^2$ – дисперсия белого гауссовского шума
 
 Согласно бесконечному представлению Эйлера функции синуса:
 
+\begin{equation}
+	\label{eq:equation71}
+	\sin \pi \delta = \pi \delta \prod\limits_{n = 1}^\infty \left( 1- \frac{\delta^2}{n^2} \right) 
+\end{equation}
+
+\begin{equation}
+\label{eq:equation72}
+E(\delta) = \frac{\sin(\pi \delta) }{h(\delta)} = \frac{\pi \delta \prod\limits_{n = 1}^\infty \left( 1- \frac{\delta^2}{n^2}\right)}{\pi \delta (1 - \delta^2)} = \prod\limits_{n = 2}^\infty \left( 1 - \frac{\delta^2}{n^2}\right) \geq 0 
+\end{equation}
+
+Находим производную $E(\delta)$:     
+
+\begin{equation}
+\label{eq:equation73}
+E'(\delta) = E(\delta)L(\delta)
+\end{equation}
+
+\begin{equation}
+\label{eq:equation74}
+L(\delta) = \sum_{n=2}^{\infty} \frac{-2 \delta}{n^2 - \delta^2} = \sum_{n=2}^{\infty} \left(  \frac{1}{n + \delta} -  \frac{1}{n - \delta} \right) 
+\end{equation}
+
+\begin{equation}
+\label{eq:equation75}
+D(\delta) = \frac{E(\delta)}{E(\delta + \epsilon)} = \frac{\prod\limits_{n = 2}^\infty \left( 1 - \frac{\delta^2}{n^2} \right) }{\prod\limits_{n = 2}^\infty \left( \frac{1 - (\delta + \epsilon)^2}{n^2}\right)} = \prod\limits_{n = 2}^\infty \frac{n^2 - \delta^2}{n^2 - (\delta + \epsilon)^2}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation76}
+D'(\delta) = \frac{E(\delta)L(\delta)E(\delta + \epsilon) - E(\delta)E(\delta + \epsilon)L(\delta + \epsilon)}{E^2 (\delta + \epsilon)} = \frac{E(\delta) [L(\delta) - L(\delta + \epsilon)])}{E(\delta + \epsilon)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation77}
+L(\delta) - L(\delta + \epsilon) = \sum_{n=2}^{\infty} \left(  \frac{\epsilon}{(n + \delta)(n + \delta + \epsilon)} + \frac{\epsilon}{(n - \delta)(n - \delta - \epsilon)} \right) > 0
+\end{equation}
+
+\begin{equation}
+\label{eq:equation78}
+D'(\delta) > 0 
+\end{equation}
+
+$D(\delta)$ -- монотонно возрастающая функция в зависимости от $\delta$, $\frac{1}{D(\delta)}$ -- монотонно убывающая функция. 
+
+На основании уравнения \labelcref{eq:equation72} $\gamma_1, \gamma_2$ могут быть представлены:
+
+\begin{equation}
+\label{eq:equation79}
+\gamma_1 = \frac{E(\delta + \epsilon)}{E(\delta)} 
+\end{equation}
+
+\begin{equation}
+\label{eq:equation80}
+\gamma_2 = \frac{E(\delta - \epsilon)}{E(\delta)} 
+\end{equation}
+
+\begin{equation}
+\label{eq:equation81}
+p(\delta) = \frac{[E(\delta + \epsilon)(3 + 2 \epsilon) + E(\delta - \epsilon)(3 - 2 \epsilon)]}{E(\delta)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation82}
+q(\delta) = \frac{[E(\delta + \epsilon)(3 - 2 \epsilon) + E(\delta - \epsilon)(3 + 2 \epsilon)]}{E(\delta)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation83}
+p'(\delta) = \frac{H_{p}(\delta, \epsilon)}{E(\delta)}
+\end{equation}
+
 %\chapter{Длинное название главы, в которой мы смотрим на~примеры того, как будут верстаться изображения и~списки}\label{ch:ch2}
 %
 %\section{Одиночное изображение}\label{sec:ch2/sec1}
