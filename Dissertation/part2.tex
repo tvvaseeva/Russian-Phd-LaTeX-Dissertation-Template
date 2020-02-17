@@ -945,6 +945,83 @@ I(\delta, \epsilon) = \frac{E(\delta - \epsilon)}{E(\delta + \epsilon)} \cdot \f
 \label{eq:equation96}
 K(\epsilon) = \frac{3 + 2\epsilon}{3 - 2\epsilon}
 \end{equation}
+
+Если $I(\delta, \epsilon) > 0$, $0 < K(\epsilon) < 1 < K (\epsilon)$, а также $K(- \epsilon)K(\epsilon) = 1$.
+
+\begin{equation}
+\label{eq:equation97}
+\frac{H_{p}(\delta, \epsilon)}{H_{p}(- \delta, \epsilon)} = \frac{I(\delta, \epsilon) - K(\epsilon)}{K(- \epsilon) - I(\delta, \epsilon)}
+\end{equation}
+ 
+\begin{equation}
+\label{eq:equation98}
+\frac{H_{q}(\delta, \epsilon)}{H_{q}(- \delta, \epsilon)} = \frac{K(- \epsilon) -  I(\delta, \epsilon)}{I(\delta, \epsilon) - K(\epsilon)}
+\end{equation}
+
+Если $\delta > 0$, то:
+\begin{equation}
+\label{eq:equation99}
+K(- \epsilon) < \frac{E(\delta + \epsilon)}{E(\delta - \epsilon)}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation100}
+1 < \frac{L(\delta) - L(\delta + \epsilon)}{L(\delta - \epsilon) - L(\delta)} < K(\epsilon)
+\end{equation}
+
+\begin{equation}
+\label{eq:equation101}
+K(- \epsilon) < I(\delta, \epsilon) < K(\epsilon)
+\end{equation}
+
+Подставив уравнение \labelcref{eq:equation101} в  \labelcref{eq:equation97} и  \labelcref{eq:equation98}, то $\frac{H_{p}(\delta, \epsilon)}{H_{p}(- \delta, \epsilon)} > 0$, а также $\frac{H_{q}(\delta, \epsilon)}{H_{q}(- \delta, \epsilon)} > 0$
+
+\begin{equation}
+\label{eq:equation102}
+T(\delta,  \epsilon) = \frac{L(\delta) - L(\delta + \epsilon)}{L(\delta - \epsilon) - L(\delta)} \cdot \frac{ \sum_{n = 2}^{\infty} a_{n}}{\sum_{n = 2}^{\infty} b_{n}}
+\end{equation}
+
+\begin{equation}
+\label{eq:equation103}
+a_{n} = \frac{1}{(n + \delta)(n + \delta - \epsilon)} + \frac{1}{(n - \delta)(n - \delta - \epsilon)} 
+\end{equation}
+
+\begin{equation}
+\label{eq:equation104}
+b_{n} = \frac{1}{(n + \delta)(n + \delta - \epsilon)} + \frac{1}{(n - \delta)(n - \delta + \epsilon)} 
+\end{equation}
+
+\begin{equation}
+\label{eq:equation105}
+C_{n} = \frac{a_{n}}{b_{n}} = \frac{n^2 -\delta^2 - \epsilon^2 + 2\delta \epsilon}{n^2 -\delta^2 - \epsilon^2 - 2\delta \epsilon} \cdot \frac{n^2 + \delta^2 + \delta \epsilon}{n^2 + \delta^2 - \delta \epsilon}
+\end{equation}
+
+Если $\delta > 0$, $\frac{n^2 - \delta^2 - \epsilon^2 +2\delta \epsilon}{n^2 - \delta^2 - \epsilon^2 - 2\delta \epsilon} > 1$ также $\frac{n^2 + \delta^2 + \delta \epsilon}{n^2 + \delta^2 - \delta \epsilon} > 1$, то:
+
+\begin{equation}
+\label{eq:equation106}
+C_{n} > C_{n + 1} > 1 
+\end{equation}
+
+\begin{equation}
+\label{eq:equation107}
+1 < T(\delta, \epsilon) < C_{2}
+\end{equation} 
+
+$C_{n}$ может быть записана:
+\begin{equation}
+\label{eq:equation108}
+C = \frac{1 + \frac{2 \delta \epsilon}{(n^2 - \delta^2 - \epsilon^2)}}{1 - \frac{2 \delta \epsilon}{(n^2 - \delta^2 - \epsilon^2)}} \cdot \frac{1 + \frac{\delta \epsilon}{(n^2 + \delta^2)}}{1 - \frac{\delta \epsilon}{(n^2 + \delta^2)}}
+\end{equation} 
+
+Вводя параметр $D_{1} =  \frac{2 \delta \epsilon}{(n^2 - \delta^2 - \epsilon^2)}$ и $D_{1} =  \frac{\delta \epsilon}{n^2 + \delta^2}$
+
+\begin{equation}
+\label{eq:equation109}
+C_{n} = \frac{1 + D_{1}}{1 - D_{1}} \cdot  \frac{1 + D_{2}}{1 - D_{2}} = \frac{1 + D_{1}D_{2} + D_{1} + D_{2}}{1 + D_{1}D_{2} - D_{1} - D_{2}} = \frac{1 + \frac{(D_{1} + D_{1})}{(1 + D_{1}D_{2})}}{1 - \frac{(D_{1} + D_{1})}{(1 + D_{1}D_{2})}}
+\end{equation} 
+
+ 
 %\chapter{Длинное название главы, в которой мы смотрим на~примеры того, как будут верстаться изображения и~списки}\label{ch:ch2}
 %
 %\section{Одиночное изображение}\label{sec:ch2/sec1}
