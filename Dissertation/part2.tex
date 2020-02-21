@@ -1206,6 +1206,200 @@ N_a[n] = round(k_{LMS} f_s / \hat{f}_g[n-1])
 N_b[n] = round(k_{MAF} f_s / \hat{f}_g[n-1])
 \end{equation}
 
+представляют количество образцов, используемых \labelcref{eq:equation126} и \labelcref{eq:equation127}. $ N_a[n] $ и $ N_b[n] $ получают на основе предыдущей оценки частоты сетки $ ({\hat{f}}_g[n-1]) $, поскольку текущая оценка $ ({\hat{f}}_g[n) $ еще не доступна, когда вычисляются $ N_a[n] $ и $ N_b[n] $.
+
+Общий метод изображен на \labelcref{img:picture18}. Первым этапом является вычисление обратных разностей $ \delta $ фаз и углов сетки с использованием \labelcref{eq:equation113}, \labelcref{eq:equation116} и \labelcref{eq:equation120}. На втором этапе выполняется первая оценка частоты сетки $ (f_g^\prime) $ методом LMS с использованием \labelcref{eq:equation126}. На третьем этапе получают оценку частоты сетки $ ({\hat{f}}_g) $ путем фильтрации первой оценки с использованием фильтра MAF с использованием \labelcref{eq:equation127}. Количество выборок в \labelcref{eq:equation126} и \labelcref{eq:equation127} определяется расчетной частотой сетки.
+
+Следует отметить, что дифференциатор LMS \labelcref{eq:equation119}, применяемый к фазовому углу, реализуется с помощью \labelcref{eq:equation120} и \labelcref{eq:equation126}.
+
+Оценщик в виде двух параметров: $ k_{LMS} $ и $ k_{MAF} $. Параметр $ k_{MAF} $ установлен в 1, так как это минимальное значение, которое позволяет отклонять гармонические помехи. Устанавливая это значение на минимум, время установления также сохраняется на минимуме. Однако для улучшения подавления гармоник, особенно если $ f_s/\ f_g $ не является целым числом, $ k_{MAF} $ может быть установлено на большее целое число. Недостатком является снижение динамики, увеличивающее время установления оценки.
+
+Параметр $ k_{LMS} $ устанавливается для минимизации влияния гармоник напряжения сети и дисбалансов в оценке частоты, как описано в следующем подразделе.
+
+\subsection{Метод выбора алгоритма LMS по количеству выборок} \label{sec:ch2/sec1_4}
+
+Чтобы выбрать значение параметра $ k_{LMS} $, анализируются коэффициенты усиления частотного отклика в частотах гармоник. Выбранный критерий состоит в том, чтобы минимизировать квадратный корень из суммы квадратов усиления $ (J_H) $ на этих частотах:
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics [width=0.9\linewidth] {f4.png}
+	\caption{Схема предлагаемого способа оценки частоты сетки.}
+	\label{img:picture18}
+\end{figure}
+
+\begin{equation}\label{eq:equation130}
+J_H=\sqrt{\sum_{h=1}^{h_{max}}{H^2(hf_g),}}\ \ \ \ \ \ \ h_{max}=int(\frac{1}{2}f_s/\ f_g)
+\end{equation}
+
+где функция int (x) возвращает целую часть числа x. Гармоника $ h_{max} $- это максимальный порядок гармоник основной частоты $ f_g $, который можно анализировать с частотой дискретизации $ f_s $.
+
+В качестве примера на \labelcref{img:picture19} показаны частотные характеристики оценщика LMS $ (H_{LMS}) $, фильтра MAF $ (H_{MAF}) $ и полного оценщика $ (H) $ для заданного набора значений $ f_s $, $ N_a $ и $ N_b $. Точки представляют коэффициенты усиления в гармониках для данной частоты сетки: $ f_g=52.6 Гц $. Сумма квадратов усиления должна быть минимизирована путем правильного выбора $ N_a $.
+
+На \labelcref{img:picture20} показана эволюция $ J_H $ как функции параметра $ N_a $ для тех же значений $ f_s $, $ N_b $ и $ f_g $, что и на \labelcref{img:picture19}. Функция имеет два локальных минимума (для показанного диапазона $ N_a $): $ N_a=14 $ и $ N_a=24 $. Чтобы улучшить динамику оценки (сократить время установления), выбирается нижнее значение: $ N_a=14 $. Следует отметить, что если частота дискретизации кратна частоте сетки, точки, представленные на \labelcref{img:picture19} будет соответствовать нулям MAF, а значение $ J_H $ на \labelcref{img:picture20} всегда будет равно нулю.
+
+Чтобы получить выражение для значения  $ N_a $ как функции от $ f_s $ и $ f_g $, было выполнено несколько симуляций, как показано на \labelcref{img:picture20}. Моделирование для частоты сетки между 30 Гц и 70 Гц (с шагом 1 МГц) и для частоты дискретизации между 500 Гц и 10 кГц (с шагом 50 Гц) позволяет сделать вывод, что значение $ N_a $, которое минимизирует $  J_H $, составляет:
+
+\begin{equation}\label{eq:equation131}
+N_a=round(1.431 f_s / f_g)
+\end{equation}
+
+и так, параметр $ k_{LMS} $ установлен в:
+
+\begin{equation}\label{eq:equation132}
+k_{LMS}=1.431
+\end{equation}
+
+\labelcref{img:picture21} иллюстрирует эволюцию величины $ J_H $ и число выборок, используемых устройство оценки LMS $ (N_a) $, и с помощью фильтра MAF $ (N_b) $ в зависимости от частоты сетки для конкретной частоты дискретизации с использованием 
+$ k_{LMS}=1.431 $ и $ k_{MAF}=1 $.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics [width=0.9\linewidth] {f5.png}
+	\caption{Частотные характеристики оценки LMS $ (H_{LMS}) $, фильтра MAF $ (H_{MAF}) $ и полной оценки (H) для $ f_s=500 Гц $, $ N_a=12 $ и $ N_b=10 $. $ (vertical\ scale\ =\ x^{1/5}) $.}
+	\label{img:picture19}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics [width=0.9\linewidth] {f6.png}
+	\caption{Эволюция $ J_H $ как функция параметра $ N_a $ для $ f_s=500 Гц $, 
+		$ N_b=10 $ и $ f_s=52.6 Гц $.}
+	\label{img:picture20}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics [width=0.9\linewidth] {f7.png}
+	\caption{Эволюция $ J_H $, $  N_a $ и $ N_b $ как функция частоты сетки для $ f_s=500 Гц $.}
+	\label{img:picture21}
+\end{figure}
+
+Значение $ J_H $ равно нулю всякий раз, когда $ f_g $ является фактором $ f_s $. Локальные максимумы $ J_H $ увеличиваются с увеличением частоты сетки.
+
+\subsection{Рекурсивная реализация} \label{sec:ch2/sec1_5}
+
+Чтобы улучшить вычислительные требования оценщика за счет сокращения количества операций и времени выполнения, должна использоваться рекурсивная реализация.
+
+Оценщик частоты LMS в \labelcref{eq:equation126} может быть выражен как:
+
+\begin{equation}\label{eq:equation133}
+f_g^\prime[n]=\frac{3f_s}{\pi} \dfrac{(N_a[n]-1) S_\delta[n] +(N_a[n]-2) S_{i \delta}[n] - S_{i^2 \delta[n]}} {N_a[n] (N_a[n]^2-1}
+\end{equation}
+
+где 
+
+\begin{equation}\label{eq:equation134}
+S_\delta[n] = \sum_{i=0}^{N_a[n]-2} \delta[n-i]
+\end{equation}
+
+\begin{equation}\label{eq:equation135}
+S_{i\delta}[n] = \sum_{i=0}^{N_a[n]-2} \delta[n-i]
+\end{equation}
+
+и 
+
+\begin{equation}\label{eq:equation136}
+S_{i^2\delta}[n] = \sum_{i=0}^{N_a[n]-2} i^2\delta[n-i]
+\end{equation}
+
+Фильтр MAF в \labelcref{eq:equation127} можно переписать как:
+
+\begin{equation}\label{eq:equation137}
+\hat{f}_g[n] = S_{\hat{f}_g} [n] / N_b[n]
+\end{equation}
+
+где 
+
+\begin{equation}\label{eq:equation138}
+S_{\hat{f}_g} [n] = \sum_{i=0}^{N_a[n]-1} \hat{f}_g [n-i]
+\end{equation}
+
+Если различия $ N_a $ и $ N_b $  между последовательными циклами ограничены до $ ±1 $, суммы $ S_{f_g^\prime}[n] $ могут быть реализованы рекурсивно. Несколько симуляций показали, что различия находятся в этом диапазоне даже при наличии частотного шага для частот дискретизации выше 500 Гц. Однако, если это условие не выполняется, рекурсивный алгоритм все еще работает должным образом, ограничивая различия до $ ±1 $ замедляя обновление $ N_a $ и  $ N_b $.
+
+Принимая во внимание это соображение, необходимы три случая, чтобы учесть изменения $ N_a $ и $ N_b $ в суммах, определенных рекурсивно. Рекурсивные версии \labelcref{eq:equation134} - \labelcref{eq:equation137} определяются соответственно \labelcref{eq:equation139} -  \labelcref{eq:equation142}:
+
+\begin{equation}\label{eq:equation139}
+\footnotesize{
+S_\delta[n]=
+\begin{cases}
+S_\delta[n-1]+\delta[n]-\delta_{n1}-\delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+S_\delta[n-1]+\delta[n]-\delta_{n1} , &\text{если $N_a[n]=N_a[n-1]$} \\
+S_\delta[n-1]+\delta[n] , &\text{если $N_a[n]=N_a[n-1]+1$}
+\end{cases}
+}
+\end{equation}
+
+\begin{equation}\label{eq:equation140}
+\footnotesize{
+S_{i\delta}[n]=
+\begin{cases}
+S_{i\delta}[n-1]+S_\delta[n-1]-k_1 \delta_{n1}-k_2 \delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+S_{i\delta}[n-1]+S_\delta[n-1]-k_1 \delta_{n1}, &\text{если $N_a[n]=N_a[n-1]$} \\
+S_{i\delta}[n-1]+S_\delta[n-1] , &\text{если $N_a[n]=N_a[n-1]+1$}
+\end{cases}
+}
+\end{equation}
+
+\begin{equation}\label{eq:equation141}
+\footnotesize{
+S_{i^{2}\delta}[n]=
+\begin{cases}
+S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1]-k_1^2\delta_{n1}-k_2^2\delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1]-k_1^2\delta_{n1}, &\text{если $N_a[n]=N_a[n-1]$} \\
+S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1] , &\text{если $N_a[n]=N_a[n-1]+1$}
+\end{cases}
+}
+\end{equation}
+
+И 
+
+\begin{equation}\label{eq:equation142}
+\footnotesize{
+S_{f^\prime_g}[n]=
+\begin{cases}
+S_{f^\prime_g}[n-1] + f^\prime_g[n] + f^\prime_g[n-N_b[n]] - f^\prime_g[n-N_b[n]-1] , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+S_{f^\prime_g}[n-1] + f^\prime_g[n] + f^\prime_g[n-N_b[n]], &\text{если $N_a[n]=N_a[n-1]$} \\
+S_{f^\prime_g}[n-1] + f^\prime_g[n] , &\text{если $N_a[n]=N_a[n-1]+1$}
+\end{cases}
+}
+\end{equation}
+
+где $ k_1=1-N_a[n] $, $ k_2=N_a[n] $, $ \delta_{n1}=\delta[n-N_a[n]+1] $ и $ \delta_{n2}=\delta[n-N_a[n]] $
+
+Реализация алгоритма с использованием рекурсивных и циклических буферов показана в Алгоритме 1. Алгоритм написан с использованием записи Octave / Matlab и является готовой к использованию функцией. Однако алгоритм не использует какие-либо конкретные функции Octave / Matlab, которые легко адаптируются к другим языкам программирования. При использовании метода циклического буфера оптимизируется время выполнения для доступа к значениям переменных в предыдущих циклах. Если линейно-нейтральные напряжения недоступны, алгоритм может использоваться с линейно-линейными напряжениями путем правильной настройки строки алгоритма с номером 20.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics [width=0.9\linewidth] {a1.png}
+	\caption{Алгоритм 1.}
+	\label{img:picture22}
+\end{figure}
+
+\begin{table} [htbp]
+	\centering
+	\changecaptionwidth\captionwidth{15cm}
+	\caption{Параметры оценщиков}\label{tab:Ts0Sib}%
+	\begin{tabular}{| p{3cm} | p{3cm} | p{3cm} | p{3cm}l | p{3cm}l |}
+		\hline
+		\hline
+		\multicolumn{1}{|c|}{LMSD} & \multicolumn{1}{c|}{WLLMP} & IRNTA & FLMS                                                       & DMD \\ \hline
+		\multicolumn{1}{|c|}{\begin{tabular}[c]{@{}c@{}}$k_{LMS}  = 1.431$\end{tabular}} &
+		\multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Размер\\ шага: $ \mu=0.048$\end{tabular}} &
+		\begin{tabular}[c]{@{}l@{}}Фактор забвения:\\ $\lambda =0.9645$\end{tabular} &
+		\begin{tabular}[c]{@{}l@{}}$\mu_{max} =0.024$\end{tabular} &
+		DFT: $h_1:$ один цикл треугольный \\ \hline
+		\multicolumn{1}{|c|}{\begin{tabular}[c]{@{}c@{}}$k_{MAF} = 1$\end{tabular}} &
+		\multicolumn{1}{c|}{} &
+		\multicolumn{1}{c|}{\begin{tabular}[c]{@{}l@{}}Начальное\\ значение ковариации: $ \delta = 100$\end{tabular}} &
+		\begin{tabular}[c]{@{}l@{}}$\mu_{min} =0.001$\end{tabular} &
+		\begin{tabular}[c]{@{}l@{}}Сглаживающий\\ фильтр:$ h_2: $двухтактный фильтр Кея\end{tabular} \\ \cline{1-2} \cline{4-5} 
+		&                            &       & \begin{tabular}[c]{@{}l@{}}$\lambda =0.97$\end{tabular} &     \\ \hline
+		&                            &       & $\gamma =0.01$                                             &     \\ \hline
+		&                            &       & $\rho=0.99$                                                &     \\ \hline
+		\hline
+	\end{tabular}
+\end{table}
+
 
 
 %\chapter{Длинное название главы, в которой мы смотрим на~примеры того, как будут верстаться изображения и~списки}\label{ch:ch2}
