@@ -5,39 +5,47 @@
 \usepackage{float}
 \begin{document}
 \definecolor{azure(colorwheel)}{rgb}{0.0, 0.5, 1.0}
-%\definecolor{brandeisblue}{rgb}{0.0, 0.44, 1.0}
-%\definecolor{brandeisblue}{rgb}{0.0, 0.44, 1.0}
-%\definecolor{blue}{rgb}{0.3, 0.5, 0.8}
-%\definecolor{bblue}{rgb}{0.22, 0.44, 0.77}
-	\begin{figure}
+%	\definecolor{cyan(process)}{rgb}{0.0, 0.72, 0.92}
+%	\definecolor{cyan(process)}{rgb}{0.0, 0.72, 0.92}
+		\begin{figure}
 		\begin{tikzpicture}
 		\draw (0,0)--(xyz cs:x=14.8) [->,line width=2pt,>=latex];
 		\draw (0,0)--(xyz cs:y=9) [->,line width=2pt,>=latex];
-		\node at (-0.5,9) {$Y_{c}$};
+		\node at (-0.5,9) {$Y_{g,h}$};
 		\node at (4.4,8.4) {$h+2$};
 		\node at (12.3,8.4) {$h+4$};
-		\node at (4.4,9) {Гармоническая подгруппа};
-		\node at (12.3,9.2) {Интергармоническая центрированная};
+		\node at (4.4,9) {Гармоническая группа};
+		\node at (12.3,9.2) {Интергармоническая группа};
 		\node at (12.3,8.8) {подгруппа};
 		\node at (1.2,-0.5) {$h+1$};
 		\node at (4.6,-0.5) {$h+2$};
 		\node at (7.7,-0.5) {$h+3$};
 		\node at (10.4,-0.5) {$h+4$};
 		\node at (14.3,-0.5) {$h+5$};
-		\node at (6.3,-1.1) {Порядок Гармоники};
-		\node at (14.3,-1.1) {Выход дискретного};
-		\node at (14.3,-1.6) {преобразования};
-		\node at (14.3,-2.1) {Фурье};
+		\node at (6.3,-1.1) {Порядок гармоники};
+		\node at (14.3,-1.1) {Выход ДПФ-вычислителя};
+		%\node at (14.3,-1.6) {преобразования};
+		%\node at (14.3,-2.1) {Фурье};
 	\begin{scope}[azure(colorwheel)!78!black,fill=azure(colorwheel),line width=3.2mm]
+		\draw (26.5mm,6mm)--(26.5mm,30mm);
+		\draw (29.5mm,6mm)--(29.5mm,60mm);
+		\draw (32.5mm,6mm)--(32.5mm,60mm);
+		\draw (35.5mm,6mm)--(35.5mm,60mm);
+		\draw (38.5mm,6mm)--(38.5mm,60mm);
+		\draw (41.5mm,6mm)--(41.5mm,60mm);
 		\draw (44.5mm,6mm)--(44.5mm,60mm);
 		\draw (47.5mm,6mm)--(47.5mm,60mm);
-		
-		\draw (131.7mm,6mm)--(131.7mm,60mm);
-		\draw (128.7mm,6mm)--(128.7mm,60mm);
-		\draw (125.7mm,6mm)--(125.7mm,60mm);
-		\draw (122.7mm,6mm)--(122.7mm,60mm);
-		\draw (119.7mm,6mm)--(119.7mm,60mm);
+		\draw (50.5mm,6mm)--(50.5mm,60mm);
+		\draw (53.5mm,6mm)--(53.5mm,30mm);
+				
+		\draw (107.7mm,6mm)--(107.7mm,60mm);
+		\draw (110.7mm,6mm)--(110.7mm,60mm);
+		\draw (113.7mm,6mm)--(113.7mm,60mm);
 		\draw (116.7mm,6mm)--(116.7mm,60mm);
+		\draw (119.7mm,6mm)--(119.7mm,60mm);
+		\draw (122.7mm,6mm)--(122.7mm,60mm);
+		\draw (125.7mm,6mm)--(125.7mm,60mm);
+		\draw (128.7mm,6mm)--(128.7mm,60mm);
 	\end{scope}
 	\begin{scope}[black,line width=0.5pt] 
 		\draw (10mm,6mm)--(10mm,80mm);
@@ -90,9 +98,7 @@
 	\end{scope}
 	\begin{scope}[azure(colorwheel)!90!white,fill=azure(colorwheel)!30!white,line width=2pt] 
 		\draw (10mm,6mm)--(10mm,80mm);
-		\draw (10mm,6mm)--(10mm,80mm);
 		\draw (76mm,6mm)--(76mm,80mm);
-		\draw (103mm,6mm)--(103mm,80mm);
 		\draw (142mm,6mm)--(142mm,80mm);
 	\end{scope}
 \end{tikzpicture}

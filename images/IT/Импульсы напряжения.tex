@@ -1,0 +1,49 @@
+%Преамбула
+\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[papersize={17cm,7.5cm}]{geometry}
+
+\pgfplotsset{compat=newest}
+\pagestyle{empty} % нумерация выкл.
+%Содержимое документа
+\begin{document}
+\begin{center}
+	\begin{tikzpicture}[scale=1]
+\draw (0,0) -- (10,0);
+\draw[dashed] (0,1)node[left,font=\large] {$U$} -- (10,1);
+\node[left,font=\large] at (0,0){$0$};
+\draw[dashed] (0,-1)node[left,font=\large] {$-U$} -- (10,-1); 
+\node[right,font=\large] at (10,0.3){$t$}; 
+%\foreach \x in {0,0.5,...,10}{\draw (\x,-0.1)node [below,font=\tiny,] {\x} -- (\x,0.1) ;}
+
+% Оси
+\draw[->] (0,0) -- (10.2,0) coordinate (x axis);
+\draw[->] (0,-1.5) -- (0,1.5) coordinate (y axis);
+
+
+% Импульсы напряжения
+\draw[ultra thick, red] (0,0) sin (1,1);
+\draw[ultra thick, red] (1,1) cos (2,0);    
+\draw[ultra thick, red] (2,0) sin (3,-1);   
+\draw[ultra thick, red] (3,-1) cos (4,0);
+
+\draw[ultra thick, red] (4,0) sin (4.1,0.31);
+\draw[ultra thick, red] (4.1,0.29) sin (4.1,2.3);
+\draw[ultra thick, red] (4.1,2) cos (4.2,0.8); 
+\draw[ultra thick, red] (4.2,0.8) sin (4.5,1);
+\draw[ultra thick, red] (4.5,1) cos (4.9,0.8); 
+\draw[ultra thick, red] (4.9,0.8) cos (5.2,-2); 
+\draw[ultra thick, red] (5.2,-2) sin (5.5,0.5);
+\draw[ultra thick, red] (5.5,0.5) cos (6,0);    
+\draw[ultra thick, red] (6,0) sin (7,-1);   
+\draw[ultra thick, red] (7,-1) cos (8,0);
+\draw[ultra thick, red] (8,0) sin (8.1,0.7); 
+\draw[ultra thick, red] (8.1,0.7) cos (8.2,-1.2);
+\draw[ultra thick, red] (8.2,-1.2) sin (8.3,0.9); 
+\draw[ultra thick, red] (8.3,0.9) sin (8.3,1); 
+\draw[ultra thick, red] (8.3,1) sin (8.7,1); 
+\draw[ultra thick, red] (8.7,1) cos (9,0);
+
+\end{tikzpicture}
+\end{center}
+\end{document}

@@ -1,124 +1,199 @@
-\chapter{Примеры вставки листингов программного кода}\label{app:A}
+%\chapter{Примеры вставки листингов программного кода}\label{app:A}
+%
+%Для крупных листингов есть два способа. Первый красивый, но в нём могут быть
+%проблемы с поддержкой кириллицы (у вас может встречаться в~комментариях
+%и печатаемых сообщениях), он представлен на листинге~\ref{lst:hwbeauty}.
+%\begin{ListingEnv}[!h]% настройки floating аналогичны окружению figure
+%    \captiondelim{ } % разделитель идентификатора с номером от наименования
+%    \caption{Программа ,,Hello, world`` на \protect\cpp}\label{lst:hwbeauty}
+%    % окружение учитывает пробелы и табуляции и применяет их в сответсвии с настройками
+%    \begin{lstlisting}[language={[ISO]C++}]
+%	#include <iostream>
+%	using namespace std;
+%
+%	int main() //кириллица в комментариях при xelatex и lualatex имеет проблемы с пробелами
+%	{
+%		cout << "Hello, world" << endl; //latin letters in commentaries
+%		system("pause");
+%		return 0;
+%	}
+%    \end{lstlisting}
+%\end{ListingEnv}%
+%Второй не~такой красивый, но без ограничений (см.~листинг~\ref{lst:hwplain}).
+%\begin{ListingEnv}[!h]
+%    \captiondelim{ } % разделитель идентификатора с номером от наименования
+%    \caption{Программа ,,Hello, world`` без подсветки}\label{lst:hwplain}
+%    \begin{Verb}
+%
+%        #include <iostream>
+%        using namespace std;
+%
+%        int main() //кириллица в комментариях
+%        {
+%            cout << "Привет, мир" << endl;
+%        }
+%    \end{Verb}
+%\end{ListingEnv}
+%
+%Можно использовать первый для вставки небольших фрагментов
+%внутри текста, а второй для вставки полного
+%кода в приложении, если таковое имеется.
+%
+%Если нужно вставить совсем короткий пример кода (одна или две строки),
+%то~выделение  линейками и нумерация может смотреться чересчур громоздко.
+%В таких случаях можно использовать окружения \texttt{lstlisting} или
+%\texttt{Verb} без \texttt{ListingEnv}. Приведём такой пример
+%с указанием языка программирования, отличного от~заданного по умолчанию:
+%\begin{lstlisting}[language=Haskell]
+%fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
+%\end{lstlisting}
+%Такое решение~--- со вставкой нумерованных листингов покрупнее
+%и вставок без выделения для маленьких фрагментов~--- выбрано,
+%например, в книге Эндрю Таненбаума и Тодда Остина по архитектуре
+%%компьютера~\autocite{TanAus2013} (см.~рис.~\ref{fig:tan-aus}).
+%
+%Наконец, для оформления идентификаторов внутри строк
+%(функция \lstinline{main} и~тому подобное) используется
+%\texttt{lstinline} или, самое простое, моноширинный текст
+%(\texttt{\textbackslash texttt}).
+%
+%Пример~\ref{lst:internal3}, иллюстрирующий подключение переопределённого
+%языка. Может быть полезным, если подсветка кода работает криво. Без
+%дополнительного окружения, с подписью и ссылкой, реализованной встроенным
+%средством.
+%\begingroup
+%\captiondelim{ } % разделитель идентификатора с номером от наименования
+%\begin{lstlisting}[language={Renhanced},caption={Пример листинга c подписью собственными средствами},label={lst:internal3}]
+%## Caching the Inverse of a Matrix
+%
+%## Matrix inversion is usually a costly computation and there may be some
+%## benefit to caching the inverse of a matrix rather than compute it repeatedly
+%## This is a pair of functions that cache the inverse of a matrix.
+%
+%## makeCacheMatrix creates a special "matrix" object that can cache its inverse
+%
+%makeCacheMatrix <- function(x = matrix()) {#кириллица в комментариях при xelatex и lualatex имеет проблемы с пробелами
+%    i <- NULL
+%    set <- function(y) {
+%        x <<- y
+%        i <<- NULL
+%    }
+%    get <- function() x
+%    setSolved <- function(solve) i <<- solve
+%    getSolved <- function() i
+%    list(set = set, get = get,
+%    setSolved = setSolved,
+%    getSolved = getSolved)
+%
+%}
+%
+%
+%## cacheSolve computes the inverse of the special "matrix" returned by
+%## makeCacheMatrix above. If the inverse has already been calculated (and the
+%## matrix has not changed), then the cachesolve should retrieve the inverse from
+%## the cache.
+%
+%cacheSolve <- function(x, ...) {
+%    ## Return a matrix that is the inverse of 'x'
+%    i <- x$getSolved()
+%    if(!is.null(i)) {
+%        message("getting cached data")
+%        return(i)
+%    }
+%    data <- x$get()
+%    i <- solve(data, ...)
+%    x$setSolved(i)
+%    i
+%}
+%\end{lstlisting} %$ %Комментарий для корректной подсветки синтаксиса
+%                 %вне листинга
+%\endgroup
+%
+%Листинг~\ref{lst:external1} подгружается из внешнего файла. Приходится
+%загружать без окружения дополнительного. Иначе по страницам не переносится.
+%\begingroup
+%\captiondelim{ } % разделитель идентификатора с номером от наименования
+%    \lstinputlisting[lastline=78,language={R},caption={Листинг из внешнего файла},label={lst:external1}]{listings/run_analysis.R}
+%\endgroup
 
-Для крупных листингов есть два способа. Первый красивый, но в нём могут быть
-проблемы с поддержкой кириллицы (у вас может встречаться в~комментариях
-и печатаемых сообщениях), он представлен на листинге~\ref{lst:hwbeauty}.
-\begin{ListingEnv}[!h]% настройки floating аналогичны окружению figure
-    \captiondelim{ } % разделитель идентификатора с номером от наименования
-    \caption{Программа ,,Hello, world`` на \protect\cpp}\label{lst:hwbeauty}
-    % окружение учитывает пробелы и табуляции и применяет их в сответсвии с настройками
-    \begin{lstlisting}[language={[ISO]C++}]
-	#include <iostream>
-	using namespace std;
+\chapter{Очень длинное название второго приложения, в~котором продемонстрирована работа с~длинными таблицами}\label{app:A}
 
-	int main() //кириллица в комментариях при xelatex и lualatex имеет проблемы с пробелами
-	{
-		cout << "Hello, world" << endl; //latin letters in commentaries
-		system("pause");
-		return 0;
-	}
-    \end{lstlisting}
-\end{ListingEnv}%
-Второй не~такой красивый, но без ограничений (см.~листинг~\ref{lst:hwplain}).
-\begin{ListingEnv}[!h]
-    \captiondelim{ } % разделитель идентификатора с номером от наименования
-    \caption{Программа ,,Hello, world`` без подсветки}\label{lst:hwplain}
-    \begin{Verb}
+Значения коэффициентов нечетных гармонических составляющих напряжения не кратных трем.
+\section{Подраздел приложения}\label{app:A1}
+\fontsize{10pt}{10pt}\selectfont
+\begin{longtable*}[c]{|c|c|c|c|c|} %longtable* появляется из 
+\hline
 
-        #include <iostream>
-        using namespace std;
+Порядок & 
+\multicolumn{4}{|l|}{Значения коэффициентов гармонических}  \\
+гармонической &
+\multicolumn{4}{|l|}{составляющих напряжения $K_{U(n)}$ ,\% ${U_1}$}\\		
+составляющей &
+\multicolumn{4}{|l|}{Напряжение электрической сети, кВ} \\			
+$n$ &
+$0,38$ кВ &
+$6-25$~кВ &
+$35$ кВ  &
+$110-220$~кВ \\
 
-        int main() //кириллица в комментариях
-        {
-            cout << "Привет, мир" << endl;
-        }
-    \end{Verb}
-\end{ListingEnv}
+\midrule %%% тонкий разделитель. Отделяет названия столбцов. Обязателен по ГОСТ 2.105 пункт 4.4.5 
+$5$ &
+$6$ &
+$4$ &
+$3$ &
+$1,5$ \\
 
-Можно использовать первый для вставки небольших фрагментов
-внутри текста, а второй для вставки полного
-кода в приложении, если таковое имеется.
+$7$ &
+$5$ &
+$3$ &
+$2,5$&
+$1$ \\
 
-Если нужно вставить совсем короткий пример кода (одна или две строки),
-то~выделение  линейками и нумерация может смотреться чересчур громоздко.
-В таких случаях можно использовать окружения \texttt{lstlisting} или
-\texttt{Verb} без \texttt{ListingEnv}. Приведём такой пример
-с указанием языка программирования, отличного от~заданного по умолчанию:
-\begin{lstlisting}[language=Haskell]
-fibs = 0 : 1 : zipWith (+) fibs (tail fibs)
-\end{lstlisting}
-Такое решение~--- со вставкой нумерованных листингов покрупнее
-и вставок без выделения для маленьких фрагментов~--- выбрано,
-например, в книге Эндрю Таненбаума и Тодда Остина по архитектуре
-%компьютера~\autocite{TanAus2013} (см.~рис.~\ref{fig:tan-aus}).
+$11$ &
+$3,5$ &
+$2$ &
+$2$ &
+$1$ \\
 
-Наконец, для оформления идентификаторов внутри строк
-(функция \lstinline{main} и~тому подобное) используется
-\texttt{lstinline} или, самое простое, моноширинный текст
-(\texttt{\textbackslash texttt}).
+$13$ &
+$3,0$ &
+$2$ &
+$1,5$ &
+$0,7$\\
 
-Пример~\ref{lst:internal3}, иллюстрирующий подключение переопределённого
-языка. Может быть полезным, если подсветка кода работает криво. Без
-дополнительного окружения, с подписью и ссылкой, реализованной встроенным
-средством.
-\begingroup
-\captiondelim{ } % разделитель идентификатора с номером от наименования
-\begin{lstlisting}[language={Renhanced},caption={Пример листинга c подписью собственными средствами},label={lst:internal3}]
-## Caching the Inverse of a Matrix
+$17$ &
+$2,0$ &
+$1,5$ &
+$1$ &
+$0,5$\\
 
-## Matrix inversion is usually a costly computation and there may be some
-## benefit to caching the inverse of a matrix rather than compute it repeatedly
-## This is a pair of functions that cache the inverse of a matrix.
+$19$ &
+$1,5$ &
+$1$	&
+$1$ &
+$0,4$\\
 
-## makeCacheMatrix creates a special "matrix" object that can cache its inverse
+$23$ &
+$1,5$ &
+$1$ &
+$1$ &
+$0,4$\\
 
-makeCacheMatrix <- function(x = matrix()) {#кириллица в комментариях при xelatex и lualatex имеет проблемы с пробелами
-    i <- NULL
-    set <- function(y) {
-        x <<- y
-        i <<- NULL
-    }
-    get <- function() x
-    setSolved <- function(solve) i <<- solve
-    getSolved <- function() i
-    list(set = set, get = get,
-    setSolved = setSolved,
-    getSolved = getSolved)
+$25$ &
+$1,5$ &
+$1$ &
+$1$ &
+$0,4$\\
 
-}
+$>25$ &
+$1,5$ &
+$1$ &
+$1$ &
+$0,4$\\
+\hline
+\end{longtable*}
 
 
-## cacheSolve computes the inverse of the special "matrix" returned by
-## makeCacheMatrix above. If the inverse has already been calculated (and the
-## matrix has not changed), then the cachesolve should retrieve the inverse from
-## the cache.
-
-cacheSolve <- function(x, ...) {
-    ## Return a matrix that is the inverse of 'x'
-    i <- x$getSolved()
-    if(!is.null(i)) {
-        message("getting cached data")
-        return(i)
-    }
-    data <- x$get()
-    i <- solve(data, ...)
-    x$setSolved(i)
-    i
-}
-\end{lstlisting} %$ %Комментарий для корректной подсветки синтаксиса
-                 %вне листинга
-\endgroup
-
-Листинг~\ref{lst:external1} подгружается из внешнего файла. Приходится
-загружать без окружения дополнительного. Иначе по страницам не переносится.
-\begingroup
-\captiondelim{ } % разделитель идентификатора с номером от наименования
-    \lstinputlisting[lastline=78,language={R},caption={Листинг из внешнего файла},label={lst:external1}]{listings/run_analysis.R}
-\endgroup
-
-\chapter{Очень длинное название второго приложения, в~котором продемонстрирована работа с~длинными таблицами}\label{app:B}
-
-\section{Подраздел приложения}\label{app:B1}
 Вот размещается длинная таблица:
 \fontsize{10pt}{10pt}\selectfont
 \begin{longtable*}[c]{|l|c|l|l|} %longtable* появляется из пакета ltcaption и даёт ненумерованную таблицу

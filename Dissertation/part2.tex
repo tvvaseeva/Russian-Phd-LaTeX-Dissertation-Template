@@ -1377,28 +1377,43 @@ S_{f^\prime_g}[n-1] + f^\prime_g[n] , &\text{если $N_a[n]=N_a[n-1]+1$}
 
 \begin{table} [htbp]
 	\centering
-	\changecaptionwidth\captionwidth{15cm}
-	\caption{Параметры оценщиков}\label{tab:Ts0Sib}%
-	\begin{tabular}{| p{3cm} | p{3cm} | p{3cm} | p{3cm}l | p{3cm}l |}
+	\caption{Параметры оценщиков.}%
+	\label{tab:makecell}%
+	\begin{tabular}{| c  c  c  c  c |}
 		\hline
-		\hline
-		\multicolumn{1}{|c|}{LMSD} & \multicolumn{1}{c|}{WLLMP} & IRNTA & FLMS                                                       & DMD \\ \hline
-		\multicolumn{1}{|c|}{\begin{tabular}[c]{@{}c@{}}$k_{LMS}  = 1.431$\end{tabular}} &
-		\multicolumn{1}{c|}{\begin{tabular}[c]{@{}c@{}}Размер\\ шага: $ \mu=0.048$\end{tabular}} &
-		\begin{tabular}[c]{@{}l@{}}Фактор забвения:\\ $\lambda =0.9645$\end{tabular} &
-		\begin{tabular}[c]{@{}l@{}}$\mu_{max} =0.024$\end{tabular} &
-		DFT: $h_1:$ один цикл треугольный \\ \hline
-		\multicolumn{1}{|c|}{\begin{tabular}[c]{@{}c@{}}$k_{MAF} = 1$\end{tabular}} &
-		\multicolumn{1}{c|}{} &
-		\multicolumn{1}{c|}{\begin{tabular}[c]{@{}l@{}}Начальное\\ значение ковариации: $ \delta = 100$\end{tabular}} &
-		\begin{tabular}[c]{@{}l@{}}$\mu_{min} =0.001$\end{tabular} &
-		\begin{tabular}[c]{@{}l@{}}Сглаживающий\\ фильтр:$ h_2: $двухтактный фильтр Кея\end{tabular} \\ \cline{1-2} \cline{4-5} 
-		&                            &       & \begin{tabular}[c]{@{}l@{}}$\lambda =0.97$\end{tabular} &     \\ \hline
-		&                            &       & $\gamma =0.01$                                             &     \\ \hline
-		&                            &       & $\rho=0.99$                                                &     \\ \hline
-		\hline
-	\end{tabular}
+		% 1 строка
+		%Колонка 1.1 
+		LMSD & 
+		%Колонка 1.2
+		WLLMP &
+		%Колонка 1.3
+		IRNTA & 
+		%Колонка 1.4
+		FLMS &
+		%Колонка 1.5
+		DMD \\ \hline
+
+		% 2 строка
+		\multicolumn{1}{|c}{\thead{$k_{LMS}  = 1.431$}} & \multicolumn{1}{c}{\thead{Размер шага:}} & \multicolumn{1}{c}{\thead{Фактор забвения}} & \multicolumn{1}{c}{\thead{$\mu_{max} =0.024$}} & \multicolumn{1}{c|}{\thead{DFT:}} \\ \hline
+		
+        % 3 строка
+	    \multicolumn{1}{|c}{\thead{$k_{MAF} = 1$}} & \multicolumn{1}{c}{\thead{$ \mu=0.048$}} & \multicolumn{1}{c}{\thead{$\lambda =0.9645$}} & \multicolumn{1}{c}{\thead{$\mu_{min} =0.001$}} & \multicolumn{1}{c|}{\thead{$h_1:$ один \\ цикл треугольный}} \\ \hline
+	    
+	    % 4 строка
+	    \multicolumn{2}{|c}{} & \multicolumn{1}{c}{\thead{Начальное значение \\ ковариации}} & \multicolumn{1}{c}{\thead{$\lambda =0.97$}} & \multicolumn{1}{c|}{\thead{\thead{Сглаживающий \\ фильтр:}}}  \\ \hline
+	   
+		% 5 строка
+		\multicolumn{2}{|c}{} & \multicolumn{1}{c}{\thead{$\delta = 100$}} & \multicolumn{1}{c}{\thead{$\gamma =0.01$}} & \multicolumn{1}{c|}{\thead{\thead{$h_1:$ один  двухтактный \\ фильтр Кея}}}  \\ \hline
+			   
+	   
+	    % 6 строка
+		\multicolumn{3}{|c}{} & \multicolumn{1}{c}{\thead{$\rho=0.99$}} & \multicolumn{1}{c|}{}  \\ \hline
+	\end{tabular}%
 \end{table}
+
+
+
+
 
 
 
