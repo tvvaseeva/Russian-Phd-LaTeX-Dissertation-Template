@@ -1,0 +1,110 @@
+% Преамбула
+\documentclass{proc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+
+%\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[papersize={30cm,30cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}  
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\pagestyle{empty} % Отключить нумерацию страницы
+
+\begin{document}
+\begin{center}
+	\begin{tikzpicture}
+	\tikzstyle{line} = [thick, blue]
+	
+% Координаты и названия осей (рисунок под буквой А)
+\node[right] at (0,10.75){u(t)};
+\node[left] at (0,9){0.8};
+\node[left] at (0,8){0.6};
+\node[left] at (0,7){0.4};
+\node[left] at (0,6){0.2};
+\node[left] at (0,5){0};
+\node[left] at (0,4){-0.2};
+\node[left] at (0,3){-0.4};
+\node[left] at (0,2){-0.6};
+\node[left] at (0,1){-0.8};
+\node[left] at (0,0){-1};
+\node[below] at (0,0){0};
+\node[below] at (2,0){500};
+\node[below] at (4,0){1000};
+\node[below] at (6,0){1500};
+\node[below] at (8,0){2000};
+\node[right] at (9,0.25){t}; 
+\node[below] at (4.25,-0.5){a)};
+
+% Координаты и названия осей (рисунок под буквой Б)
+\node[right] at (11,10.75){u(t)};
+\node[left] at (11,9){0.8};
+\node[left] at (11,8){0.6};
+\node[left] at (11,7){0.4};
+\node[left] at (11,6){0.2};
+\node[left] at (11,5){0};
+\node[left] at (11,4){-0.2};
+\node[left] at (11,3){-0.4};
+\node[left] at (11,2){-0.6};
+\node[left] at (11,1){-0.8};
+\node[left] at (11,0){-1};
+\node[below] at (11,0){0};
+\node[below] at (13,0){500};
+\node[below] at (15,0){1000};
+\node[below] at (17,0){1500};
+\node[below] at (19,0){2000};
+\node[right] at (20,0.25){t}; 
+\node[below] at (15.25,-0.5){б)};
+
+% График (рисунок под буквой А)
+\draw[thick, blue] (0,5) sin (0.25,10); \draw[thick, blue] (0.25,10) cos (0.5,5); 
+\draw[thick, blue] (0.5,5) sin (0.75,0); \draw[thick, blue] (0.75,0) cos (1,5); 
+\draw[thick, blue] (1,5) sin (1.25,10); \draw[thick, blue] (1.25,10) cos (1.5,5); 
+\draw[thick, blue] (1.5,5) sin (1.75,0); \draw[thick, blue] (1.75,0) cos (2,5); 
+\draw[thick, blue] (2,5) sin (2.25,10); \draw[thick, blue] (2.25,10) cos (2.5,5); 
+\draw[thick, blue] (2.5,5) sin (2.75,0); \draw[thick, blue] (2.75,0) cos (3,5);
+\draw[thick, blue] (3,5) sin (3.25,10); \draw[thick, blue] (3.25,10) cos (3.5,5); 
+\draw[thick, blue] (3.5,5) sin (3.75,0); \draw[thick, blue] (3.75,0) cos (4,5);
+\draw[thick, blue] (4,5) sin (4.25,10); \draw[thick, blue] (4.25,10) cos (4.5,5); 
+\draw[thick, blue] (4.5,5) sin (4.75,0); \draw[thick, blue] (4.75,0) cos (5,5); 
+\draw[thick, blue] (5,5) sin (5.25,10); \draw[thick, blue] (5.25,10) cos (5.5,5); 
+\draw[thick, blue] (5.5,5) sin (5.75,0); \draw[thick, blue] (5.75,0) cos (6,5); 
+\draw[thick, blue] (6,5) sin (6.25,10); \draw[thick, blue] (6.25,10) cos (6.5,5); 
+\draw[thick, blue] (6.5,5) sin (6.75,0); \draw[thick, blue] (6.75,0) cos (7,5);
+\draw[thick, blue] (7,5) sin (7.25,10); \draw[thick, blue] (7.25,10) cos (7.5,5); 
+\draw[thick, blue] (7.5,5) sin (7.75,0); \draw[thick, blue] (7.75,0) cos (8,5);
+
+% График (рисунок под буквой Б)
+\node (p1) at (11,5) {}; \node (p2) at (11.25,5.05) {}; \node (p3) at (11.5,5) {}; 
+\node (p4) at (11.75,4.95) {}; \node (p5) at (12,5.25) {}; \node (p6) at (12.25,5.5) {}; 
+\node (p7) at (12.5,5) {}; \node (p8) at (13,4) {}; \node (p9) at (13.25,5.5) {}; 
+\node (p10) at (13.5,7) {}; \node (p11) at (14,4) {}; \node (p12) at (14.25,2) {};
+\node (p13) at (14.5,6) {}; \node (p14) at (14.75,9) {}; \node (p15) at (15,3.8) {};
+\node (p16) at (15.25,0.2) {}; \node (p17) at (15.5,6.5) {}; \node (p18) at (15.75,10) {};
+\node (p19) at (16,6) {}; \node (p20) at (16.25,1) {}; \node (p21) at (16.5,4.5) {}; 
+\node (p22) at (16.75,8) {}; \node (p23) at (17,6) {}; \node (p24) at (17.25,3) {}; 
+\node (p25) at (17.5,4.5) {}; \node (p26) at (17.75,6) {}; \node (p27) at (18,5.125) {};
+\node (p28) at (18.25,4.25) {}; \node (p29) at (18.5,4.65) {}; \node (p30) at (18.75,5.05) {}; 
+\node (p31) at (19,5) {}; \node (p32) at (19.25,4.95) {}; \node (p33) at (19.5,5) {};
+\draw[line] (p1) sin (p2) cos (p3) sin (p4) cos (p5) sin (p6) cos (p7) sin (p8) cos (p9) sin (p10) 
+cos (p11) sin (p12) cos (p13) sin (p14) cos (p15) sin (p16) cos (p17) sin (p18) cos (p19) sin (p20) 
+cos (p21) sin (p22) cos (p23) sin (p24) cos (p25) sin (p26) cos (p27) sin (p28) cos (p29) sin (p30) 
+cos (p31) sin (p32) cos (p33);
+
+% Оси рисунков
+\draw[->] (0,0) -- (9.5,0) coordinate (x axis);
+\draw[->] (0,0) -- (0,10.5) coordinate (y axis);
+\draw[->] (11,0) -- (20.5,0) coordinate (x axis);
+\draw[->] (11,0) -- (11,10.5) coordinate (y axis);
+
+% Наименование рисунков
+\node[below] at (10.25,-1.5){Рисунок 2.8 - a) Напряжение до наложения на него окна;};
+\node[below] at (10.25,-2){б) Напряжение после наложения на него окна.};
+
+    \end{tikzpicture} 
+\end{center}
+\end{document}

@@ -1,1800 +1,970 @@
-%[154. - Yue Yi, Zhiqiang Liu, Rong Guo, Ruichen Sun. Design and Implementation of Digital Power Quality Analyzer. – 2016.]
+% ПЛАН
+%
+%# Глава 2 – Математические основы построения алгоритмов оценки параметров гармоник
+%
+%Выводы по главе:
+%
+%1. Математической основой для анализа спектра сигналов является преобразование Фурье. Для дискретных сигналов применяется дискретное преобразование Фурье.
+%2. При анализе спектра многотонального сигнала с помощью дискретного преобразования Фурье в большинстве случаев имеются гармоники частота которых не кратна частоте основной гармоники. При оценке их параметров необходимо учитывать изменение спектра сигнала, связанное с ограниченной длиной выборки этого сигнала.
+%3. При анализе спектра сигнала с ограниченной выборкой необходимо использовать оконные функции, поскольку в противном случае сигнал будет взвешен прямоугольной оконной функцией с плохой частотной характеристикой.
+%4. Применение оконной функции уменьшает количество информации, получаемое из сигнала, и, как следствие, увеличивается дисперсия оценки параметров сигнала, или, другими словами, ухудшается точность оценки параметров сигналов.
+%5. Ухудшение точности оценки можно определить исходя из предложенного в главе коэффициента окна. Данный коэффициент показывает, насколько уменьшиться точность оценки амплитуды гармоники для оптимальной несмещенной оценки при применении такого окна, а также может использоваться для оценки снижения точности параметров.
+%6. Алгоритмы для нахождения оптимальной несмещенной оценки параметров могут быть построены на основе методов оптимального приема, изучаемых в радиотехники, в частости, с помощью корреляционного анализа.
 
-\chapter{Система анализа данных} \label{ch:ch2}
+\chapter{Математические основы построения алгоритмов оценки параметров гармоник} \label{ch:ch2}
 
-\section{Многопоточность} \label{sec:ch2/sec1}
-% Разобраться в том, что такое многопоточность
+Вторая глава посвящена математическим основам построения алгоритмов оценки параметров гармоник.
 
-Система анализа данных(Data analysis System) принимает точные данные из системы сбора и анализа данных. Эта подсистема в основном состоит из частот, гармоник, алгоритма анализа мощности и многопоточности (multi-threading) для повышения эффективности функционирования системы. 
+Спектр сигнала определяется зависимостью сигнала от времени. Временная область и частотная связанны друг с другом с помощью преобразования Фурье. Практически преобразование Фурье определяется с помощью систем цифровой обработки сигналов (ЦОС). Точность гармонических моделей может обеспечить ЦОС, при условии, что математической основой является Дискретное преобразование Фурье (ДПФ, DFT -- Discrete Fourier Transform) или Быстрое преобразование Фурье (БПФ, FFT -- Fast Fourier Transform). 
+\cite{Time-frequency_Avramchuk_2009,Optimization_Computational_Altman2008,Building_suboptimal_Altman_2017}
+%1. Аврамчук В. С., Гончаров В. И. Чан Вьет Тьяу. Частотно-временной корреляционный анализ цифровых сигналов //Известия Томского политехнического университета. – 2009. – Т. 315. – №. 5. – С. 112-115.
+%9. Альтман Е. А. Оптимизация вычислительной схемы быстрого преобразования Фурье //Омский научный вестник. – 2008. – №. 1 (64).
+%10. Альтман Е. А. Построение субоптимальных моделей алгоритмов БПФ по основанию 2 //Информационно-телекоммуникационные системы и технологии. – 2017. – С. 409-411.
 
-Многопоточность была использована из-за следующих причин:
-\begin{enumerate}
-	\item Во-первых,АЦП DPQA должны взаимодействовать с пользователями, а это значит, что GUI (Графический Интерфейс Пользователя) должен реагировать за любые внутренние и внешние события. Если применяется последовательное программирование, пользователь может взаимодействовать только с АЦП DPQA, после того как программа завершилась. 
-	
-	\item Во-вторых, с АЦП DPQA требуется непрерывно получать данные, как только была нажата кнопка «Старт». Многопоточность представляет собой оптимальный способ, чтобы обеспечить обработку данных и одновременного их получения. В заключение, больше времени эффективно применять многопоточность для анализа алгоритмов с участием нескольких операций (т.~е. оконные функции – windowing, промежуточные – padding, FFT и кросс-корреляцию – cross-correlation). 
-\end{enumerate}
+%ДПФ
+\cite{Digital_processing_Sergienko_2011}
 
-\section{Алгоритмы расчета частоты} \label{sec:ch2/sec2}
-
-Чтобы рассчитать информацию о качестве электроэнергии, вычисляем сначала входную частоту. Существуют три альтернативных метода для вычисления частоты по дискретизированному сигналу(sampled signal):
+Методы цифровой фильтрации сигналов развивались динамично в последние годы. Появились новые математические методы (дискретное преобразование Фурье, быстрое преобразование Фурье, разряженное преобразование Фурье и др.), позволяющие создавать эффективные алгоритмы фильтрации. Фильтрация, в конечном счете, является не конечным этапом обработки сигналов, а предобработкой. Операции могут быть выполнены путем моделирования на персональных компьютерах или с помощью специализированной аппаратуры.
+Алгоритмы фильтрации сигналов условно разделяем на два класса:
 \begin{itemize}
-	\item Пересечение (Zero-Crossing).
-	\item Максимальная точка (Maximum-Point).
-	\item Дискретное преобразование Фурье (ДПФ).
+	\item Алгоритмы фильтрации в пространственной области.
+	\item Алгоритмы фильтрации в частотной области.
 \end{itemize}
-Метод ДПФ (FFT) используется для вычисления входных значений частоты. Формула ДПФ описана [152]:
-% [152 - Sundararajan D. The discrete Fourier transform: theory, algorithms and applications. – World Scientific, 2001.]
-\begin{equation}
-\label{eq:equation1}
-X(k) = \frac{1}{N} \sum\limits_{n=0}^{N-1} x(n)e^{-j\frac{2 \pi}{N}nk}
-\end{equation}
 
-где $N$ -- это число $k = 0, 1, \cdots, N-1$
 
-Для реализации ДПФ в Python используем алгоритм быстрого преобразования Фурье (БПФ, FFT). БПФ -- это эффективный алгоритм для вычисления ДПФ (DFT). Число операций необходимых для вычисления Дискретного преобразования Фурье пропорционально $N2$ и $N$ наблюдений при этом алгоритм БПФ требует число операций пропорциональное $Nlog(N)$ [153].
-% [153 -	Cooley J. W., Lewis P. A. W., Welch P. D. The fast Fourier transform and its applications //IEEE Transactions on Education. – 1969. – Т. 12. – №. 1. – С. 27-34.]
-После того, как реализовали алгоритм вычисления частоты, произошли проблемы разрешением частоты. Для обнаружения потоков сигналов в частотной области,  требуются улучшения разрешения. Сигнал частотной области, рассчитанный БПФ, имеет разрешение $0,5$~Гц. В результате, любое содержимое сигнала, которое существует между двух частот  с разделением $0,5$~Гц, будет полностью игнорироваться, и будет вызван неправильный результат частоты.
 
-Следовательно, разрешение по частоте должно быть улучшено, чтобы минимизировать ошибку вычисления. Используем ноль заполнение для улучшения разрешения БПФ. Из уравнения видно, что длина $X(k)$ полностью зависит от количества образцов $X (n)$.
+%Статья СРАВНИТЕЛЬНЫЙ АНАЛИЗ ПРИМЕНЕНИЯ АЛГОРИТМОВ ОПРЕДЕЛЕНИЯ ЧАСТОТЫ ПРИ ОЦЕНКЕ ГАРМОНИК В ЭЛЕКТРИЧЕСКИХ СЕТЯХ
+Существует большое число алгоритмов определения частоты для оценки гармоник в электрических сетях: ДПФ, интерполированный алгоритм ДПФ (IpDFT -- Interpolated Discrete Fourier Transform), техника заполнения нулями (Zero-crossing), и другие.
+\section{Быстрое преобразование Фурье} \label{sec:ch2/sec1}
 
-Текущий сигнал задается уравнением:
-\begin{equation}
-\label{eq:equation2}
-I = R_{HallEffect} \times  I_{ADC} + Offset
-\end{equation}
+Применение алгоритмов БПФ началось после публикации работы Джеймса Кули (James Cooley) и Джона Тьюки (John Tukey) в $1965$ году \cite{cooley1965algorithm}. 
 
-где $R_{HallEffect}$ -- коэффициент выхода напряжения на эффекте Холла;
+В работе Кули и Тьюки была ссылка на публикацию Ирвинга Гуда (Irving Good) \cite{good1958interaction} в $1958$ году, в которой был рассмотрен алгоритм, получивший названияb алгоритм Гуда–Томаса или алгоритм простых чисел. Алгоритм получил известность после публикации Ллевеллина Томаса (Llewellyn Thomas) об использовании этого алгоритма для задач физики \cite{thomas1963using}.
 
-$I_{ADC}$ -- необработанные текущие данные из АЦП, добавлено смещение, постоянное смещение от схемы регулировки;
+В 1966 году Филип Рудник (Philip Rudnick) опубликовал похожую работу \cite{rudnick1966note}. В ней была ссылка на работу Гордона Даниельсона (Gordon Danielson) и Корнелиуса Ланкоса (Cornelius Lanczos) \cite{danielson1942some} в которой приведены формулы для разложения тригонометрических рядов. 
 
-Модификация сигнала напряжения:
-\begin{equation}
-\label{eq:equation3}
-V = R_Trans former\times V_ADC + Offset
-\end{equation}
-где $R_Trans former$ -- Коэффициент обмотки трансформатора;
-$V_{ADC}$ -- представляет собой исходные данные напряжения от АЦП;
+Научная работа Иоганна Гаусса (Johann Gauss), которая была опубликована после его смерти в сборнике не опубликованных рукописей \cite{gauss1866nachlass}.
 
-Из уравнения \labelcref{eq:equation2} длина волны $X(k)$ зависит от количества образцов $X(n)$. Если добавлять нули в конец $X(n)$, способны эффективно увеличить количество образцов $X(n)$ без изменения фактического сигнала. Это будет также увеличивать размер $X(k)$. $X(k)$ не меняется, потому что $X(n)$ остается прежним сигналом. Приращение частоты bins из $X(k)$ мы будем сжимать bins ближе к друг другу, который дает разрешение по частоте.
+Идеи, которые рассмотрены в алгоритме Кули–Тьюки были отрыты
+в XIX веке несколько раз. Поэтому сложно предположить кто из авторов первый открыл алгоритм.
 
-\section{Алгоритмы вычисления амплитуды гармоник} \label{sec:ch2/sec3}
+Алгоритм БПФ снижает вычислительную сложность ДПФ и применяется, когда количество отсчетов сигнала пропорционально степени $2$ \cite{Quick_conversion_1985}. Исходная последовательность в обобщенном случае может быть другого размера,но данное условие помогает лучше вычислить БПФ. 
 
-Содержание гармоник до $20$ гармоники. Содержание гармоник можно извлечь из частотного спектра, после того как мы получили основную частоту БПФ (FFT) напряжения и текущего значения. Гармоники расположены в частотной области, которые являются положительными целыми числами, кратными основной частоте. Чтобы получить гармоники используем частотный индекс и умножаем его на целые числа. После этого берем амплитуды тока и напряжения от БПФ (FFT) на основе рассчитанного индекса. Результаты гармоник не точные (из результатов тестирования). Причина заключается в том, что измеренный нами сигнал ограничен по времени. При выполнении БПФ (FFT), есть частота сглаживания (frequency aliasing). Если заполнять нулями массив, то длина данных увеличивается, и гармоника может не располагать точным частотным индексом (из-за ошибок в вычислениях).
+БПФ Кули-Тьюки имеет две разновидности: прореживание по времени и частоте \cite{Digital_processing_Goldenberg_1985}. 
 
-Чтобы решить проблему, вместо использования рассчитанного индекса для получения амплитуды гармоник, ищем индексы. Находим максимальную точку в этом индексе. Тогда максимальная амплитуда будет точкой максимальной амплитуды в пределах диапазона.
+В таких алгоритмах $S$-точечная последовательность на первом шаге делится на две $S/2$ последовательности, на следующем шаге каждая из полученных последовательностей делится еще на две равной длины и~т.~д., пока размер не будет равен двум отсчетам. 
+Прореживание по времени делит исходную последовательность размером $S$ на две размером $S/2$, состоящие из четных и из нечетных отсчетов. Прореживание по частоте первую последовательность заполняет первыми $S/2$ отсчетами исходной, вторую -- оставшимися $S/2$ отсчетами. На каждом шаге двух вариантов прореживания применяется один и тот же алгоритм. Оба метода имеют схожую структуру, но отличаются весовыми коэффициентами. Поэтому каждый из алгоритмов вычисляет все отсчеты исходной последовательности за одинаковое количество арифметических операций: $(\frac{S}{2})\log2S$ комплексных умножений и $S\log2S$ комплексных сложений.
 
-\section{Коэффициент мощности и алгоритм расчета энергопотребления} \label{sec:ch2/sec4}
+В последующие годы были разработаны более быстрые алгоритмы вычисления преобразования Фурье. Одними из таких методов при определенных условиях является алгоритм Винограда, теоретико-числовое преобразование.
 
-Для нахождения коэффициента мощности была применена перекрестная корреляция (Cross Correlation), а также идентификация триггера (Trig Identity). Перекрестная корреляция нужна для того, чтобы найти более точные результаты идентификации триггера вместо взаимной корреляции. Рассмотрим два сигнала, первый сигнал представляет напряжение из уравнения \labelcref{eq:equation4}, другой~–-~ток из уравнения 
+В качестве главного способа измерения гармоник напряжения 
+ГОСТ Р 51317.4.7–2008 \cite{ГОСТР51317.4.7-2008} определяет дискретное преобразование Фурье (ДПФ) или быстрое преобразование Фурье (БПФ), которые применяются вместе с дополнительными операциями над данными, например, их сглаживание и взвешивание. Однако это не исключает применение других принципов анализа гармоник \cite{ГОСТР51317.4.7-2008}.
 
-\labelcref{eq:equation5}:
-\begin{equation}
-\label{eq:equation4}
-V = A \cos(\omega t)
-\end{equation}
-
-\begin{equation}
-\label{eq:equation5}
-I = B \cos (\omega t + \theta)
-\end{equation}
-
-Ток содержит разность фаз $\theta$. Умножение двух сигналов вместе дает \labelcref{eq:equation6}:
-
-\begin{equation}
-\label{eq:equation6}
-\left| {V \times I}\right| = \left|A \right| \times \left|B \right| \times \cos \theta  
-\end{equation}
-
-Разность фаз может быть найдена как \labelcref{eq:equation7}:
-
-\begin{equation}
-\label{eq:equation7}
-\theta = \cos^{-1} \frac{V \times I}{A \times B}  
-\end{equation}
-
-Уравнение \labelcref{eq:equation7} можно записать в дискретной форме:
-
-\begin{equation}
-\label{eq:equation8}
-\theta = \cos^{-1} \frac{\sum V\left[ n \right] I\left[ n \right]}{\sqrt{\sum{{\left| V\left[ n \right]\right|}^2} \sum{{\left| I\left[ n \right]\right|}^2}}}
-\end{equation}
-
-Функция обратного косинуса может возвращать величину $\theta$, которая означает полярность коэффициента мощности. Чтобы найти полярность коэффициента мощности, используется кросс-корреляцию:
-
-\begin{equation}
-\label{eq:equation9}
-R_{VI}(l) = \sum_{n=-\infty}^{\infty}V(n)I(n-l)
-\end{equation}
-где $l=0,\mp1,\mp2,\dots$
-
-$R_{VI}(l)$ -- является наибольшим $l$, в котором напряжение и ток сигнала имеют наибольшее сходство.
-
-Знак перед $l$ показывает является ли коэффициент мощности нагрузки опережающим или запаздывающим. Отрицательное $l$ означает, что текущий сигнал смещен влево. Интервал выборки характеризует отстающую нагрузку. Положительное значение $l$ означает, что нагрузка является ведущей нагрузкой, $l=0$ говорит о том, что нагрузка резитивная (purely resistive). Получение коэффициента мощности позволит рассчитать потребляемую мощность нагрузки.
-
-Из алгоритма нахождения гармоник и амплитуд находим амплитуду содержания гармоник и рассчитываем реальную реактивную мощность в уравнениях (\labelcref{eq:equation10} и \labelcref{eq:equation11}):
-
-\begin{equation}
-\label{eq:equation10}
-P_{real} = I\times V \cos \theta
-\end{equation}
-
-\begin{equation}
-\label{eq:equation11}
-P_{reactive} = I\times V \sin \theta
-\end{equation}
-
-\section{Интерполированные алгоритмы ДПФ с нулевым заполнением для классических окон} \label{sec:ch2/sec5}
-% [155. - Luo J., Xie Z., Xie M. Interpolated DFT algorithms with zero padding for classic windows //Mechanical Systems and Signal Processing. – 2016. – Т. 70. – С. 1011-1025.]
-
-Точная оценка параметров (частоты, амплитуды и фазы) для синусоид, загрязненных случайным шумом (random noise), была предметом исследований в различных областях в течение нескольких десятилетий. Например, общая проблема, возникающая при анализе вибрации для вращающихся машин является оценкой параметров дискретизированных многочастотных сигналов в присутствии аддитивного шума (additive noise) [156].
-
-% [156. - Santamaria I., Pantaleon C., Ibanez J. A comparative study of high-accuracy frequency estimation methods //Mechanical Systems and Signal Processing. – 2000. – Т. 14. – №. 5. – С. 819-834.]
-
-С увеличением применения в нелинейных устройствах (non-linear devices) и периодических временных переменных нагрузок в электроэнергетических системах, искажение тока и напряжения сигналов (voltage waveforms) становится серьезной проблемой. Поэтому анализ и контроль гармоник электрической мощности в реальном времени имеет большое значение для поддержания качества электрической энергии (electrical energy), предотвращения повреждения систем электрических сетей (network systems) и экономии энергии (saving energy)[157][158].
-
-% [157.- Zhang F., Geng Z., Yuan W. The algorithm of interpolating windowed FFT for harmonic analysis of electric power system //IEEE transactions on power delivery. – 2001. – Т. 16. – №. 2. – С. 160-164.]
-
-%[158.- Qian H., Zhao R., Chen T. Interharmonics analysis based on interpolating windowed FFT algorithm //IEEE Transactions on Power Delivery. – 2007. – Т. 22. – №. 2. – С. 1064-1069.]
-Кроме того, ряд аудио кодирования (audio coding) технологий были недавно разработан, где звуковой сигнал (audio signal) раскладывается на синусоиды и шума перед кодированием. Разложение (decomposition), конечно, зависит от точной оценки частоты (frequency estimation) звукового сигнала [159]. 
-% [159.- Ferreira A., Sinha D. Accurate and robust frequency estimation in the ODFT domain //IEEE Workshop on Applications of Signal Processing to Audio and Acoustics, 2005. – IEEE, 2005. – С. 203-206.]
-
-В предшествующей литературе были представлены различные подходы к оценке, которые обычно можно классифицировать на временную область и частотную область. Учитывая их простую работу и высокую эффективность, часто используются подходы в частотной области, основанные на дискретном преобразовании Фурье (discrete Fourier transform – DFT) и реализованные с помощью быстрого преобразования Фурье (fast Fourier transform – FFT). Тем не менее, существуют некоторые присущие методам частотной области недостатки, такие как эффект пикет-ограды (picket fence effect – PFE) и эффект спектральной утечки (spectral leakage effect – SLE) [158]. 
-% [158. - Qian H., Zhao R., Chen T. Interharmonics analysis based on interpolating windowed FFT algorithm //IEEE Transactions on Power Delivery. – 2007. – Т. 22. – №. 2. – С. 1064-1069.]
-
-Они могут вносить существенные ошибки в оценки частоты, если сигнал некогерентно дискретизирован (noncoherently sampled) [160][161].
-
-Исследования показали, что если можно позволить себе дополнительные вычислительные затраты, можно компенсировать ошибки и получить высокоточные оценки частоты даже с небольшим количеством выборок [156].
-% [156.- Santamaria I., Pantaleon C., Ibanez J. A comparative study of high-accuracy frequency estimation methods //Mechanical Systems and Signal Processing. – 2000. – Т. 14. – №. 5. – С. 819-834.]
-
-Интерполированный алгоритм DFT (IpDFT) является одним из наиболее широко изученных методов оценки [156] ,[157], [158], [159], [160], [161],.[162], [163], [164], [165], [166], [167], [168], [169], [170], [171]. 
-% [156.-Santamaria I., Pantaleon C., Ibanez J. A comparative study of high-accuracy frequency estimation methods //Mechanical Systems and Signal Processing. – 2000. – Т. 14. – №. 5. – С. 819-834.]
-
-% [157.-Zhang F., Geng Z., Yuan W. The algorithm of interpolating windowed FFT for harmonic analysis of electric power system //IEEE transactions on power delivery. – 2001. – Т. 16. – №. 2. – С. 160-164.]
-
-%[158.-Qian H., Zhao R., Chen T. Interharmonics analysis based on interpolating windowed FFT algorithm //IEEE Transactions on Power Delivery. – 2007. – Т. 22. – №. 2. – С. 1064-1069.]
-
-%[159.	Ferreira A., Sinha D. Accurate and robust frequency estimation in the ODFT domain //IEEE Workshop on Applications of Signal Processing to Audio and Acoustics, 2005. – IEEE, 2005. – С. 203-206.]
-
-%[160.-Xie M., Adams D. F. A nonlinear finite element analysis for composite materials //Finite elements in analysis and design. – 1996. – Т. 22. – №. 3. – С. 211-223.]
-
-%[161.-Luo J., Xie M. Phase difference methods based on asymmetric windows //Mechanical Systems and Signal Processing. – 2015. – Т. 54. – С. 52-67.]
-
-%[162.-Jain V. K., Collins W. L., Davis D. C. High-accuracy analog measurements via interpolated FFT //IEEE Transactions on Instrumentation and Measurement. – 1979. – Т. 28. – №. 2. – С. 113-122.]
-
-% [163.-Grandke T. Interpolation algorithms for discrete Fourier transforms of weighted signals //IEEE transactions on instrumentation and measurement. – 1983. – Т. 32. – №. 2. – С. 350-355.]
-
-%[164.-Andria G., Savino M., Trotta A. Windows and interpolation algorithms to improve electrical measurement accuracy //IEEE Transactions on Instrumentation and Measurement. – 1989. – Т. 38. – №. 4. – С. 856-863.]
-
-%[165.-Offelli C., Petri D. Interpolation techniques for real-time multifrequency waveform analysis //6th IEEE Conference Record., Instrumentation and Measurement Technology Conference. – IEEE, 1989. – С. 325-331.]
-
-%[166.-Agrez D. Weighted multipoint interpolated DFT to improve amplitude estimation of multifrequency signal //IEEE Transactions on Instrumentation and Measurement. – 2002. – Т. 51. – №. 2. – С. 287-292.]
-
-%[167.-Jacobsen E., Kootsookos P. Fast, accurate frequency estimators [DSP Tips & Tricks] //IEEE Signal Processing Magazine. – 2007. – Т. 24. – №. 3. – С. 123-125.]
-
-%[168.	Belega D., Dallet D. Multifrequency signal analysis by interpolated DFT method with maximum sidelobe decay windows //Measurement. – 2009. – Т. 42. – №. 3. – С. 420-426.]
-
-%[169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-
-%[170.-Duda K. DFT interpolation algorithm for Kaiser–Bessel and Dolph–Chebyshev windows //IEEE Transactions on Instrumentation and Measurement. – 2011. – Т. 60. – №. 3. – С. 784-790.]
-
-%[171.-Schoukens J., Pintelon R., Van Kamme H. The interpolated fast Fourier transform: A comparative study //[1991] Conference Record. IEEE Instrumentation and Measurement Technology Conference. – IEEE, 1991. – С. 358-364.]
-
-Основная идея этого метода заключается в том, что частотная ошибка (frequency error) может быть компенсирована отношением средневзвешенного значения (weighted average) определенного числа известных спектральных бинов вокруг локального максимума. Когда максимум боковых лепестков (sidelobe) выбрано окно распада (MSDW, также известное как Райф-Винсент (Rife–Vincent) класс I окна), ошибка частоты может получить с помощью простых аналитических зависимосытей [166], [167], [168], [169]. 
-%[166.-Agrez D. Weighted multipoint interpolated DFT to improve amplitude estimation of multifrequency signal //IEEE Transactions on Instrumentation and Measurement. – 2002. – Т. 51. – №. 2. – С. 287-292.]
-
-%[167.-Jacobsen E., Kootsookos P. Fast, accurate frequency estimators [DSP Tips & Tricks] //IEEE Signal Processing Magazine. – 2007. – Т. 24. – №. 3. – С. 123-125.]
-
-%[168.	Belega D., Dallet D. Multifrequency signal analysis by interpolated DFT method with maximum sidelobe decay windows //Measurement. – 2009. – Т. 42. – №. 3. – С. 420-426.]
-
-%[169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-
-Основываясь на работе Оффелли (Offelli) и Петри (Petri) [165], 
-%[165.-Offelli C., Petri D. Interpolation techniques for real-time multifrequency waveform analysis //6th IEEE Conference Record., Instrumentation and Measurement Technology Conference. – IEEE, 1989. – С. 325-331.]
-Дуда (Duda) вывел алгоритм интерполяции полиномиального приближения (polynomial approximation interpolation – PAIpDFT), который можно использовать для окон Дольфа-Чебышева (Dolph–Chebyshev) и окон Кайзера-Бесселя (Kaiser–Bessel) [170]. 
-%[170.-Duda K. DFT interpolation algorithm for Kaiser–Bessel and Dolph–Chebyshev windows //IEEE Transactions on Instrumentation and Measurement. – 2011. – Т. 60. – №. 3. – С. 784-790.]
-
-Полиномиальные коэффициенты должны быть рассчитаны до анализа, что означает, что коэффициенты для различных окон должны быть рассчитаны и сохранены заранее. Этот процесс неизбежно является интенсивным и хлопотным, особенно для регулируемых окон, свойства которых могут регулироваться одним или несколькими параметрами.
-
-Cначала рассмотрен новый алгоритм интерполяции для окна Хеннинга (Hanning window), в котором был принят метод заполнения нулями, чтобы получить больше спектральных линий (spectral lines) в пределах частотного интервала (frequency interval). Впоследствии этот новый алгоритм был расширен для совместимости с другими классическими окнами путем введения метода подгонки основного лепестка (main-lobe). Изучены систематические ошибки (systematic errors) предлагаемого метода для различных окон, а также характеристики при белом гауссовском шуме (white Gaussian noise).
-
-\subsection{Основы алгоритма} \label{sec:ch2/sec5_1}
-
-Рассмотрим для простоты, но без потери общности, непрерывный косинус-сигнал, загрязненный аддитивным белым шумом, который представлен в виде:
-\begin{equation}
-\label{eq:equation12}
-x(t) = A_0 \cos(2 \pi f_0 t + \theta_0 + e(t))
-\end{equation}
-
-где $A_0$ – амплитуда;
-
-$f_0$ – обозначает частоту;
-
-$\theta_0$ – обозначает фазовый угол;
-
-$t$ – обозначает переменную непрерывного времени;
-
-$e(t)$ – белый шум. 
-
-Отбор проб на частоте $f_s$ в течение интервала наблюдения (observation interval) $N\bigtriangleup t(\bigtriangleup t=1/f_s )$, следующий дискретный косинус сигнал $N$ образцы:
-\begin{equation}
-\label{eq:equation13}
-x(n) = A_0 \cos(2 \pi \frac{f_0}{f_s} n + \theta_0) + e(n), n = 0,1, \cdots , N-1
-\end{equation}
-
-Чтобы удовлетворить теорему выборки Найквиста (Sampling Theorem), $f_s$ должно быть больше $2f_0$. Разрешение по частоте (Frequency resolution) получается $\bigtriangleup f=f_s/N$ определяется как:
-\begin{equation}
-\label{eq:equation14}
-\frac{f_0}{f_s}=\frac{\lambda_0}{N}
-\end{equation}
-
-$\lambda_0$ – обозначает количество циклов, содержащихся в выборках сигнала (signal samples) [169].
-%[169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-
-Следует подчеркнуть, что $\lambda_0$ также представляет нормированную частоту (частоту $f_0$, масштабированную по разрешающей способности по частоте), выраженную в бинах DFT [169].
-%[169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-На этом этапе мы игнорируем шумовой член и переходим к умножению выборок сигнала $x(n)$ на значения окна данных $\omega(n)$.
-Взвешенные образцы даны:
-\begin{equation}
-\label{eq:equation15}
-x_\omega(n)=A_0 \cos(\frac{2 \pi \lambda_0 n}{N}+\theta_0)\omega(n)
-\end{equation}
-
-Дискретное преобразование Фурье (ДПФ, discrete Fourier transform – DFT) взвешенного сигнала может быть вычислена путем:
-\begin{equation}
-\label{eq:equation16}
-X_\omega(k) = \sum_{n=0}^{N-1} x_\omega(n) e^{-j \frac{2 \pi}{N}nk}
-\end{equation}
-
-Применение \labelcref{eq:equation16} к взвешенным выборкам в \labelcref{eq:equation15} дает явный вид~(explicit form):
-
-\begin{equation}
-\label{eq:equation17}
-X_\omega(k) = \frac{A_0}{2} e^{j\phi_0}W_N(k-\lambda_0)+\frac{A_0}{2}e^{j\phi_0}W_N(k+\lambda_0)
-\end{equation}
-
-где $W_N (k)$ и обозначает дискретное временное преобразование Фурье (discrete time Fourier transform – DTFT) весовой функции (weighting function). Если сигнал дискретизируется асинхронно, нормализованная частота $\lambda_0$ находится между двумя самыми большими спектральными линиями (spectral lines). Следовательно, $\lambda_0$  может быть далее записано на две части с целой частью $l_\omega$ и дробной частью (fractional part) $\delta_\omega$ $(-0,5<\delta_{\omega}\leq0,5)$ соответственно.
-
-\begin{equation}
-\label{eq:equation18}
-\lambda_0 = l_\omega + \delta_\omega
-\end{equation}
-
-Целочисленная часть $l_\omega$ может быть легко и правильно определена с помощью процедуры максимального поиска, если SNR превышает пороговое значение (приблизительно от -$18$ до –$20$ дБ) [172]. 
-% [172.-Rife D., Boorstyn R. Single tone parameter estimation from discrete-time observations //IEEE Transactions on information theory. – 1974. – Т. 20. – №. 5. – С. 591-598.]
-Подстановка \labelcref{eq:equation18} в \labelcref{eq:equation17} дает наибольшую величину:
-\begin{equation}
-\label{eq:equation19}
-\left|{X_\omega(l_\omega)} \right| = \frac{A_0}{2} \left| e^{j\phi_0}W_N(- \delta_\omega) +e^{j\phi_0}W_N(2l_\omega+\delta_\omega) \right| 
-\end{equation}
-
-Соответственно, вторая и третья по величине спектральные линии также могут быть определены. При правильной комбинации двух или более спектральных линий может быть получено отношение $\alpha$, которое зависит только от выбранного окна и отклонения частоты $\delta_{\omega}$. Другими словами, если окно данных, как известно, $\delta_{\omega}$ может быть определена только с помощью $\alpha$.
-
-\begin{equation}
-\label{eq:equation20}
-\delta_\omega = g(\alpha)
-\end{equation}
-
-В частности, для максимальных окон распада боковых лепестков (side-lobe) $\delta_{\omega}$ можно записать как функцию от $\alpha$ в простой и явной форме [157], [158], [160], [161], [168], [169].
-
-% [157. - Zhang F., Geng Z., Yuan W. The algorithm of interpolating windowed FFT for harmonic analysis of electric power system //IEEE transactions on power delivery. – 2001. – Т. 16. – №. 2. – С. 160-164.]
-
-% [158.- Qian H., Zhao R., Chen T. Interharmonics analysis based on interpolating windowed FFT algorithm //IEEE Transactions on Power Delivery. – 2007. – Т. 22. – №. 2. – С. 1064-1069.]
-
-% [160. - Xie M., Adams D. F. A nonlinear finite element analysis for composite materials //Finite elements in analysis and design. – 1996. – Т. 22. – №. 3. – С. 211-223.]
-
-% [161.- Luo J., Xie M. Phase difference methods based on asymmetric windows //Mechanical Systems and Signal Processing. – 2015. – Т. 54. – С. 52-67]
-
-% [168.-Belega D., Dallet D. Multifrequency signal analysis by interpolated DFT method with maximum sidelobe decay windows //Measurement. – 2009. – Т. 42. – №. 3. – С. 420-426.]
-
-% [169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-
-Для других окон предлагается решение полиномиальной аппроксимации (polynomial approximation) [170]. 
-%[170.	Duda K. DFT interpolation algorithm for Kaiser–Bessel and Dolph–Chebyshev windows //IEEE Transactions on Instrumentation and Measurement. – 2011. – Т. 60. – №. 3. – С. 784-790.]
-
-В следующем разделе представляем простой алгоритм интерполяции (interpolation), который можно применять практически ко всем классическим окнам.
-
-\subsection{Предлагаемый алгоритм} \label{sec:ch2/sec5_2}
-
-Рассмотрим алгоритм техника заполнения нулями. Заполнение нулями – это метод, определяемый как добавление нулевых значений к взвешенным выборкам до вычисления DFT. Добавленные нулевые значения обрабатываются как дополнительные образцы, собранные с той же скоростью, и, следовательно, увеличивают время измерения, как показано в \labelcref{eq:equation21}
-
-\begin{equation}
-\label{eq:equation21}
-x_{ap}(n)=
-\begin{cases}
-x_{\omega}, \leq n < N
-\\ 0, N \leq n < MN
-\end{cases}
-\end{equation}
-
-где $(M-1) \cdot N$ добавляются нули. Соответственно, дискретный спектр (discrete spectrum) также расширяется. Эта процедура приводит к более точной выборке спектра сигнала (signal spectrum), потому что вместо $N$ спектральных выборок $M \cdot N$ образцы того же спектра доступны. Обратите внимание, что расширение данных нулями и вычисление более длинного ДПФ действительно увеличивает количество точек в частотной области, но не нарушает основное ограничение и не влияет на эффекты наложения [173].
-% [173.-Dorf R. C. Circuits, signals, and speech and image processing. – CRC Press, 2018.]
-
-Пределы разрешения  (Resolution limits) определяются интервалом наблюдения (observation interval) и частотой дискретизации (sampling frequency) [173].
-
-Никакое количество заполнения нулями не может преодолеть эти фундаментальные пределы, и параметры спектра, такие как уровень отношение сигнал/шум (signal-to-noise ratio) и уровень спектральной утечки (spectral leakage), остаются неизменными. Коэффициенты ДПФ по \labelcref{eq:equation21}:
-
-\begin{equation}
-\label{eq:equation22}
-X(N)= \sum_{n=0}^{MN-1} x_{ap}(n) e^{-j \frac{2 \pi}{N}\cdot \frac{k}{M} \cdot n}, 0\leq k \leq MK-1
-\end{equation}
-По сравнению с \labelcref{eq:equation16} получается:
-
-\begin{equation}
-\label{eq:equation23}
-X(k)= X_\omega \left( {\frac{k}{M}}\right)  \end{equation}
-Соответственно, \labelcref{eq:equation19} можно переформулировать как:
-
-\begin{equation}
-\label{eq:equation24}
-\left| {X(l)} \right|   = \frac{A_0}{2}\left| {e^{j\phi_0}W_N(-\delta)+e^{-j\phi_0}W_N \left(\frac{2l}{M}+\delta \right)} \right|,
-\end{equation}
-
-где $l$ и $\hat{\delta}
-\left( {\delta= \frac{\hat{\delta}}{M}}\right) $
-являются целой частью и дробная часть (fractional part) из $M\lambda_0$ соответственно. Точно так же $l$ возвращается максимальной процедурой поиска X(k). На этом этапе три крупнейших линии X(k) даны $\left| {X(l)} \right|$,$\left| {X(l+1)} \right|$ а также $\left|{X(l-1)}\right|$.
-
-Рассмотрим алгоритм интерполяции для окна Хеннинга с техникой заполнения нулями.
-
-Второе слагаемое в правой части \labelcref{eq:equation24} представляет вклад мнимой части (imaginary part) спектра. Если $\lambda_0$ удовлетворяет $5<\lambda_0$ , а также $\lambda_0 < \frac{N}{2}-5$, тогда помехи от второго слагаемого могут быть минимальными и ими можно пренебречь. С этим предположением \labelcref{eq:equation24} сводится к:
-
-\begin{equation}
-\label{eq:equation25}
-\left| {X(l)} \right| \cong \frac{A_0}{2}\left| {W_N(-\delta)} \right|,
-\end{equation}
-
-Точно так же у нас есть это $\left| {X(l)} \right| \cong \frac{A_0}{2}\left| {W_N(\varepsilon -\delta)} \right|$, а так же $\left| {X(l-1)} \right| \cong \frac{A_0}{2} \left| {W_N(\varepsilon +\delta)} \right|$, где $\varepsilon=\frac{1}{M}$. Для окна Хеннинга (Hanning window), $W_N (k) \cong \frac{sin(\pi k)}{h(k)}$,
-$h(k) = 2 \pi k (1-k^2)$ [160]
-%[160.	Xie M., Adams D. F. A nonlinear finite element analysis for composite materials //Finite elements in analysis and design. – 1996. – Т. 22. – №. 3. – С. 211-223.]
-
-\begin{equation}
-\label{eq:equation26}
-\left| {X(l)} \right| \cong \frac{A_0}{2} \frac{\sin{(\pi \delta)} }{h(\delta)} ,
-\end{equation}
-
-\begin{equation}
-\label{eq:equation27}
-\left| {X(l+1)} \right| \cong \frac{A_0}{2} \frac{\sin{(\pi \varepsilon - \pi \delta)} }{h(\varepsilon - \delta)} ,
-\end{equation}
-
-\begin{equation}
-\label{eq:equation28}
-\left| {X(l+1)} \right| \cong \frac{A_0}{2} \frac{\sin{(\pi \varepsilon + \pi \delta)} }{h(\varepsilon + \delta)}
-\end{equation}
-
-Разлагая синусоиды в \labelcref{eq:equation27} и \labelcref{eq:equation28} и комбинируя их вместе, мы достигаем того, что:
-
-\begin{equation}
-\label{eq:equation29}
-h(\varepsilon+\delta)\left|{X(l-1)} \right| - h(\varepsilon-\delta) \left|{X(l+1)} \right| \cong A_0 \sin{(\pi \delta)} \cos{(\pi \varepsilon)}
-\end{equation}
-
-Дальнейшее объединение \labelcref{eq:equation26} и \labelcref{eq:equation29}
-
-\begin{equation}
-\label{eq:equation30}
-h(\delta+\varepsilon)\left|{X(l-1)} \right| - h(\delta - \varepsilon) \left|{X(l+1)} \right| \cong 2 \left|{X(l)} \right| h(\delta) \cos{(\pi \varepsilon)}
-\end{equation}
-
-Теперь введем две переменные $\gamma_1$,$\gamma_2$ определяются как:
-
-\begin{equation}
-\label{eq:equation31}
-\gamma_1 = \frac{\left| X(l-1)\right|}{\left| X(l)\right|}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation32}
-\gamma_1 = \frac{\left| X(l+1)\right|}{\left| X(l)\right|}
-\end{equation}
-
-Для простоты и краткости (conciseness) мы будем использовать знак $«=»$ в \labelcref{eq:equation30}, вместо $\cong$. Но отношение аппроксимации все еще остаются. 
-
-\begin{equation}
-\label{eq:equation33}
-h(\delta +\varepsilon)\gamma_1 - h(\delta -\varepsilon)\gamma_2 = 
-2h(\delta) \cos(\pi \varepsilon) 
-\end{equation}
-
-Расширение условий $h(\delta +\varepsilon)$,$h(\delta -\varepsilon)$, а также получаем $h(\delta)$ кубическое уравнение (cubic equation):
-
-\begin{equation}
-\label{eq:equation34}
-{a \delta}^3 + {b \delta}^2 + c \delta + d = 0, 
-\end{equation}
-где $a = 2 \cos(\pi \varepsilon)-(\gamma_1 + \gamma_2)$;
-
-$b = -3(\gamma_1 - \gamma_2)\varepsilon$;
-
-$c = \left( \gamma_1 + \gamma_2 - \frac{2 \cos(\pi \varepsilon)}{1-3\varepsilon^2}
-\right) \left( {1-3\varepsilon^2} \right) $;
-
-$d = ( \gamma_1 - \gamma_2)(\varepsilon - \varepsilon^3)$
-
-\begin{equation}
-\label{eq:equation35}
-g(\delta) = {a \delta}^3 + {b \delta}^2 + c \delta + d
-\end{equation}
-
-Можно доказать, что $g(-1)>0$,$g(-0,5)<0$,$g(0,5)>0$,$g(1)<0$ 
-
-\begin{equation}
-\label{eq:equation36}
-\gamma_1 = \frac{\left| X(l-1)\right|}{\left| X(l)\right|} = \frac{\sin({\pi \varepsilon + \pi \delta})}{h(\varepsilon + \delta)} \cdot \frac{h(\delta)}{\sin(\pi \delta)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation37}
-\gamma_2 = \frac{\left| X(l+1)\right|}{\left| X(l)\right|} = \frac{\sin({\pi \varepsilon - \pi \delta})}{h(\varepsilon - \delta)} \cdot \frac{h(\delta)}{\sin(\pi \delta)}
-\end{equation}
-
-где $\delta \in[-0.5,0.5]$ а также $\varepsilon\in[0,0.5]$. Согласно формуле \labelcref{eq:equation35}
-
-\begin{equation}
-\label{eq:equation38}
-f(0,5) = -\frac{3}{4} \cos(\pi \varepsilon) + \frac{(1-4 \varepsilon^2)}{8} \left[ {\gamma_1 (3+2 \varepsilon)+\gamma_2 (3-2 \varepsilon)}\right] 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation39}
-f(-0,5) = +\frac{3}{4} \cos(\pi \varepsilon) + \frac{(1-4 \varepsilon^2)}{8} \left[ {\gamma_1 (3-2 \varepsilon)+\gamma_2 (3+2 \varepsilon)}\right] 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation40}
-f(1) = -\gamma_1 \varepsilon(\varepsilon+1)(\varepsilon + 2) + \gamma_2 \varepsilon(\varepsilon-1)(\varepsilon - 2)
-\end{equation}
-
-\begin{equation}
-\label{eq:equation41}
-f(-1) = -\gamma_1 \varepsilon(\varepsilon-1)(\varepsilon - 2) + \gamma_2 \varepsilon(\varepsilon+1)(\varepsilon + 2)
-\end{equation}
-
-Определяем $p(\delta)$:
-
-\begin{equation}
-\label{eq:equation42}
-p(\delta) = \gamma_1 (3+2\varepsilon) + \gamma_2 (3-2\varepsilon)
-\end{equation}
-
-Определяем $q(\delta)$:
-\begin{equation}
-\label{eq:equation43}
-q(\delta) = \gamma_1 (3-2\varepsilon) + \gamma_2 (3+2\varepsilon)
-\end{equation}
-
-Принимая производную $p(\delta)$, мы знаем, что $p(\delta)$ является монотонно убывающей функцией как функция $\delta$. $p(\delta)$ является монотонно возрастающей функцией.
-В результате можем получить:
-
-\begin{equation}
-\label{eq:equation44}
-p_{min}(\delta) = p(\delta = 0,5) = \frac{6 \cos(\pi  \varepsilon)}{1-4\varepsilon ^2}
-\end{equation}
-
-а также
-\begin{equation}
-\label{eq:equation45}
-q_{min}(\delta) = q(\delta = -0,5) = \frac{6 \cos(\pi  \varepsilon)}{1-4\varepsilon ^2}
-\end{equation}
-
-Тогда
-\begin{equation}
-\label{eq:equation46}
-f(0,5) > -\frac{3}{4} \cos (\pi \varepsilon) + \frac{(1-4 \varepsilon ^2)}{8} p_{min} (\delta) = - \frac{3}{4} \cos(\pi \varepsilon) + \frac{3 \ cos(\pi \varepsilon)}{4} = 0 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation47}
-f(-0,5) < \frac{3}{4} \cos (\pi \varepsilon) + \frac{(1-4 \varepsilon ^2)}{8} q_{min} (\delta) = + \frac{3}{4} \cos(\pi \varepsilon) - \frac{3 \ cos(\pi \varepsilon)}{4} = 0 
-\end{equation}
-
-С другой стороны, определяем:
-\begin{equation}
-\label{eq:equation48}
-u(\varepsilon, \gamma) = \frac{f(1)}{\varepsilon \gamma_1} = (\varepsilon ^2 + 2) (\gamma - 1) - 3\varepsilon (\gamma + 1)
-\end{equation}
-
-\begin{equation}
-\label{eq:equation49}
-\nu(\varepsilon, \gamma) = \frac{f(-1)}{\varepsilon \gamma_1} = (\varepsilon ^2 + 2) (\gamma - 1) + 3\varepsilon (\gamma + 1)
-\end{equation}
-
-$\gamma = \frac{\gamma_1}{\gamma_2}$
-
-\begin{equation}
-\label{eq:equation50}
-u'_{\gamma}(\varepsilon, \gamma) = \varepsilon^2 - 3\varepsilon + 2 = (\varepsilon - 2)(\varepsilon -1) >0
-\end{equation}
-
-\begin{equation}
-\label{eq:equation51}
-{\nu}'_\gamma
-(\varepsilon, \gamma) = \varepsilon^2 + 3\varepsilon + 2 = (\varepsilon + 2)(\varepsilon + 1) >0
-% 
-\end{equation}
-
-
-\begin{equation}
-\label{eq:equation52}
-u _{max}(\varepsilon, \gamma) =
-\left( {\varepsilon^2+2} \right) 
-\left( {\frac{1,5+\varepsilon}{1,5-\varepsilon}-1} \right) - 3 \varepsilon 
-\left( {\frac{1,5+\varepsilon}{1,5-\varepsilon}+1} \right) = \frac{\varepsilon}{1,5-\varepsilon}(2\varepsilon^2 - 5) < 0
-\end{equation}
-
-\begin{equation}
-\label{eq:equation53}
-\nu _{min}(\varepsilon, \gamma) =
-\left( {\varepsilon^2+2} \right) 
-\left( {\frac{1,5-\varepsilon}{1,5+\varepsilon}-1} \right) - 3 \varepsilon 
-\left( {\frac{1,5-\varepsilon}{1,5+\varepsilon}+1} \right) = \frac{\varepsilon}{1,5-\varepsilon}(5-2\varepsilon^2) > 0
-\end{equation}
-
-Соответственно, достигаем
-
-\begin{equation}
-\label{eq:equation54}
-f(1) = u(\varepsilon, \gamma)(\varepsilon \gamma_1) <0
-\end{equation}
-
-\begin{equation}
-\label{eq:equation55}
-f(-1) = \nu(\varepsilon, \gamma)(\varepsilon \gamma_1) > 0
-\end{equation}
-
-Согласно исследованию в [174], три корня можно выразить как:
-
-%[174.	Nickalls R. W. D. A new approach to solving the cubic: Cardan’s solution revealed //The Mathematical Gazette. – 1993. – Т. 77. – №. 480. – С. 354-359.]
-
-\begin{equation}
-\label{eq:equation56}
-\delta_1 = 
-\delta_0 + 2 \sigma \cos \left({\frac{2 \pi}{3}} + \varphi  \right) 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation57}
-\delta_2 = 
-\delta_0 + 2 \sigma \cos \left({\frac{2 \pi}{3}} - \varphi  \right) 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation58}
-\delta_3 = 
-\delta_0 + 2 \sigma \cos (\varphi) 
-\end{equation}
-
-$\delta_0 = \frac{-a}{3b};$
-
-$\sigma = \sqrt{\frac{b^2 - 3ac}{9a^2}}$
-
-$\cos(3 \varphi) = - g \left( {\frac{\delta_0}{p}}
-\right) $
-
-$p = -a \delta_0 ^3$
-
-$\delta_1$ и $\delta_3$ выходят за пределы определенного диапазона $(-0,5;0,5]$. Таким образом, единственным приемлемым решением является $\delta_2 $. Получаем расчетную дробную часть:
-
-\begin{equation}
-\label{eq:equation59}
-\hat{\delta} = \delta_2 + \delta_0 + 2 \sigma \cos \left({\frac{2 \pi}{3} - \varphi} \right) 
-\end{equation}
-
-Рассмотрим расширение на другие классические окна с фурнитурой.
-
-В этом подразделе расширим интерполяцию (interpolation) для других классических окон, используя метод подгонки основного лепестка. 
-
-\begin{equation}
-\label{eq:equation60}
-S(k) = [W_C (k)]^q - W_H (k)
-\end{equation}
-
-где $W_C (k)$ - обозначает нормализованный спектр любого классического окна;
-
-$W_H (k)$ - обозначает нормализованный спектр окна Хеннинга;
-
-$q = \frac{S L_{Han}}{S L_\omega(n)}$
-
-$S L_{Han}$ и $S L_\omega(n)$ - представляют собой убывающие потери $SL$ окна Хеннинга.
-
-Потери с наклоном определяются как отношение когерентного усиления для частотной составляющей (frequency component), расположенной на полпути между бинами DFT, к когерентному усилению для частотной составляющей, расположенной точно в бине DFT [168].
-
-% [168.-Belega D., Dallet D. Multifrequency signal analysis by interpolated DFT method with maximum sidelobe decay windows //Measurement. – 2009. – Т. 42. – №. 3. – С. 420-426.]
-
-Можно определить, что $|S(k)|$ очень мало 
-для большинства классических окон, если k находится в диапазоне  $(-0,5;0,5]$. 
-Например, максимальное значение $|S(k)|$ равняется $10-5$ для окна Хемминга(Hamming window) и $10^-4$ для окна Блекмена (Blackman window).
-Это означает, что $[W_C (k)]^q$, а также $W_H (k)$ хорошо сочетаются друг с другом в середине их основных лепестков. 
-Подразумевается, что вышеуказанный алгоритм интерполяции может быть расширен для классических окон до тех пор, пока $[W_C (k)]^q$ используется $k$ и ограничен в диапазоне $[-0,5;0,5]$. 
-С нулевой техникой заполнения $(M\geq3)$, три самые большие спектральные линии (spectral lines), которые используются в алгоритме интерполяции, легко удовлетворяют требованию. Для большого $M$, погрешность оценки(estimation error) будет уменьшаться как в шуме, так и в ситуации без шума. Однако улучшение не ясно, когда $(M>5)$. С другой стороны, объем расчета увеличится из-за добавленного нуля. Следовательно, учитывая объем вычислений и алгоритм FFT для radix-2, часто выбираем $(M=4)$ для практических измерений.
-
-\subsection{Производительность предлагаемого алгоритма
-} \label{sec:ch2/sec5_3}
-
-В этом разделе систематические ошибки (systematic errors) и влияние шума были изучены. В многочастотном случае, если выбрано правильное окно, мы можем обрабатывать каждый максимальный спектральный пик независимо до тех пор, пока спектральные пики хорошо разделены [169]. 
-
-%[169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-
-В результате рассматриваем только случай с частотой в моделировании. В 
-\labelcref{eq:equation13} был использован для генерации временных выборок (time samples). 
-
-Амплитуда (amplitude) $A_0$ была зафиксирована на $1$ уровне. Число анализируемых образцов $N$, было установлено равным $1024$, и предполагаем, что частота дискретизации (sampling frequency) $1024$ так, чтобы разрешение по частоте (frequency resolution) было $1$. Для краткости, оценки частоты (frequency estimates) были масштабированы по разрешающей способности по частоте и выражены в бинах.
-
-Изучение систематических ошибок.
-
-Определенные приближения необходимы для того, чтобы вывести алгоритм оценки частоты (frequency estimation). Одно из приближений состоит в том, что предложенный метод игнорирует вклад от отрицательной оси частот (frequency axis).  Другие окна требуют техники установки основного лепестка. Как следствие, приближения вносят систематические ошибки моделирования (modeling errors) в оценку даже в бесшумном случае. Систематические ошибки были определены аналогично [169], но с некоторыми изменениями. 
-%[169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-
-Для определенного DFT бин (bin) номера $k$, сканирование частоты было выполнено в интервале $(k-0,5;k+ 0,5]$ изменено с шагом $0,05$. 
-Для каждого значения частоты фаза менялась в диапазоне $(-\pi,\pi]$ с шагом $\frac{\pi}{72}$.Это означает, что $2880$ тестовых сигналов (test signals) были сгенерированы для конкретного DFTbin, и в качестве SME была выбрана максимальная абсолютная ошибка (maximum absolute error).
-
-На рисунке \ref{img:picture7} показаны систематические погрешности оценки частоты для разных окон в зависимости от интервала частот (frequency bin). Можем видеть, что частотные ошибки (frequency errors) резко уменьшаются, когда частота далека от частоты постоянного тока (direct-current) или частоты Найквиста (Nyquist frequency). Систематическая ошибка очень мала и ею можно пренебречь, если $\lambda_0>5$ а также $\lambda_0< \frac{N}{2-5}$. Также показано, что окно Хеннинга имеет наименьшую погрешность частоты, и тренд показывает очень хорошее согласие с этим в [169]. 
-%[169.-Belega D., Dallet D., Petri D. Accuracy of sine wave frequency estimation by multipoint interpolated DFT approach //IEEE Transactions on Instrumentation and Measurement. – 2010. – Т. 59. – №. 11. – С. 2808-2815.]
-
-Для всех остальных окон максимальная ошибка частоты составляет около $10^-3$, что является приемлемым для большинства инженерных приложений (engineering applications). Обратите внимание, что ошибка для большинства окон – почти прямая линия, за исключением окна Хэмминга (Hamming window), которое имеет постоянно уменьшающиеся ошибки в первой половине оси частот. Это связано, прежде всего, с тем, что ошибки подбора основного лепестка для окна Хэмминга очень малы, а остаточные ошибки (residual errors) в значительной степени определяются отрицательной частотой (negative frequency). Для остальных окон остаточные ошибки в основном связаны с ошибками подгонки основного лепестка.
+Общая структура средств измерений (СИ), рекомендованная в \cite{ГОСТР51317.4.7-2008}, реализована на основе БПФ и представлена на рисунке \ref{img:picture7}. 
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.9] {picture7.png}
-	\caption{SME предложенного алгоритма для разных окон.}
+	\includegraphics [scale=0.85] {general_SI_structure}
+	\caption{Общая структура средств измерений.}
 	\label{img:picture7}
 \end{figure}
 
-Исследование влияния шума
+% Математической основой для анализа спектра сигналов является преобразование Фурье. Для дискретных сигналов применяется дискретное преобразование Фурье.
 
-В этом пункте рассмотрим, что косинусоида (cosine-wave) была искажена аддитивным белым гауссовским шумом (white Gaussian noise) e(n)
-с нулевым средним и дисперсией, соответствующей соотношению сигнал / шум (SNR – Signal-to-Noise Ratio) в диапазоне от $-5$ до $80$ дБ. Теоретическая частота была произвольно выбрана в интервале [255,5;256,5), чтобы минимизировать помехи от отрицательной частоты. Фазовое сканирование (Phase scanning) проводилось для каждой частоты, и в результате была выбрана наихудшая ситуация. В общей сложности $10000$ экземпляров таких тестовых сигналов были сгенерированы для каждого значения SNR, и была оценена среднеквадратичная ошибка (RMSE – root-mean-square error). На рисунке \ref{img:picture8} показана RMSE для разных окон в зависимости от SNR.
+\section{Дискретное преобразование Фурье} \label{sec:ch2/sec2}
+Впервые французский математик Ж.Б.Ж. Фурье предположил, что каждую функцию можно разложить в тригонометрический ряд. Эта гипотеза имеет огромное значение в обработке сигналов, то есть периодический сигнал с периодом $T$ может быть представлен суммированием гармонических колебаний с
+угловыми частотами $\omega_{n} = n \cdot \omega_{n} $ , где $n$ -- номер гармоники. Гармонику $n = 1$ называют основной гармоникой, а $n > 1$ высшими гармониками. 
 
-\begin{figure}[ht]
-	\centering
-	%\includegraphics [scale=0.27] {picture1.png}
-	\includegraphics [scale=0.9] {picture8.png}
-	\caption{RMSE предложенного алгоритма для разных окон.}
-	\label{img:picture8}
-\end{figure}
+Математической основой для анализа спектра сигналов является преобразование Фурье. Для дискретных сигналов применяется дискретное преобразование Фурье.
 
-Нижняя граница Крамера–Рао (CRLB – Cramer–Rao lower bound) для оценки частоты также показана для сравнения. За $N\gg 1$ асимптотический CRLB оценки частоты в \labelcref{eq:equation12}  задается формулой [168]:
-
-%[168.	Belega D., Dallet D. Multifrequency signal analysis by interpolated DFT method with maximum sidelobe decay windows //Measurement. – 2009. – Т. 42. – №. 3. – С. 420-426.]
+Чтобы проанализировать алгоритмы определения частоты для оценки гармоник в частотной области часто используют подходы, основанные на дискретном преобразовании Фурье, которые
+реализованы с помощью быстрого преобразования Фурье \cite{vaseeva2019comparative}. В формуле \ref{eq:$f(t)$} показано разложение в ряд Фурье периодической функции $f(t)$ с периодом $2\pi$ на интервале $[0,2\pi]$:
 
 \begin{equation}
-\label{eq:equation61}
-\sigma_{f} \approx \frac{6 f^2 _s}{{(2 \pi)^2}p N^3}
+\label{eq:$f(t)$}
+f(t) = \sum_{k=-\infty}^{\infty} {C_{k}\exp^{jkt}},
 \end{equation}
 
-где $p$ – SNR определяется как $\frac{A^2}{2 \ sigma ^2}$;
-$\sigma^2$ – дисперсия белого гауссовского шума.
+где $C_{k}$ -- комплексные коэффициенты Фурье. 
 
-Можем четко наблюдать, что RMSE для окна Хеннинга является линейным во всем диапазоне SNR, потому что нет ошибок подгонки основного лепестка. В остальных случаях RMSE становится плоской из-за ошибок аппроксимации. На рисунке показано, что шум оказывает значительное влияние (significant impact) на неопределенность оценки при низком SNR. Таким образом, систематические ошибки можно почти игнорировать. Напротив, когда SNR высокое, систематические ошибки становятся основным источником ошибок. Значение отклонения SNR составляет около $30-40$ дБ, в зависимости от окна. Результаты также показывают, что когда SNR ниже перегиба, окна с узким основным лепестком (main-lobe) превосходят окна с широким основным лепестком. Это соответствует эквивалентной ширине полосы шума (ENBW – equivalent noise bandwidth), которая является эффективным индексом (effective index) для оценки свойств шума окна. 
-
-\subsection{Сравнительное исследование} \label{sec:ch2/sec5_5}
-
-В этом разделе некоторые симуляции предназначены для сравнения характеристик нового алгоритма (короткого как IpZPMF) с современными алгоритмами, включая алгоритм двухточечной интерполяции (interpolation) для окна Хеннинга (Hanning window), предложенного Грандке (Grandke) в $1983$ году [163] алгоритм трехточечной интерполяции для окна Хеннинга (Hanning window), предложенный Агрежем (Agrež) в $2002$ году [166], алгоритм интерполяции на основе 3-точечного модуля и трехточечный алгоритм интерполяции на основе сложного спектра (complex spectrum based interpolation algorithm), упомянутый Якобсеном (Jacobsen) и Коотсукосом (Kootsookos) в $2007$ году [167] полиномиальное приближение (polynomial approximation) с двумя и тремя точками Алгоритмы интерполяции, предложенные Дудой (Duda) в $2011$ году [170] и алгоритм интерполяции на основе 2-точечного сложного спектра, представленный Ченом (Chen) в $2008$ году. Параметры косинусоидальной волны (cosine wave), а также количество отсчетов и частота отсчетов (sampling frequency) такие же, как в предыдущем разделе.
-
-% [163.-Grandke T. Interpolation algorithms for discrete Fourier transforms of weighted signals //IEEE transactions on instrumentation and measurement. – 1983. – Т. 32. – №. 2. – С. 350-355.]
-
-%[166.-Agrez D. Weighted multipoint interpolated DFT to improve amplitude estimation of multifrequency signal //IEEE Transactions on Instrumentation and Measurement. – 2002. – Т. 51. – №. 2. – С. 287-292.]
-
-%[167.-Jacobsen E., Kootsookos P. Fast, accurate frequency estimators [DSP Tips & Tricks] //IEEE Signal Processing Magazine. – 2007. – Т. 24. – №. 3. – С. 123-125.]
-
-%[170.-Duda K. DFT interpolation algorithm for Kaiser–Bessel and Dolph–Chebyshev windows //IEEE Transactions on Instrumentation and Measurement. – 2011. – Т. 60. – №. 3. – С. 784-790.]
-
-Без шума.
-
-Чтобы оценить эффективность этих подходов для разных смещений по частоте, мы устанавливаем $\delta_\omega$ в диапазоне от $-0,5$ до $0,5$ с шагом $0.05$. Для каждого $\delta_\omega$ $72$ значения равноудалены в интервале $(-\pi,\pi]$ были выбраны для фазы косинусоидальной волны. Аналогичным образом, максимальное абсолютное значение между истинной и расчетной частотой было выбрано в качестве результата. На рисунке \ref{img:picture9} показаны частотные ошибки (frequency errors) для восьми методов коррекции (correction methods), когда выборки были взвешены окном Хеннинга (Hanning) до DFT. 
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics [scale=0.9] {picture9.png}
-	\caption{Ошибки оценки частоты для окна Хеннинга.}
-	\label{img:picture9}
-\end{figure}
-
-Методы могут оценивать частоту (estimate frequency) с относительно высокой точностью (high precision), за исключением – алгоритма интерполяции на основе $3$-точечного модуля, где максимальная погрешность частоты составляет около $10^ -2$, и трехточечный алгоритм интерполяции на основе сложного спектра, где максимальная погрешность частоты составляет около $10^ -1$. Наилучшим результатом является алгоритм трехточечной интерполяции для окна Хеннинга, где погрешность частоты составляет менее $10^ -9$. Предложенный алгоритм также дает очень маленькую ошибку около $10^-8$ результаты, в которых образцы, взвешенные в окне Хэмминга (Hamming window) и окно Блекмана (Blackman window) представлены на рисунках \ref{img:picture10} и \ref{img:picture11}. 
-
-\begin{figure}[ht]
-	\centering
-	%\includegraphics [scale=0.27] {picture1.png}
-	\includegraphics [scale=0.9] {picture10.png}
-	\caption{Ошибки оценки частоты для окна Хэмминга.}
-	\label{img:picture10}
-\end{figure}
-
-\begin{figure}[ht]
-	\centering
-	%\includegraphics [scale=0.27] {picture1.png}
-	\includegraphics [scale=0.9] {picture11.png}
-	\caption{Ошибки оценки частоты для окна Блэкмана.}
-	\label{img:picture11}
-\end{figure}
-
-Поскольку алгоритм двухточечной интерполяции для окна Хеннинга, алгоритм трехточечной интерполяции для окна Хеннинга, алгоритм интерполяции на основе $2$-точечного сложного спектра совместимы только с окном Хеннинга (Hamming window), отображаются только результаты остальных пяти алгоритмов. Тенденции алгоритм интерполяции на основе $3$-точечного модуля и трехточечный алгоритм интерполяции на основе сложного спектра близки к тому, когда было принято окно Хеннинга (Hamming window). Алгоритмы интерполяции $2$-точечных и $3$-точечных полиномиальных приближений дают лучшие результаты, чем алгоритм интерполяции на основе $3$-точечного модуля и  трехточечный алгоритм интерполяции на основе сложного спектра. Как показано, IpZPMF очень стабилен, когда используются окна, отличные от Ханнинга, и обеспечивает максимальную погрешность частоты менее $10^ -3$. Результаты моделирования показывают, что в условиях отсутствия шума или низкого уровня шума и при использовании окна Хеннинга (Hamming window) алгоритм двухточечной интерполяции для окна Хеннинга, алгоритм трехточечной интерполяции для окна Хеннинга, алгоритм интерполяции на основе $2$-точечного сложного спектра являются приемлемыми вариантами, учитывая их высокую точность и простоту. Алгоритмы интерполяции полиномиальной аппроксимации и IpZPMF рекомендуются для других окон.
-
-Устойчивость к аддитивному шуму.
-
-Фактически, высокий уровень шума может даже привести к неправильному расположению правой спектральной линии (spectral line), даже если SNR выше порога. Эта проблема, называемая проблемой неправильной оценки полярности (polarity) (IPE – incorrect polarity estimation) в предыдущих ссылках [161], часто возникает при почти когерентном условии выборки $(|\delta_\omega|$ около нуля) для алгоритмов, основанных на $2$ точках, и при почти половине условие выборки периода $(|\delta_\omega |$ близко $0,5$) для алгоритмов, основанных на $3$ точках.
-
-% [161.- Luo J., Xie M. Phase difference methods based on asymmetric windows //Mechanical Systems and Signal Processing. – 2015. – Т. 54. – С. 52-67]
-
-Если спектральная линия выбрана неправильно, это не только влияет на значение $\delta_\omega$ но также приводит к изменению знака, что приводит к значительной ошибке в оценке частоты. Чтобы сравнить производительность (compare performance) различных алгоритмов с аддитивным шумом (additive noise), теоретические сигналы были получены с аддитивным нулевым Гауссовым шумом (Gaussian noise). SNR было установлено на $-5$ дБ, чтобы обеспечить высокую вероятность (high probability) неправильной оценки полярности. Частота сканировалась от $255,5$ Гц до $256,5$ Гц с шагом $0,025$ Гц, и случайная фаза была равномерно распределена на  $(-\pi,\pi]$ был принят. В общей сложности $50000$ независимых экземпляров (independent instances) были созданы для каждой частоты.
-
-На рисунке \ref{img:picture12}, RMSE для окна Хеннинга (Hanning window) отображается как функция отклонения частоты $\lambda_{\omega}$. 
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics [scale=0.9] {picture12.png}
-	\caption{RMSE различных алгоритмов для окна Хеннинга SNR=$-5$ dB.}
-	\label{img:picture12}
-\end{figure}
-
-Здесь мы видим, что три двухточечных алгоритма (алгоритм двухточечной интерполяции для окна Хеннинга, алгоритм интерполяции на основе $2$-точечного сложного спектра, полиномиальное приближение с двумя точками алгоритмы интерполяции) имеют почти одинаковую производительность. Как мы и ожидали, с уменьшением |$\delta_{\omega}$|, RMSE этих трех алгоритмов возрастает. Самые высокие значения достигаются при условии когерентной выборки ($\delta_{\omega}=0$). 
-
-Трехточечные алгоритмы (полиномиальное приближение с $3$-мя точками алгоритм интерполяции, алгоритм трехточечной интерполяции для окна Хеннинга) показывают схожую производительность, но остальные алгоритмы отличаются друг от друга. Полиномиальное приближение с $3$-мя точками алгоритм интерполяции, алгоритм трехточечной интерполяции для окна Хеннинга, алгоритм интерполяции на основе $3$-точечного модуля уменьшаются как |$\delta_{\omega}$| уменьшается и достигает минимума при $\delta_{\omega}=0$. Значения 
-трехточечный алгоритм интерполяции на основе сложного спектра сначала увеличиваются, но затем постепенно снижаются до низкого уровня. Тенденции предлагаемого алгоритма относительно стабильны. Значения остаются на одном уровне с небольшими колебаниями. Более того, предлагаемый алгоритм имеет наименьшую среднеквадратичную величину во всем диапазоне $\delta_{\omega}$ по сравнению со всеми другими алгоритмами. Результаты для окна Хемминга (Hamming window) и окна Блэкмена (Blackman window) также показаны. Из рисунков \ref{img:picture13} и \ref{img:picture14} видно, что общие тенденции сходны с таковыми для окна Хеннинга (Hanning window).
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics [scale=0.9] {picture13.png}
-	\caption{RMSE различных алгоритмов для окна Хеннинга SNR=$-5$ dB.}
-	\label{img:picture13}
-\end{figure}
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics [scale=0.9] {picture14.png}
-	\caption{RMSE различных алгоритмов для окна Блэкмена SNR=$-5$ dB.}
-	\label{img:picture14}
-\end{figure}
-
-Результаты подтверждают тот факт, что IPE оказывает значительное влияние на текущие оценки (estimators) и что традиционные алгоритмы могут стать уязвимыми в присутствии шума. Предложенный алгоритм не только показывает сильную способность против IPE, но также имеет самый низкий RMSE. В результате он имеет подавляющее преимущество перед традиционными алгоритмами в условиях шума. Надежность может быть объяснена тем фактом, что спектральные линии, используемые в IpZPMF, намного сильнее, чем в традиционных алгоритмах. Кроме того, интервал спектральных линий, используемых в IpZPMF, составляет всего $\frac{1}{M}$ разрешения по частоте (frequency resolution). Это означает, что соседние спектральные линии могут содержать аналогичные шумы и, следовательно, обладают собственной способностью подавлять их часть. В традиционных алгоритмах, поскольку интервал между двумя спектральными линиями является частотным разрешением, корреляции шума резко ослабевают.
-
-Был предложен алгоритм интерполяции (interpolation) для обеспечения точной оценки частоты. Описанный алгоритм основан на заполнении нулями и методах подгонки основного лепестка (main-lobe). Это легко понять, и обладает преимуществом практической простоты. Стоимость – это увеличение вычислений для БПФ (FFT). Новый алгоритм совместим с большинством классических окон, не требует знания спектра окна данных (data window) и не требует каких-либо предварительных расчетов. С помощью компьютерного моделирования (computer simulations) была продемонстрирована эффективность предложенного алгоритма для различных окон. Влияние систематической ошибки (systematic error) и белого Гауссового шума (white Gaussian noise) на точность частотных оценок (frequency estimations) также было изучено. Кроме того, обсуждалась проблема IPE в традиционных алгоритмах интерполяции. Результаты моделирования показывают, что предлагаемый алгоритм обладает внутренней устойчивостью к IPE и более высокой устойчивостью к аддитивному шуму (additive noise), чем предыдущие алгоритмы интерполяции.
-
-Согласно определению в уравнениях \labelcref{eq:equation31} и \labelcref{eq:equation32}, имеем
-
-\begin{equation}
-\label{eq:equation62}
-\gamma_1 = \frac{\left| X(l-1)\right|}{\left| X(l)\right|} = \frac{\sin \pi({\delta + \varepsilon})}{\sin \pi \delta} \cdot \frac{h(\delta)}{h(\delta + \varepsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation63}
-\gamma_2 = \frac{\left| X(l+1)\right|}{\left| X(l)\right|} = \frac{\sin \pi({\delta - \varepsilon})}{\sin \pi \delta} \cdot \frac{h(\delta)}{h(\delta - \varepsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation64}
-\gamma = \frac{\left| X(l+1)\right|}{\left| X(l-1)\right|} = \frac{\sin \pi({\delta - \varepsilon})}{\sin \pi ({\delta + \varepsilon})} \cdot \frac{h({\delta + \varepsilon})}{h(\delta - \varepsilon)}
-\end{equation}
-
-Знаем $\gamma_1$, является монотонно убывающей функцией и $\gamma_2$, $\gamma$ является монотонно возрастающей функцией в зависимости от $\delta$ в диапазоне $[-0.5;0.5]$. Итак, можем получить
-
-\begin{equation}
-\label{eq:equation65}
-\gamma_{1 max} = \gamma_1 (\delta = - 0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 - 2 \varepsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation66}
-\gamma_{1 min} = \gamma_1 (\delta = 0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 + 2 \varepsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation67}
-\gamma_{2 max} = \gamma_2 (\delta = 0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 - 2 \varepsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation68}
-\gamma_{2 min} = \gamma_2 (\delta = -0,5) = \frac{3 \cos \pi \varepsilon}{(1 + 2 \varepsilon)(1 - 2 \varepsilon)(3 + 2 \varepsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation69}
-\gamma_{max} = \gamma(\delta = 0,5) = \frac{1,5+ \varepsilon}{1,5 - \varepsilon}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation70}
-\gamma_{min} = \gamma(\delta = -0,5) = \frac{1,5 - \varepsilon}{1,5 + \varepsilon}
-\end{equation}
-
-Согласно бесконечному представлению Эйлера функции синуса:
-
-\begin{equation}
-	\label{eq:equation71}
-	\sin \pi \delta = \pi \delta \prod\limits_{n = 1}^\infty \left( 1- \frac{\delta^2}{n^2} \right) 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation72}
-E(\delta) = \frac{\sin(\pi \delta) }{h(\delta)} = \frac{\pi \delta \prod\limits_{n = 1}^\infty \left( 1- \frac{\delta^2}{n^2}\right)}{\pi \delta (1 - \delta^2)} = \prod\limits_{n = 2}^\infty \left( 1 - \frac{\delta^2}{n^2}\right) \geq 0 
-\end{equation}
-
-Находим производную $E(\delta)$:     
-
-\begin{equation}
-\label{eq:equation73}
-E'(\delta) = E(\delta)L(\delta)
-\end{equation}
-
-\begin{equation}
-\label{eq:equation74}
-L(\delta) = \sum_{n=2}^{\infty} \frac{-2 \delta}{n^2 - \delta^2} = \sum_{n=2}^{\infty} \left(  \frac{1}{n + \delta} -  \frac{1}{n - \delta} \right) 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation75}
-D(\delta) = \frac{E(\delta)}{E(\delta + \epsilon)} = \frac{\prod\limits_{n = 2}^\infty \left( 1 - \frac{\delta^2}{n^2} \right) }{\prod\limits_{n = 2}^\infty \left( \frac{1 - (\delta + \epsilon)^2}{n^2}\right)} = \prod\limits_{n = 2}^\infty \frac{n^2 - \delta^2}{n^2 - (\delta + \epsilon)^2}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation76}
-D'(\delta) = \frac{E(\delta)L(\delta)E(\delta + \epsilon) - E(\delta)E(\delta + \epsilon)L(\delta + \epsilon)}{E^2 (\delta + \epsilon)} = \frac{E(\delta) [L(\delta) - L(\delta + \epsilon)])}{E(\delta + \epsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation77}
-L(\delta) - L(\delta + \epsilon) = \sum_{n=2}^{\infty} \left(  \frac{\epsilon}{(n + \delta)(n + \delta + \epsilon)} + \frac{\epsilon}{(n - \delta)(n - \delta - \epsilon)} \right) > 0
-\end{equation}
-
-\begin{equation}
-\label{eq:equation78}
-D'(\delta) > 0 
-\end{equation}
-
-$D(\delta)$ -- монотонно возрастающая функция в зависимости от $\delta$, $\frac{1}{D(\delta)}$ -- монотонно убывающая функция. 
-
-На основании уравнения \labelcref{eq:equation72} $\gamma_1, \gamma_2$ могут быть представлены:
-
-\begin{equation}
-\label{eq:equation79}
-\gamma_1 = \frac{E(\delta + \epsilon)}{E(\delta)} 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation80}
-\gamma_2 = \frac{E(\delta - \epsilon)}{E(\delta)} 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation81}
-p(\delta) = \frac{[E(\delta + \epsilon)(3 + 2 \epsilon) + E(\delta - \epsilon)(3 - 2 \epsilon)]}{E(\delta)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation82}
-q(\delta) = \frac{[E(\delta + \epsilon)(3 - 2 \epsilon) + E(\delta - \epsilon)(3 + 2 \epsilon)]}{E(\delta)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation83}
-p'(\delta) = \frac{H_{p}(\delta, \epsilon)}{E(\delta)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation84}
-q'(\delta) = \frac{H_{q}(\delta, \epsilon)}{E(\delta)}
-\end{equation}
-
-Где $H_{p}(\delta, \epsilon)$ и $H_{q}(\delta, \epsilon)$ соответственно:
-
-\begin{equation}
-\label{eq:equation85}
-H_{p}(\delta, \epsilon) = E(\delta + \epsilon)(3 + 2 \epsilon) [L (\delta + \epsilon) - L(\delta)] + E(\delta - \epsilon)(3 - 2\epsilon) [L(\delta - \epsilon) - L(\delta)]
-\end{equation}
-
-\begin{equation}
-\label{eq:equation86}
-H_{q}(\delta, \epsilon) = E(\delta + \epsilon)(3 - 2 \epsilon) [L (\delta + \epsilon) - L(\delta)] + E(\delta - \epsilon)(3 + 2\epsilon)[L(\delta - \epsilon) - L(\delta)]
-\end{equation}
-
-\begin{equation}
-\label{eq:equation87}
-H_{p}(\delta, \epsilon) + H_{p}(- \delta, \epsilon) = 4 \epsilon E (\delta + \epsilon) [L(\delta + \epsilon) - L(\delta)] + 4 \epsilon E (\delta - \epsilon)[L(\delta) - L (\delta - \epsilon)] 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation88}
-H_{q}(\delta, \epsilon) + H_{q}(- \delta, \epsilon) = - 4 \epsilon E (\delta + \epsilon) [L(\delta + \epsilon) - L(\delta)] - 4 \epsilon E (\delta - \epsilon)[L(\delta) - L (\delta - \epsilon)]  
-\end{equation}
-
-Если $L (\delta - \epsilon) - L(\delta) < 0$ и $L(\delta) - L(\delta - \epsilon) < 0$, то:
-
-\begin{equation}
-\label{eq:equation89}
-H_{p}(\delta, \epsilon) + H_{p}(- \delta, \epsilon) < 0  
-\end{equation}
-
-\begin{equation}
-\label{eq:equation90}
-H_{q}(\delta, \epsilon) + H_{q}(- \delta, \epsilon) > 0  
-\end{equation}
-
-\begin{equation}
-\label{eq:equation91}
-H_{p}(\delta, \epsilon) < 0
-\end{equation}
-
-\begin{equation}
-\label{eq:equation92}
-H_{q}(\delta, \epsilon) > 0
-\end{equation}
-
-\begin{equation}
-\label{eq:equation93}
-p'(\delta) = \frac{H_{p}(\delta, \epsilon)}{E(\delta)} < 0
-\end{equation}
-
-\begin{equation}
-\label{eq:equation94}
-q'(\delta) = \frac{H_{q}(\delta, \epsilon)}{E(\delta)} > 0
-\end{equation}
-
-где $p(\delta)$ -- убывающая функция;
-
-$\delta$ -- убывающая функция;
-
-$q(\delta)$ -- возрастающая функция.
-
-\begin{equation}
-\label{eq:equation95}
-I(\delta, \epsilon) = \frac{E(\delta - \epsilon)}{E(\delta + \epsilon)} \cdot \frac{L(\delta - \epsilon) - L(\delta)}{L(\delta) - L(\delta + \epsilon)}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation96}
-K(\epsilon) = \frac{3 + 2\epsilon}{3 - 2\epsilon}
-\end{equation}
-
-Если $I(\delta, \epsilon) > 0$, $0 < K(\epsilon) < 1 < K (\epsilon)$, а также $K(- \epsilon)K(\epsilon) = 1$.
-
-\begin{equation}
-\label{eq:equation97}
-\frac{H_{p}(\delta, \epsilon)}{H_{p}(- \delta, \epsilon)} = \frac{I(\delta, \epsilon) - K(\epsilon)}{K(- \epsilon) - I(\delta, \epsilon)}
-\end{equation}
  
 \begin{equation}
-\label{eq:equation98}
-\frac{H_{q}(\delta, \epsilon)}{H_{q}(- \delta, \epsilon)} = \frac{K(- \epsilon) -  I(\delta, \epsilon)}{I(\delta, \epsilon) - K(\epsilon)}
+	\label{eq:$C_{k}$}
+	C_{k} = \frac{1}{2\pi} \int\limits_{-\pi}^{\pi} f(t) \exp^{-jkt} \mathrm{d}x,
 \end{equation}
 
-Если $\delta > 0$, то:
+где $\bigtriangleup t$ -- интервал дискретизации. 
+
+$N \bigtriangleup t$ -- основной период сигнала. 
+
+ В межгосударственном стандарте \cite{GOST30804.4.7-2013} в качестве способа изменения гармоник напряжения используем ДПФ или БПФ, которые используют дополнительные операции над данными.
+
+Рассмотрим сигнал $x(k)$ с отчетами $N$ для спектра $\dot{X}(n)$. Выражение описывающее ДПФ сигнала имеет следующий вид:
 \begin{equation}
-\label{eq:equation99}
-K(- \epsilon) < \frac{E(\delta + \epsilon)}{E(\delta - \epsilon)}
+	\label{eq:equation1}
+	\dot{X}(n)= \displaystyle\sum_{k=0}^{N-1} x(k) \cdot \exp\left( -j \cdot \frac{2 \pi n k}{N}\right).
 \end{equation}
 
-\begin{equation}
-\label{eq:equation100}
-1 < \frac{L(\delta) - L(\delta + \epsilon)}{L(\delta - \epsilon) - L(\delta)} < K(\epsilon)
-\end{equation}
+Если период равен $T$ для аналогово сигнала кратный расстоянию между отчетами дискретизированного сигнала. То процедура ДПФ обеспечивает точные  параметры для высших гармоник.
 
-\begin{equation}
-\label{eq:equation101}
-K(- \epsilon) < I(\delta, \epsilon) < K(\epsilon)
-\end{equation}
-
-Подставив уравнение \labelcref{eq:equation101} в  \labelcref{eq:equation97} и  \labelcref{eq:equation98}, то $\frac{H_{p}(\delta, \epsilon)}{H_{p}(- \delta, \epsilon)} > 0$, а также $\frac{H_{q}(\delta, \epsilon)}{H_{q}(- \delta, \epsilon)} > 0$
-
-\begin{equation}
-\label{eq:equation102}
-T(\delta,  \epsilon) = \frac{L(\delta) - L(\delta + \epsilon)}{L(\delta - \epsilon) - L(\delta)} \cdot \frac{ \sum_{n = 2}^{\infty} a_{n}}{\sum_{n = 2}^{\infty} b_{n}}
-\end{equation}
-
-\begin{equation}
-\label{eq:equation103}
-a_{n} = \frac{1}{(n + \delta)(n + \delta - \epsilon)} + \frac{1}{(n - \delta)(n - \delta - \epsilon)} 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation104}
-b_{n} = \frac{1}{(n + \delta)(n + \delta - \epsilon)} + \frac{1}{(n - \delta)(n - \delta + \epsilon)} 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation105}
-C_{n} = \frac{a_{n}}{b_{n}} = \frac{n^2 -\delta^2 - \epsilon^2 + 2\delta \epsilon}{n^2 -\delta^2 - \epsilon^2 - 2\delta \epsilon} \cdot \frac{n^2 + \delta^2 + \delta \epsilon}{n^2 + \delta^2 - \delta \epsilon}
-\end{equation}
-
-Если $\delta > 0$, $\frac{n^2 - \delta^2 - \epsilon^2 +2\delta \epsilon}{n^2 - \delta^2 - \epsilon^2 - 2\delta \epsilon} > 1$ также $\frac{n^2 + \delta^2 + \delta \epsilon}{n^2 + \delta^2 - \delta \epsilon} > 1$, то:
-
-\begin{equation}
-\label{eq:equation106}
-C_{n} > C_{n + 1} > 1 
-\end{equation}
-
-\begin{equation}
-\label{eq:equation107}
-1 < T(\delta, \epsilon) < C_{2}
-\end{equation} 
-
-$C_{n}$ может быть записана:
-\begin{equation}
-\label{eq:equation108}
-C = \frac{1 + \frac{2 \delta \epsilon}{(n^2 - \delta^2 - \epsilon^2)}}{1 - \frac{2 \delta \epsilon}{(n^2 - \delta^2 - \epsilon^2)}} \cdot \frac{1 + \frac{\delta \epsilon}{(n^2 + \delta^2)}}{1 - \frac{\delta \epsilon}{(n^2 + \delta^2)}}
-\end{equation} 
-
-Вводя параметр $D_{1} =  \frac{2 \delta \epsilon}{(n^2 - \delta^2 - \epsilon^2)}$ и $D_{1} =  \frac{\delta \epsilon}{n^2 + \delta^2}$
-
-\begin{equation}
-\label{eq:equation109}
-C_{n} = \frac{1 + D_{1}}{1 - D_{1}} \cdot  \frac{1 + D_{2}}{1 - D_{2}} = \frac{1 + D_{1}D_{2} + D_{1} + D_{2}}{1 + D_{1}D_{2} - D_{1} - D_{2}} = \frac{1 + \frac{(D_{1} + D_{1})}{(1 + D_{1}D_{2})}}{1 - \frac{(D_{1} + D_{1})}{(1 + D_{1}D_{2})}}
-\end{equation} 
-
-\begin{equation}
-\label{eq:equation110}
-D = \delta \epsilon \frac{3n^2 - \epsilon^2 + \delta^2}{(n^2 - \delta^2 - \epsilon ^2)(n^2 + \delta ^2) + 2 \delta ^2 \epsilon^2} < \delta \epsilon \frac{3 n^2 + \frac{1}{4}}{(n^2 - \frac{1}{2})n^2}
-\end{equation} 
-
-Если $n = 2$, то
-\begin{equation}
-\label{eq:equation111}
-D < \epsilon \ frac{6 + \frac{1}{8}}{14} < \frac{2}{3} \epsilon
-\end{equation} 
-
-Соответственно:
-\begin{equation}
-\label{eq:equation112}
-1 < T(\delta, \epsilon) < C_{2} < \frac{1 + \frac{2 \epsilon}{3}}{1 - \frac{2 \epsilon}{3}} = K(\epsilon)
-\end{equation} 
-
-При $\delta <0$ получаем $K(\epsilon) < T(\delta, \epsilon) < 1$ 
-
-\section{Оценка частоты энергосистемы с использованием дифференциатора наименьших средних квадратов} \label{sec:ch2/sec6}
-
-Частота энергосистемы является решающим фактором для мониторинга и контроля рабочего состояния сети, а также для синхронизации и управления электронными преобразователями мощности, подключенными к ней. Некоторые методы синхронизации, используемые в преобразователях мощности, подключенных к сети, основаны на точной оценке частоты сети. 
-\cite{lee2013novel, lee2011active}. Несколько методов было разработано для получения частоты электросети, как описано в \cite{chen2013comparative}. На основе DFT \cite{borkowski2014interpolated,kamwa2004performance}, искусственная нейронная сеть \cite{jiang2014frequency}, частотно-замкнутый контур (FLL) \cite{fedele2014frequency}, широколинейная фаза наименьшего среднего значения (WLLMP) \cite{xia2014widely}, наименьшие квадраты (LS) \cite{kuvsljevic2013ls}, Комплексные наименьшие средние квадраты \cite{pradhan2005power, xia2014complex} наименьшие квадраты, примененные к фазовому углу \cite{ramos2015frequency}, улучшенный алгоритм рекурсивного ньютоновского типа (IRNTA) \cite{ray2015improved}, фильтр Калмана \cite{routray2002novel}, Prony \cite{rubeena2014accurate}, улучшенная фазовая автоподстройка частоты (EPLL) ) \cite{karimi2010application}, фаза кадра синхронной автоподстройки частоты (ОСР-ФАПЧ) \cite{golestan2013performance}, и переход через нуль \cite{ramos2005synchronizing} среди доступных методов оценки частоты.
-Точность оценки частоты сильно зависит от помех в энергосистеме. Нарушения могут быть разделены на две основные группы: стационарное состояние и переходные процессы. Проблемы установившегося состояния включают несбалансированные напряжения, гармоники, низкочастотные колебания амплитуды и отклонения частоты. Временные проблемы включают в себя внезапные изменения основной формы волны напряжения и амплитуд и фаз гармоник, изменения частоты, скачки фазового угла, пики, вырезы, экспоненциальные затухающие компоненты и шум. Поскольку возмущения энергосистемы увеличиваются с распространением систем распределенной генерации и нелинейных нагрузок, крайне важно, чтобы алгоритм оценки частоты был невосприимчив к помехам. Одновременно алгоритм должен иметь достаточную пропускную способность для отслеживания изменений частоты. Компромисс между шириной полосы и отклонением помех является общим свойством для всех методов оценки частоты.
-В этой статье предлагается метод оценки частоты, основанный на дифференцировании фазового угла комплексной синусоиды, полученной путем применения матрицы преобразования Кларка к напряжениям сетки. Насколько известно авторам, первые случаи использования фазовых углов для получения частоты сложной синусоиды были описаны Треттером \cite{tretter1985estimating} и Кейем \cite{kay1989fast}. МакКиллиам \cite{mckilliam2010frequency} предложил версию, более устойчивую к шуму за счет времени вычислений. Идея в \cite{tretter1985estimating} состоит в том, чтобы использовать метод наименьших квадратов (LSM), чтобы развернуть развернутый фазовый угол в прямую линию, где наклон указывает частоту. Таким образом, частота задается первой производной фаTзового угла. Таким образом, \cite{tretter1985estimating} дает те же результаты, что и применение фильтра Савицкого – Голея первого порядка \cite{schafer2011savitzky} к фазовым углам. Версия Kay \cite{kay1989fast} улучшает оценку, избегая шага разворачивания фазового угла, используя разности фазного угла назад. Другое тонкое улучшение заключается в том, что в версии Kay нет ограничения на то, что количество выборок должно быть нечетным. Вклад этой статьи: добавление фильтра скользящего среднего (MAF) для дальнейшего сглаживания оценки частоты и обеспечения полной оценки устойчивости оценщика к гармоникам напряжения и дисбалансам; разработка метода выбора количества выборок, используемых алгоритмом LMS; рекурсивная реализация алгоритма LMS.
-
-\subsection{Оценка частоты сетки с использованием фазовых углов и алгоритма LMS} \label{sec:ch2/sec1_1}
-
-Используя преобразование Кларка, сеточные напряжения выражаются в стационарном $\alpha \beta$ -- кадре :
-
-\begin{equation}
-\label{eq:equation113}
-[u_{\alpha}[n],u_{\beta}[n]]^T=\dfrac{\sqrt{2}}{2\sqrt{3}} 
-\begin{bmatrix}
-2 & -1 & -1\\
-0 & \sqrt{3} & -\sqrt{3}
-\end{bmatrix}
-[u_1[n], u_2[n], u_3[n]]^T ,
-\end{equation} 
-
-где $u_1[n], u_2[n]$  и  $u_3[n]$ представляют текущую выборку трех фазно-нейтральных напряжений сетки, выбранных на частоте $f_s$  и периоде $T_s$.
-Затем компоненты $u_{\alpha}[n] , u_{\beta}[n]$ используются для формирования сложной синусоиды $u_c[n]$:
- 
-\begin{equation}\label{eq:equation114}
-u_c [n]= u_{\alpha}[n]+j* u_{\beta}[n] ,
-\end{equation}
-
-который также может быть представлен в полярной форме:
-
-\begin{equation}\label{eq:equation115}
-u_c [n]= a[n]exp(j\theta [n] ),
-\end{equation}
-
-где фазовый угол $\theta [n]$ получается выражением:
-
-\begin{equation}\label{eq:equation116}
-\theta[n]=atan (u_{\beta} [n],u_{\alpha}[n] ),
-\end{equation}
-
-и $ atan(y,x)$  функция представляет угол четырех квадрантов из функции $tan^{-1} \dfrac{x}{y}$
-
-В незагрязненной сетке текущее значение фазового угла, определяемое как (4), равно фазовому углу основной положительной последовательности $(\theta^{1+})$, и текущая частота сетки        $(f_g [n])$ получается из разности между текущей и последней выборками фазового угла:
-
-\begin{equation}\label{eq:equation117}
-f_{g} [n]=(\theta[n]- \theta[n-1] ) f_{s} /(2\pi)
-\end{equation}
-
-В общей сетке, нарушенной гармониками, дисбалансами и шумом, фазовый угол $\theta$ является основным фазовым углом прямой последовательности $\theta ^{1+}$, на который накладывается фазовый угол ошибки. Значения $\theta ^{1+}$,  можно оценить, поместив развернутую последовательность $N$ элементов  $\theta`$ из значений $\theta$ в прямую линию. Расчетная частота сетки затем получается по наклону линии подгонки. Если метод наименьших квадратов используется для подгонки развернутых значений $\theta`$, текущий оцененный фазовый угол прямой последовательности $\theta ^{1+} [n]$  и текущая расчетная частота  $f_{g} [n] $  определяются как \cite{tretter1985estimating, kay1989fast}:
-
-\begin{equation}\label{eq:equation118}
-\hat{\theta}^{1+}[n] = \dfrac{6}{N(N+1)} \sum\limits_{i=0}^{N-1} i \theta^\prime[n+i-N+1]-\dfrac{2N-4}{N(N+1)} \sum\limits_{i=0}^{N-1} \theta^\prime[n+i-N+1]
-\end{equation}
-
-\begin{equation}\label{eq:equation119}
-\hat f_{g}[n] = \dfrac{6f_{s}}{N(N^{2}+1)\pi} \sum\limits_{i=0}^{N-1} i \theta^\prime[n+i-N+1]-\dfrac{3f_{s}}{N(N+1\pi)} \sum\limits_{i=0}^{N-1} \theta^\prime[n+i-N+1]
-\end{equation}
-
-Последовательность $\theta^\prime [n+i-N+1], i = {0,1,…,N-1}$ получается путем развертывания последовательности $h$ фазового угла, образованной текущим значением $(i=0)$ и $N-1$ прошлыми элементами.
-
-Чтобы избежать трудоемкой операции развертывания фазового угла, оценка частоты сетки 
-\^f$_{g}$ может быть выражена в функции обратной разности $(\theta)$ фазового угла $(\delta)$, определяемой как:
-
-\begin{equation}\label{eq:equation120}
-\delta[n]  =
-\begin{cases}
-\theta[n]-\theta[n-1]-2\pi, &\text{если $\theta[n]-\theta[n-1] >\pi$} \\
-\theta[n]-\theta[n-1], &\text{если $ -\pi<\theta[n]-\theta[n-1] \leqslant \pi$} \\
-\theta[n]-\theta[n-1]+2\pi, &\text{если $\theta[n]-\theta[n-1] \leqslant -\pi$} 
-\end{cases}
-\end{equation}
-
-\begin{figure}[ht]
+Применение дополнительных методов для определения параметров напряжения обусловлено неспособностью ДПФ определить частоту сигнала. На рисунке \ref{img:Maximum_DFT.pdf} показано, что спектр сигнала не совпадает с максимумом спектра напряжения \cite{Definition_parameters_Altman_2012, Digital_processing_Sergienko_2011}. 
+\begin{figure}[p]
 	\centering
-	%\includegraphics [scale=0.9] {f1.png}
-	\includegraphics [width=0.9\linewidth] {f1.png}
-	\caption{Оценщик (9) веса и амплитуды частотной характеристики образца.}
-	\label{img:picture15}
+	\includegraphics [scale=0.5] {Maximum_DFT.pdf}
+	\caption{Несовпадение максимума спектра напряжения и максимума ДПФ.}
+	\label{img:Maximum_DFT.pdf}
+\end{figure}
+На рисунке \ref{img:Maximum_DFT.pdf} обозначим максимум ДПФ -- $k$, $k-1$, $k+1$ -- вершины. $k_{peak}$ -- порядковый номер гармоники спектра напряжения. Диапазон между максимумо ДПФ и порядковым номером максимальной гармоники обозначим $\delta$
+
+ДПФ широко используемая вычислительная задача. Приложения его включают обработку сигналов, сжатие аудио/изображений/видео. 
+
+В настоящее время быстрым алгоритмом является БПф, который вычисляет ДПФ $n$-мерного сигнала за время $O(n \log n)$. Существование алгоритмов ДПФ быстрее, чем БПФ.
+
+	
+
+
+
+\section{При анализе спектра многотонального сигнала с помощью дискретного преобразования Фурье в большинстве случаев имеются гармоники частота которых не кратна частоте основной гармоники. При оценке их параметров необходимо учитывать изменение спектра сигнала, связанное с ограниченной длиной выборки этого сигнала} \label{sec:ch2/sec3}
+
+
+
+
+
+
+
+\section{При анализе спектра сигнала с ограниченной выборкой необходимо использовать оконные функции, поскольку в противном случае сигнал будет взвешен прямоугольной оконной функцией с плохой частотной характеристикой} \label{sec:ch2/sec4}
+Требуется выполнить процедуру измерения частоты дискретизации. Для передискретизации необходимо знать частоту основной гармоники.
+Перед выполнением БПФ-отчеты взвешиваются и умножаются на симметричную функцию. Для периодических сигналов и синхронизированных отчетов лучше использовать прямоугольную функцию взвешивания. 
+
+
+
+
+
+
+
+
+
+\section{Нижняя граница Крамера-Рао} \label{sec:ch2/sec5} %АНТИПЛАГИАТ=
+% Альтман Е. А., Васеева Т. В., Александров А. В. ГРАНИЦА КРАМЕРА-РАО ДЛЯ АМПЛИТУДЫ ГАРМОНИКИ ПРИ ИСПОЛЬЗОВАНИИ ОКОННЫХ ФУНКЦИЙ //Динамика систем, механизмов и машин. – 2020. – Т. 8. – №. 2. – С. 145-152.
+% ВВЕДЕНИЕ 
+Для определения точности полученных результатов алгоритмы можно проверить с помощью неравенства Крамера-Рао. В зарубежной литературе чаще встречается термин Cramer-Rao lower bound (CRLB), что обозначает <<нижняя граница Крамера-Рао>>. В неравенстве Крамера-Рао сигнал имеет наибольшую величину дисперсии при некоторых условиях. Если неравенство Крамера-Рао преобразуется в равенство, то оценка параметров считается наилучшей. Отсюда следует, что дисперсия данной оценки самая маленькая из возможных. 
+
+Несмещенная оценка, которая достигается нижней границей Крамера-Рао, называется эффективной. Такое решение обеспечивает наименьшую среднеквадратичную ошибку среди несмещенных методов и называется minimum variance unbiased (MVU)~--~<<оценкой с минимальной несмещенной дисперсией>> \cite{альтман2020граница}.
+
+Информация Фишера играет важную роль в статическом моделировании для построения гипотез с использованием оценок максимального правдоподобия. Функция правдоподобия называется maximum likelihood estimation (MLE), то есть <<оценкой максимального правдоподобия>>. Если можно найти производную из функции правдоподобия, то решение первого порядка производной функции возможно с помощью метода наименьших квадратов. Чаще используют методы определения локальных максимумов и минимумов с помощью численных методов \cite{press1992art}.
+
+% 14. Press, W. H.; Flannery, B. P.; Teukolsky, S. A.; Vetterling, W. T. (1992). "Least Squares as a Maximum Likelihood Estimator". Numerical Recipes in FORTRAN: The Art of Scientific Computing (2nd ed.). Cambridge: Cambridge University Press. pp. 651–655. ISBN 0-521-43064-X.
+
+Формирование уравнений для получения оценки и вычисления ее дисперсии можно решать формирование по методу максимального правдоподобия. Известно \cite{kay1993fundamentals}, что максимально правдоподобные оценки асимптотически состоятельны и эффективны, то есть их дисперсия совпадает с нижней границей Крамера-Рао. В источнике \cite{kay2013fundamentals} представлена классификация существующих алгоритмов оценки. Также следует отметить, что решения алгоритмов зависят от того, считается ли сигнал детерминированным или результатом случайного процесса. Предложенная формула в статье позволяет выбирать оконную функцию для решения задач спектрального анализа и дает оценку дисперсии амплитуды при выборе метода.
+
+% 12. Kay S. M. Fundamentals of statistical signal processing. – Prentice Hall PTR, 1993.
+% 13. Kay S. M. Fundamentals of statistical signal processing: Practical algorithm development. – Pearson Education, 2013. – Т. 3.
+%МАТЕМАТИЧЕСКАЯ МОДЕЛЬ ДЛЯ ОЦЕНКИ ТОЧНОСТИ НАХОЖДЕНИЯ АМПЛИТУДЫ ГАРМОНИКИ
+В общем случае граница Крамера-Рао определяется следующим образом \cite{kay1993fundamentals, kay2013fundamentals}:
+% 12. Kay S. M. Fundamentals of statistical signal processing. – Prentice Hall PTR, 1993.
+%13. Kay S. M. Fundamentals of statistical signal processing: Practical algorithm development. – Pearson Education, 2013. – Т. 3.
+
+\begin{equation}
+	\label{eq:equation1}
+	var(\theta)\geq\frac{1}{-E\left[\frac{(\delta^2 ln p(x;\theta)}{\delta\theta^2}\right]}
+\end{equation}
+
+где $\theta$ -- оцениваемый параметр; 
+
+var($\theta$) -- дисперсия (variance) несмещенной оценки параметра;
+
+$E$ -- среднее значение;
+
+$p(x;\theta)$ -- функция правдоподобия.
+
+Формулу ~(\ref{eq:equation1}) при выполнении условия регулярности функции правдоподобия можно разделить на части и записать в следующем виде:
+
+\begin{equation}
+	\label{eq:equation2}
+	var(\theta)\geq\frac{1}{I(\left.\theta)\right]}
+\end{equation}
+
+где $I(\theta)=-E\left[\frac{\delta^2 ln p(x;\theta)}{\delta\theta^2}\right]$ -- количество информации по Фишеру, получаемой в результате наблюдения.
+
+По формуле ~(\ref{eq:equation2}) хорошо просматривается физический смысл границы Крамера-Рао: дисперсия оценки параметра обратно пропорциональна количеству информации, полученному в результате наблюдения.
+
+При наблюдении за дискретным сигналом, на который накладывается аддитивный белый гауссовский шум, формула (\ref{eq:equation1}) может быть записана в виде: 
+
+\begin{equation}
+	\label{eq:equation3}
+	var(\theta)\geq\frac{\sigma^2}{\sum_{n=0}^{N-1}\left(\frac{\delta x(n;\theta)}{\delta\theta}\right)^2}
+\end{equation}
+
+где $\sigma $ -- среднее квадратичное отклонение шума;
+
+N -- число отсчетов в дискретном сигнале;
+
+$x(n;\theta)$ -- наблюдаемый сигнал.
+
+В нашем случае наблюдаемый сигнал описывается следующей формулой:
+\begin{equation}
+	\label{eq:equation4}
+	x_n=A\cos(2*\pi*f*n+\phi)+wgn_n, n\in0,…,n-1
+\end{equation}
+
+где $A$ -- амплитуда сигнала;
+
+$f$ -- частота;
+
+$\phi$ -- фаза;
+
+$wgn$ -- белый гауссовский шум.
+
+Этот сигнал содержит три неизвестных параметра (амплитуду, частоту и фазу). Строго говоря, в данном случае нужно применять векторный вариант формулы для границы Крамера-Рао, однако, как показано в \cite{kay1993fundamentals}, при условии, что частота сигнала не находится вблизи от частот равных нулю или половине частоты дискретизации, влияние неопределенности частоты и фазы сигнала на неопределенность амплитуды пренебрежимо мало.
+
+Пренебрегая неопределенностью частоты и фазы получим следующую формулу для дисперсии оценки амплитуды гармоники в аддитивном белом гауссовском шуме: 
+
+\begin{equation}
+	\label{eq:equation5}
+	I(A)=\sum_{n=0}^{N-1}\left( \frac{\delta x}{\delta A} \right)^2 =\frac{1}{\sigma^2} \sum_{n=0}^{N-1}\cos^2 (2*\pi*f*n+\phi)\approx \frac{N}{2\delta ^2 }
+\end{equation}
+
+После применения оконной функции сигнал будет записан в виде: 
+
+\begin{equation}
+	\label{eq:equation6}
+	x_n^{'}= w_n*A\cos(2*\pi*f*n+\phi)+w_n*wgn_n,..n\in 0,…,n-1
+\end{equation}
+где $w$ -- оконная функция.
+
+Рассмотрим слагаемые в формуле ~(\ref{eq:equation6}) по отдельности. Слагаемое $w_n*wgn_n$ будет представлять собой нормально распределенную случайную величину с нулевым математическим ожиданием. Определим дисперсию этой случайной величины.
+
+Во всех $n\in 0,…,n-1$ отклонение от нуля будет нормально распределено со средним отклонением равным $w_n*\sigma$. Среднее квадратичное отклонение в каждой точке будет равно $w_n^2*\sigma^2$. Усредняя по всем n получаем, что дисперсия случайной величины $w_n*wgn_n$ будет: 
+
+\begin{equation}
+	\label{eq:equation7}
+	\sigma^{'2}=\frac{\sum_{n=0}^{N-1} w_n^2}{N}*\sigma^2
+\end{equation}
+
+Теперь, для нахождения дисперсии результата оценки амплитуды, мы можем воспользоваться формулой (\ref{eq:equation1}) и подставить в нее новую дисперсию шума $\sigma^{'^2}$.
+
+Рассмотрим знаменатель правой части формулы. Для упрощения выкладок воспользуемся трансформацией параметра при определении границы Крамера-Рао \cite{kay1993fundamentals,kay2013fundamentals}. Если величина $\alpha$, которую нужно оценить, связана с величиной $\theta$, для которой известна граница Крамера-Рао, соотношением $\alpha=g(\theta)$, то границу Крамера-Рао для величины $\alpha$ можно найти по формуле: 
+
+\begin{equation}
+	\label{eq:equation8}
+	var(\theta)\geq \frac{\left(\frac{\delta^2 g}{\delta\theta}\right)}{-E\left[\frac{\delta^2 ln p(x;\theta)}{\delta \theta^2}\right]^{'}}
+\end{equation}
+
+Умножение сигнала на оконную функцию приводит к сворачиванию каждой гармоники сигнала со спектром оконной функции. В случае единственной гармоники ее амплитуда умножается на нулевую гармонику спектра оконной функции. Нулевая гармоника сигнала это постоянная составляющая, ее значение для оконной функции можно найти по формуле: 
+
+\begin{equation}
+	\label{eq:equation9}
+	w_0= \frac{\sum_{n=0}^{N-1} w_n}{N}.	  
+\end{equation}
+
+Получаем, что: 
+\begin{equation}
+	\label{eq:equation10}
+	A^{'}=\frac{A}{w_0} ,		  
+\end{equation}
+
+где A -- амплитуда гармоники, полученная в результате оценки умноженного на оконную функцию сигнала; 
+
+$A^{'}$ -- амплитуда гармоники исходного сигнала.
+
+В нашем случае величина $\theta$ с известной границей Крамера-Рао это A, величина $\alpha$ с неизвестной границей это  $A^{'}$ , $g(\theta)=\frac{\theta}{w_0}, \left(\frac{\delta^2 g}{\delta \theta}\right)^2=\frac{1}{w_0^2}$.
+
+Собирая все полученные соотношения вместе, получим формулу для дисперсии оценки амплитуды гармоники при использовании оконной функции: 
+\begin{equation}
+	\label{eq:equation11}
+	var(A)\geq \frac{2\sigma^2}{N} \frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n \right)^2} 			  
+\end{equation}
+
+%5. Ухудшение точности оценки можно определить исходя из предложенного в главе коэффициента окна. Данный коэффициент показывает, насколько уменьшиться точность оценки амплитуды гармоники для оптимальной несмещенной оценки при применении такого окна, а также может использоваться для оценки снижения точности параметров.
+
+С практической точки зрения имеет смысл выделить из этой формулы вторую часть. Введем обозначение коэффициент окна: 
+\begin{equation}
+	\label{eq:equation12}
+	F_{win}=\frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n\right)^2}
+\end{equation}
+
+Данный коэффициент показывает, во сколько ухудшится оценка амплитуды гармоники при использовании окна $w$.
+% РЕЗУЛЬТАТЫ ЭКСПЕРИМЕНТОВ
+Для проверки правильности рассмотренных выкладок мы промоделировали измерение амплитуды гармоник в однотональном сигнале. Экспериментально были проверены формулы (\ref{eq:equation7}) (оценка дисперсии белого шума после наложения на него окна) и (\ref{eq:equation11}) (оценка дисперсии амплитуды гармоники). Для формулы (\ref{eq:equation11}) были построены два графика -- дисперсия в зависимости от окна и от уровня шума.
+
+Зависимость дисперсии сигнала с шумом от дисперсии сигнала с наложенным на него окном (окно Кайзера с параметром $kaiser\_beta$) приведена на рисунке \ref{img:noise_win_var}.
+
+Основная часть программы для оценки дисперсии белого шума после наложения на него окна представлена в приложении \ref{app:Г}. Здесь $np$ это импортированная библиотека numpy, $variances$ -- массив исходных значений дисперсий белого шума.
+\begin{figure}[ht]
+	\centerfloat{
+		\includegraphics[scale=0.9]{noise_win_var.png}
+	}
+	\caption{Зависимость дисперсии шума после наложения окна от параметра окна.}\label{img:noise_win_var}
+\end{figure}
+Использовались параметры $kaiser\_beta=5$ и $n\_point = 1000$ и $n\_test = 100$.
+Сплошной линией отображены результаты моделирования, штриховой -- результаты расчета по формуле (\ref{eq:equation7}).
+
+Результаты моделирования при других параметрах аналогичны. Моделирование оценки амплитуды при использовании разных окон проводилось с использованием окна Кайзера с различными параметрами бета. При различных бета данное окно обладает свойствами, сопоставимыми со всеми другими окнами, поэтому полученные результаты справедливы для всех окон (приложение \ref{app:Д}). 
+Результаты моделирования приведены на рисунке \ref{img:estimate_amp_sin_kaiser_beta}. 
+\begin{figure}[ht]
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_kaiser_beta.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от параметра окна.}\label{img:estimate_amp_sin_kaiser_beta}
 \end{figure}
 
-Три случая для вычисления $\delta$ необходимы для учета циклического характера фазового угла. Это позволяет избежать абсолютных разностей фазового угла, превышающих $\pi$ радиан.
-
-Используя \labelcref{eq:equation120}, оценка частоты сетки \labelcref{eq:equation119} выражается как:
-
-\begin{equation}\label{eq:equation121}
-\hat f_{g}[n] = \sum\limits_{i=0}^{N+2} \dfrac{3f_{s}}{4\pi} 
-\dfrac{N^2-4(i-\dfrac{1}{2}N +1)^{2}} {N(N^2 -1)} \delta[n-i] = \sum\limits_{i=0}^{N+2} f_s w [-i]\delta [n-i]
-\end{equation}
-
-где $w[-i]$ представляет вес выборки окна, примененный к каждой разности фаз и углов, задержанной на $i$ выборок$ (\delta [n - 1])$:
-
-\begin{equation}\label{eq:equation122}
-w[-i] =\dfrac{3}{4\pi} \dfrac{N^2-4(i-\dfrac{1}{2}N +1)^{2}} {N(N^2 -1)}, i=2-N, ..., -1, 0
-\end{equation}
-
-На \labelcref{img:picture15}  показан вес выборки окна \labelcref{eq:equation122} и частотная характеристика выражения \labelcref{eq:equation121} для четырех значений $ N $. Без потери общности и по соображениям ясности был выбран диапазон небольших значений $ N $. Частоты $ f_1, f_2 и f_3 $ являются частотами, для которых частотная характеристика имеет нулевое усиление для $ N = 9 $.
-
-Как уже упоминалось в \cite{kay1989fast}, \labelcref{eq:equation121} достигает Крамера-Рао для сигнала к шуму (SNR) больше, чем на 6 дБ. Это означает, что этот оценщик будет иметь лучшее подавление шума для SNR более 6 дБ. Однако этот оценщик не может полностью отклонить содержание гармоник сетки, потому что нет значения N, которое приводит к нулевому усилению на всех частотах $ f=hf_g $, где $  h $ - порядок гармоник.
-
-\subsection{Фильтрация оценки частоты с помощью фильтра скользящих средних} \label{sec:ch2/sec1_2}
-
-В общей сетке, нарушенной гармониками и дисбалансами, выражение фазового угла $ \theta $ не имеет простой замкнутой формы, как в \labelcref{eq:equation116}. Тем не менее, следующие свойства подтверждаются численным моделированием: компонент постоянного тока создает колебание фазового угла с той же частотой, что и сетка; положительная последовательность гармоники n-го порядка дает осцилляцию ошибки фазового угла $ (n - 1) $, умноженную на частоту сетки; отрицательная последовательность гармоники n-го порядка создает осцилляцию ошибки фазового угла $ (n + 1) $, умноженную на частоту сетки; значение ошибки фазового угла в течение периода сетки равно нулю. На \labelcref{img:picture16} показаны четыре примера с различными условиями сетки, где $  \theta^{1+} $- это фазовый угол основной прямой последовательности, а $ \theta $- фазовый угол, полученный из \labelcref{eq:equation116}.
-
-Фильтр скользящего среднего, применяемый к оценке частоты LMS $ ({\hat{f}}_g) $, может полностью устранить ошибки частоты из-за гармоник и дисбалансов, если длина фильтра совпадает с периодом сетки. Это происходит потому, что фильтр MAF определяется:
-
-\begin{equation}\label{eq:equation123}
-y[n] =\dfrac{1}{N} \sum\limits_{i=0}^{N-1} x [n-i]
-\end{equation}
-
+Сплошной линией показаны расчеты по формуле (\ref{eq:equation11}), штриховой -- результаты моделирования. При увеличении числа тестов рисунки становятся все более одинаковыми. Результаты моделирования приведены на рисунке \ref{img:estimate_amp_sin_kaiser_noise}. Программа для моделирования оценки амплитуды при различных уровнях шума приведена в приложении \ref{app:Е}.
 \begin{figure}[ht]
-	\centering
-	%\includegraphics [scale=0.9] {f1.png}
-	\includegraphics [width=0.9\linewidth] {f2.png}
-	\caption{Примеры фазового угла с несколькими устойчивыми состояниями сетки: (а) незагрязненный; (б) загрязнены постоянным током; (в) загрязнены положительной последовательностью 5-й гармоники и (е) загрязнены отрицательной последовательностью 5-й гармоники.}
-	\label{img:picture16}
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_kaiser_noise.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума.}\label{img:estimate_amp_sin_kaiser_noise}
 \end{figure}
 
-Имеет частотную характеристику с нулевой величиной в частотах, кратных обратному временному окну, то есть все сигналы в форме:
+Штриховой линией приведены результаты расчетов по формуле (\ref{eq:equation11}), сплошной -- результаты моделирования, линией из точек -- граница Крамера-Рао.
 
-\begin{equation}\label{eq:equation124}
-x[n]=a cos{(2\pi / Nkn+1)}
+%ОБСУЖДЕНИЕ РЕЗУЛЬТАТОВ
+Оценку точности результатов для данных, которые сами по себе являются оценкой точности, выполнить на прямую довольно затруднительно. Для проверки точности и достоверности результатов все эксперименты повторялись с различным числом опытов (величина $n\_test$ в программах). Во всех трех экспериментах с увеличением числа опытов экспериментальные кривые сглаживались и становились визуально не отличимые от расчетных данных.
+
+Эксперименты были проведены при различных входных параметрах (число точек, амплитуда, частота и фаза сигналов, дисперсия шума или коэффициент окна). Ни в одном случае не было зафиксировано отклонение результатов эксперимента от результатов, полученных по предложенной формуле.
+
+Таким образом, результаты моделирования алгоритма оценки амплитуды гармоники в условиях шума при наложении оконной функции подтверждают полученные соотношения для оценки дисперсии оценки амплитуды.
+
+%ВЫВОДЫ И ЗАКЛЮЧЕНИЕ
+В работе получена формула для оценки дисперсии амплитуды при ее оценке с помощью оптимального несмещенного метода с использованием оконной функции.
+
+Эта формула дает оценку дисперсии при использовании метода, вносящего оптимальную несмещенную оценку. К таким методам относится корреляционный анализ на основе БПФ, который чаще всего и используется при решении задач спектрального анализа.
+
+Предложенная формула может использоваться при выборе оконной функции для решения задач спектрального анализа. Точность получаемой оценки амплитуды – это не единственный критерий при таком выборе, но этот критерий часто является наиболее значимым.
+
+Она также может использоваться на стадии оценки точности выработанного алгоритма анализа спектра сигнала, для оценки уровня шума и в других смежных задачах.
+
+Используемый в работе подход для нахождения дисперсии результата алгоритма обработки сигналов может быть применен и для других задач обработки сигналов, в которых применяются оконные функции или другие предварительные преобразования сигнала.
+
+\section{Граница крамера-рао амплитуды однотонального сигнала для методов ее оценки с использованием оконных функций} \label{sec:ch2/sec6} %АНТИПЛАГИАТ=90,62%
+% Васеева Т. В., Альтман Е. А. ГРАНИЦА КРАМЕРА-РАО АМПЛИТУДЫ ОДНОТОНАЛЬНОГО СИГНАЛА ДЛЯ МЕТОДОВ ЕЕ ОЦЕНКИ С ИСПОЛЬЗОВАНИЕМ ОКОННЫХ ФУНКЦИЙ //Инновационные проекты и технологии в образовании, промышленности и на транспорте. – 2021. – С.
+
+Граница Крамера-Рао позволяет найти минимальную дисперсию оценки параметра сигнала. Для гармонических сигналов известны различные формулы, которые оценивают параметры: дисперсии амплитуды, частоты и фазы гармоник. Известные алгоритмы оценки показывают результаты выше границы Крамера-Рао. В проведенных исследованиях \cite{альтман2020граница} вывелась формула для оценки минимальной дисперсии амплитуды гармоник для методов, использующих оконные функции. В данной статье более подробно рассмотрели влияние различных окон на сигнал. Полученные результаты позволят решать задачи выбора оконной функции для спектрального анализа.
+
+Модель напряжения $u_{t}$ рассматривается как сумма элементарных синусоидальных сигналов разных частот (1), которые кратны основной частоте, с наложенным аддитивным белым гауссовым шумом 
+%η(t):
+
+\begin{equation}
+	\label{eq:equation13}
+	u(t)=\sum_{v=0}^{v=N}A_{v}\cos \left( \frac{2 \pi}{T_{s}}vt + \varphi_{v} \right) + \eta(t)
 \end{equation}
 
-(где $ a$ и $b $ являются действительными числами; $  N, k$ и $ n $ являются целыми числами), становятся нулевыми после фильтрации по MAF длиной N точек (y [n] = 0).
+где $A_{v}$ -- амплитуда $v$-й гармоники;
 
-Таким образом, число отсчетов MAF задается как $ N=f_s / f_g $, но это выражение действительно только тогда, когда $ f_s / f_g $ является целым числом. Поскольку в общем случае это не будет так, число выборок MAF должно быть округлено до ближайшего целого числа:
+$\varphi_{v}$ -- фаза $v$-й гармоники;
 
-\begin{equation}\label{eq:equation125}
-N=round(f_s / f_g)
-\end{equation}
+$T_{s}$ -- период.
 
-Однако это означает, что частотная характеристика фильтра MAF на частотах гармоник сетки больше не равна нулю, а имеет значение, которое уменьшается с увеличением $ N $, т.~е. чем больше частота дискретизации, тем меньше усиление MAF на этих частотах. На \labelcref{img:picture17} показана частотная характеристика MAF с длиной $ N = 10 $. Как и ожидалось, усиление на частоте сетки             $ f_g({0.1f}_s) $ и ее гармоники $ ({0.2f}_s,\ {0.3f}_sи {0.4f}_s) $ равны нулю. С $ N $, наложенным (13), $ |H_{MAF}| $ график действителен только для частот сетки между $ f_{g_{min}} = f_s /\ (N+0.5) $ и $ f_{g_{max}} = f_s /\ (N-0.5) $. Если $ f_g<f_{g_{min}}$ $N$ увеличивается на 1 и если $ f_g> f_{g_{max}} $ N уменьшается на 1. Таким образом, максимум $ |H_{MAF}| $ усиления происходят на частотах $ kf_{g_{min}} $ и $ {kf}_{g_{max}}$ для $ k=\left\{\ 1,\ 2,\ \ldots,\ int\left(N\ /\ 2\right)\right\} $.
-
-Следует отметить, что можно сделать $ f_s/\ f_g $ целым числом, если можно изменить частоту дискретизации. Однако предложенный оценщик частоты был разработан для управления силовыми электронными преобразователями, которые работают с фиксированной частотой PWM. Поскольку частота дискретизации связана с PWM, изменить ее невозможно.
-
+Процесс наложения окна представляет собой умножение напряжения $u(t)$ на весовую функцию $w(t)$ (рисунок \ref{img:blending_process _and_Hamming_window}). Основная цель наложения окна -- получить ограниченную во времени функцию, при минимальных спектральных искажения. В зарубежной литературе так же называют спектральная утечка.
 \begin{figure}[ht]
-	\centering
-	%\includegraphics [scale=0.9] {f1.png}
-	\includegraphics [width=0.9\linewidth] {f3.png}
-	\caption{Частотная характеристика фильтра скользящего среднего с длиной N=10.}
-	\label{img:picture17}
+	\centerfloat{
+		\includegraphics[scale=0.6]{blending_process_and_Hamming_window.JPG}
+	}
+	\caption{а – Напряжение до наложения на него окна Хемминга (слева), б – Напряжение после наложение на него окна.}\label{img:blending_process _and_Hamming_window}
 \end{figure}
 
-\subsection{Предлагаемый метод оценки частоты сетки} \label{sec:ch2/sec1_3}
-Предлагаемое ядро оценщика состоит из фильтра MAF \labelcref{eq:equation123}, применяемого к выходу оценщика LMS \labelcref{eq:equation121}. Чтобы дать оценщику возможность работать с широкой сеткой вариаций частоты, количество выборок \labelcref{eq:equation121} и \labelcref{eq:equation123} должно быть переменным. Используя изменяющееся во времени количество выборок \labelcref{eq:equation121} и \labelcref{eq:equation123} переписываются соответственно как:
-
-\begin{equation}\label{eq:equation126}
-f\prime_g[n]= \sum\limits_{i=0}^{N_a[n]-2} \dfrac{3f_s}{4\pi} \dfrac{N_a[n]^2-4(i-\dfrac{1}{2} N_a[n]+1)^2}{N_a[n](N_a[n]^2-1)} \delta [n-i]
-\end{equation}
-
-\begin{equation}\label{eq:equation127}
-\hat{f}_g[n] =\dfrac{1}{N_b[n]}  \sum\limits_{i=0}^{N_a[n]-1} f^\prime_g[n-1]
-\end{equation}
-
-где 
-
-\begin{equation}\label{eq:equation128}
-N_a[n] = round(k_{LMS} f_s / \hat{f}_g[n-1])
-\end{equation}
-
-и
-
-\begin{equation}\label{eq:equation129}
-N_b[n] = round(k_{MAF} f_s / \hat{f}_g[n-1])
-\end{equation}
-
-представляют количество образцов, используемых \labelcref{eq:equation126} и \labelcref{eq:equation127}. $ N_a[n] $ и $ N_b[n] $ получают на основе предыдущей оценки частоты сетки $ ({\hat{f}}_g[n-1]) $, поскольку текущая оценка $ ({\hat{f}}_g[n) $ еще не доступна, когда вычисляются $ N_a[n] $ и $ N_b[n] $.
-
-Общий метод изображен на \labelcref{img:picture18}. Первым этапом является вычисление обратных разностей $ \delta $ фаз и углов сетки с использованием \labelcref{eq:equation113}, \labelcref{eq:equation116} и \labelcref{eq:equation120}. На втором этапе выполняется первая оценка частоты сетки $ (f_g^\prime) $ методом LMS с использованием \labelcref{eq:equation126}. На третьем этапе получают оценку частоты сетки $ ({\hat{f}}_g) $ путем фильтрации первой оценки с использованием фильтра MAF с использованием \labelcref{eq:equation127}. Количество выборок в \labelcref{eq:equation126} и \labelcref{eq:equation127} определяется расчетной частотой сетки.
-
-Следует отметить, что дифференциатор LMS \labelcref{eq:equation119}, применяемый к фазовому углу, реализуется с помощью \labelcref{eq:equation120} и \labelcref{eq:equation126}.
-
-Оценщик в виде двух параметров: $ k_{LMS} $ и $ k_{MAF} $. Параметр $ k_{MAF} $ установлен в 1, так как это минимальное значение, которое позволяет отклонять гармонические помехи. Устанавливая это значение на минимум, время установления также сохраняется на минимуме. Однако для улучшения подавления гармоник, особенно если $ f_s/\ f_g $ не является целым числом, $ k_{MAF} $ может быть установлено на большее целое число. Недостатком является снижение динамики, увеличивающее время установления оценки.
-
-Параметр $ k_{LMS} $ устанавливается для минимизации влияния гармоник напряжения сети и дисбалансов в оценке частоты, как описано в следующем подразделе.
-
-\subsection{Метод выбора алгоритма LMS по количеству выборок} \label{sec:ch2/sec1_4}
-
-Чтобы выбрать значение параметра $ k_{LMS} $, анализируются коэффициенты усиления частотного отклика в частотах гармоник. Выбранный критерий состоит в том, чтобы минимизировать квадратный корень из суммы квадратов усиления $ (J_H) $ на этих частотах:
+Рассмотрим оконные функции: Кайзера, Барлетта, Ханна, Хэмминга, Блэкмана (рисунок \ref{img:Windows}, приложение \ref{app:А}) \cite{васеева2020сравнительное,Increase_Accuracy_Yelizarov2014}. 
+%2. Васеева Т. В., Альтман Е. А., Александров А. В. Сравнительное исследование гармонических и интергармонических методов оценки сигналов //Инновационные проекты и технологии в образовании, промышленности и на транспорте. – 2020. – С. 51-57.
+%3. Елизаров Д. А. Повышение точности оценки показателей несинусоидальности напряжения в электроэнергетических системах //Омск: дис.… канд. техн. наук. – 2014.
 
 \begin{figure}[ht]
-	\centering
-	\includegraphics [width=0.9\linewidth] {f4.png}
-	\caption{Схема предлагаемого способа оценки частоты сетки.}
-	\label{img:picture18}
+	\centerfloat{
+		\includegraphics[scale=0.9]{Windows.png}
+	}
+	\caption{Окна: Кайзера ($\beta=15$), Ханна, Хэмминга, Блэкмана, Барлетта .}\label{img:Windows}
+\end{figure}
+Умножение сигнала на оконную функцию приводит сворачиванию каждой гармоники со спектром оконной функции. Дисперсии оценки увеличивается из-за наложения на исходный сигнал оконных функций. 
+
+Точность полученных результатов можно проверить с помощью неравенства Крамера-Рао (CRLB -- Cramer-Rao lower bound). В неравенстве Крамера-Рао сигнал имеет наибольшую величину дисперсии при некоторых условиях. Если неравенство Крамера-Рао преобразуется в равенство, то оценка параметров считается наилучшей. Отсюда следует, что дисперсия данной оценки самая маленькая из возможных.
+
+В статье \cite{альтман2020граница} мы промоделировали измерение амплитуды гармоник в однотональном сигнале. Была проверена формула \ref{eq:equation7} оценки дисперсии белого шума после наложения на него окна:
+% 1. Альтман Е. А., Васеева Т. В., Александров А. В. Граница Крамера-Рао для амплитуды гармоники при использовании оконных функций //Динамика систем, механизмов и машин. – 2020. – Т. 8. – №. 2. – С. 145-152.
+
+Зависимость дисперсии сигнала с шумом от дисперсии сигнала с наложенным на него окном приведены на рисунке 3. Использовались параметры: $n\_point = 1000$ и $n\_test = 100$. Сплошной линией отображены результаты моделирования, штриховой -- результаты расчета по формуле \ref{eq:equation7}. Результаты моделирования при других параметрах аналогичны.
+
+
+\begin{figure}[ht]
+	\centerfloat{
+		\includegraphics[scale=0.9]{noise_win_var_hamming.png}
+	}
+	\caption{Зависимость дисперсии шума после наложения окна от параметра окна Хэмминга.}\label{img:noise_win_var_hamming}
 \end{figure}
 
-\begin{equation}\label{eq:equation130}
-J_H=\sqrt{\sum_{h=1}^{h_{max}}{H^2(hf_g),}}\ \ \ \ \ \ \ h_{max}=int(\frac{1}{2}f_s/\ f_g)
-\end{equation}
+Экспериментально проверили формулу \ref{eq:equation11} оценки дисперсии амплитуды гармоники в статье \cite{альтман2020граница}.
+% 1. Альтман Е. А., Васеева Т. В., Александров А. В. Граница Крамера-Рао для амплитуды гармоники при использовании оконных функций //Динамика систем, механизмов и машин. – 2020. – Т. 8. – №. 2. – С. 145-152.
 
-где функция int (x) возвращает целую часть числа x. Гармоника $ h_{max} $- это максимальный порядок гармоник основной частоты $ f_g $, который можно анализировать с частотой дискретизации $ f_s $.
-
-В качестве примера на \labelcref{img:picture19} показаны частотные характеристики оценщика LMS $ (H_{LMS}) $, фильтра MAF $ (H_{MAF}) $ и полного оценщика $ (H) $ для заданного набора значений $ f_s $, $ N_a $ и $ N_b $. Точки представляют коэффициенты усиления в гармониках для данной частоты сетки: $ f_g=52.6 Гц $. Сумма квадратов усиления должна быть минимизирована путем правильного выбора $ N_a $.
-
-На \labelcref{img:picture20} показана эволюция $ J_H $ как функции параметра $ N_a $ для тех же значений $ f_s $, $ N_b $ и $ f_g $, что и на \labelcref{img:picture19}. Функция имеет два локальных минимума (для показанного диапазона $ N_a $): $ N_a=14 $ и $ N_a=24 $. Чтобы улучшить динамику оценки (сократить время установления), выбирается нижнее значение: $ N_a=14 $. Следует отметить, что если частота дискретизации кратна частоте сетки, точки, представленные на \labelcref{img:picture19} будет соответствовать нулям MAF, а значение $ J_H $ на \labelcref{img:picture20} всегда будет равно нулю.
-
-Чтобы получить выражение для значения  $ N_a $ как функции от $ f_s $ и $ f_g $, было выполнено несколько симуляций, как показано на \labelcref{img:picture20}. Моделирование для частоты сетки между 30 Гц и 70 Гц (с шагом 1 МГц) и для частоты дискретизации между 500 Гц и 10 кГц (с шагом 50 Гц) позволяет сделать вывод, что значение $ N_a $, которое минимизирует $  J_H $, составляет:
-
-\begin{equation}\label{eq:equation131}
-N_a=round(1.431 f_s / f_g)
-\end{equation}
-
-и так, параметр $ k_{LMS} $ установлен в:
-
-\begin{equation}\label{eq:equation132}
-k_{LMS}=1.431
-\end{equation}
-
-\labelcref{img:picture21} иллюстрирует эволюцию величины $ J_H $ и число выборок, используемых устройство оценки LMS $ (N_a) $, и с помощью фильтра MAF $ (N_b) $ в зависимости от частоты сетки для конкретной частоты дискретизации с использованием 
-$ k_{LMS}=1.431 $ и $ k_{MAF}=1 $.
+Результаты моделирования приведены на графиках (\ref{fig:windows_barlett_blackman,fig:windows__hamming_hanning, fig:windows__kaiser} 4-6).
 
 \begin{figure}[ht]
-	\centering
-	\includegraphics [width=0.9\linewidth] {f5.png}
-	\caption{Частотные характеристики оценки LMS $ (H_{LMS}) $, фильтра MAF $ (H_{MAF}) $ и полной оценки (H) для $ f_s=500 Гц $, $ N_a=12 $ и $ N_b=10 $. $ (vertical\ scale\ =\ x^{1/5}) $.}
-	\label{img:picture19}
+	\begin{minipage}[b][][b]{0.49\linewidth}\centering
+		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_barlett_noise.png} \\ а)
+	\end{minipage}
+	\hfill
+	\begin{minipage}[b][][b]{0.49\linewidth}\centering
+		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_blackman_noise.png} \\ б)
+	\end{minipage}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Барлетта (слева) и Блэкмана (справа)}
+	\label{fig:windows_barlett_blackman}
 \end{figure}
 
 \begin{figure}[ht]
-	\centering
-	\includegraphics [width=0.9\linewidth] {f6.png}
-	\caption{Эволюция $ J_H $ как функция параметра $ N_a $ для $ f_s=500 Гц $, 
-		$ N_b=10 $ и $ f_s=52.6 Гц $.}
-	\label{img:picture20}
+	\begin{minipage}[b][][b]{0.49\linewidth}\centering
+		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_hamming_noise.png} \\ а)
+	\end{minipage}
+	\hfill
+	\begin{minipage}[b][][b]{0.49\linewidth}\centering
+		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_hanning_noise.png} \\ б)
+	\end{minipage}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Хэмминга (слева) и Ханна(справа)}
+	\label{fig:windows__hamming_hanning}
 \end{figure}
+
 
 \begin{figure}[ht]
-	\centering
-	\includegraphics [width=0.9\linewidth] {f7.png}
-	\caption{Эволюция $ J_H $, $  N_a $ и $ N_b $ как функция частоты сетки для $ f_s=500 Гц $.}
-	\label{img:picture21}
+	\begin{minipage}[b][][b]{0.65\linewidth}\centering
+		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_kaiser(beta=15)_noise.png} \\ а)
+	\end{minipage}
+	\hfill
+	\begin{minipage}[b][][b]{0.65\linewidth}\centering
+		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_kaiser(beta=15)_noise.png} \\ б)
+	\end{minipage}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Кайзера ($\beta=4$) (слева) и Кайзера ($\beta=15$)(справа)}
+	\label{fig:windows__kaiser}
 \end{figure}
 
-Значение $ J_H $ равно нулю всякий раз, когда $ f_g $ является фактором $ f_s $. Локальные максимумы $ J_H $ увеличиваются с увеличением частоты сетки.
+Штриховой линией приведены результаты расчетов по формуле \ref{eq:equation11}, сплошной -- результаты моделирования, линией из точек -- граница Крамера-Рао. 
+В статье \cite{альтман2020граница} введен параметр -- коэффициент увеличение дисперсии. Данный параметр показывает во сколько раз ухудшилась оценка амплитуды гармоники при использовании оконных функций (таблица \ref{tbl:test2_1}).
 
-\subsection{Рекурсивная реализация} \label{sec:ch2/sec1_5}
+% 1. Альтман Е. А., Васеева Т. В., Александров А. В. Граница Крамера-Рао для амплитуды гармоники при использовании оконных функций //Динамика систем, механизмов и машин. – 2020. – Т. 8. – №. 2. – С. 145-152.
 
-Чтобы улучшить вычислительные требования оценщика за счет сокращения количества операций и времени выполнения, должна использоваться рекурсивная реализация.
-
-Оценщик частоты LMS в \labelcref{eq:equation126} может быть выражен как:
-
-\begin{equation}\label{eq:equation133}
-f_g^\prime[n]=\frac{3f_s}{\pi} \dfrac{(N_a[n]-1) S_\delta[n] +(N_a[n]-2) S_{i \delta}[n] - S_{i^2 \delta[n]}} {N_a[n] (N_a[n]^2-1}
-\end{equation}
-
-где 
-
-\begin{equation}\label{eq:equation134}
-S_\delta[n] = \sum_{i=0}^{N_a[n]-2} \delta[n-i]
-\end{equation}
-
-\begin{equation}\label{eq:equation135}
-S_{i\delta}[n] = \sum_{i=0}^{N_a[n]-2} \delta[n-i]
-\end{equation}
-
-и 
-
-\begin{equation}\label{eq:equation136}
-S_{i^2\delta}[n] = \sum_{i=0}^{N_a[n]-2} i^2\delta[n-i]
-\end{equation}
-
-Фильтр MAF в \labelcref{eq:equation127} можно переписать как:
-
-\begin{equation}\label{eq:equation137}
-\hat{f}_g[n] = S_{\hat{f}_g} [n] / N_b[n]
-\end{equation}
-
-где 
-
-\begin{equation}\label{eq:equation138}
-S_{\hat{f}_g} [n] = \sum_{i=0}^{N_a[n]-1} \hat{f}_g [n-i]
-\end{equation}
-
-Если различия $ N_a $ и $ N_b $  между последовательными циклами ограничены до $ ±1 $, суммы $ S_{f_g^\prime}[n] $ могут быть реализованы рекурсивно. Несколько симуляций показали, что различия находятся в этом диапазоне даже при наличии частотного шага для частот дискретизации выше 500 Гц. Однако, если это условие не выполняется, рекурсивный алгоритм все еще работает должным образом, ограничивая различия до $ ±1 $ замедляя обновление $ N_a $ и  $ N_b $.
-
-Принимая во внимание это соображение, необходимы три случая, чтобы учесть изменения $ N_a $ и $ N_b $ в суммах, определенных рекурсивно. Рекурсивные версии \labelcref{eq:equation134} - \labelcref{eq:equation137} определяются соответственно \labelcref{eq:equation139} -  \labelcref{eq:equation142}:
-
-\begin{equation}\label{eq:equation139}
-\footnotesize{
-S_\delta[n]=
-\begin{cases}
-S_\delta[n-1]+\delta[n]-\delta_{n1}-\delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
-S_\delta[n-1]+\delta[n]-\delta_{n1} , &\text{если $N_a[n]=N_a[n-1]$} \\
-S_\delta[n-1]+\delta[n] , &\text{если $N_a[n]=N_a[n-1]+1$}
-\end{cases}
-}
-\end{equation}
-
-\begin{equation}\label{eq:equation140}
-\footnotesize{
-S_{i\delta}[n]=
-\begin{cases}
-S_{i\delta}[n-1]+S_\delta[n-1]-k_1 \delta_{n1}-k_2 \delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
-S_{i\delta}[n-1]+S_\delta[n-1]-k_1 \delta_{n1}, &\text{если $N_a[n]=N_a[n-1]$} \\
-S_{i\delta}[n-1]+S_\delta[n-1] , &\text{если $N_a[n]=N_a[n-1]+1$}
-\end{cases}
-}
-\end{equation}
-
-\begin{equation}\label{eq:equation141}
-\footnotesize{
-S_{i^{2}\delta}[n]=
-\begin{cases}
-S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1]-k_1^2\delta_{n1}-k_2^2\delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
-S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1]-k_1^2\delta_{n1}, &\text{если $N_a[n]=N_a[n-1]$} \\
-S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1] , &\text{если $N_a[n]=N_a[n-1]+1$}
-\end{cases}
-}
-\end{equation}
-
-И 
-
-\begin{equation}\label{eq:equation142}
-\footnotesize{
-S_{f^\prime_g}[n]=
-\begin{cases}
-S_{f^\prime_g}[n-1] + f^\prime_g[n] + f^\prime_g[n-N_b[n]] - f^\prime_g[n-N_b[n]-1] , &\text{если $N_a[n]=N_a[n-1]-1$} \\
-S_{f^\prime_g}[n-1] + f^\prime_g[n] + f^\prime_g[n-N_b[n]], &\text{если $N_a[n]=N_a[n-1]$} \\
-S_{f^\prime_g}[n-1] + f^\prime_g[n] , &\text{если $N_a[n]=N_a[n-1]+1$}
-\end{cases}
-}
-\end{equation}
-
-где $ k_1=1-N_a[n] $, $ k_2=N_a[n] $, $ \delta_{n1}=\delta[n-N_a[n]+1] $ и $ \delta_{n2}=\delta[n-N_a[n]] $
-
-Реализация алгоритма с использованием рекурсивных и циклических буферов показана в Алгоритме 1. Алгоритм написан с использованием записи Octave / Matlab и является готовой к использованию функцией. Однако алгоритм не использует какие-либо конкретные функции Octave / Matlab, которые легко адаптируются к другим языкам программирования. При использовании метода циклического буфера оптимизируется время выполнения для доступа к значениям переменных в предыдущих циклах. Если линейно-нейтральные напряжения недоступны, алгоритм может использоваться с линейно-линейными напряжениями путем правильной настройки строки алгоритма с номером 20.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics [width=0.9\linewidth] {a1.png}
-	\caption{Алгоритм 1.}
-	\label{img:picture22}
-\end{figure}
-
-\begin{table} [htbp]
-	\centering
-	\caption{Параметры оценщиков.}%
-	\label{tab:makecell}%
-	\begin{tabular}{| c  c  c  c  c |}
+%Таблица 4
+\begin{table}[ht]%
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума.}
+	\label{tbl:test2_1}
+	\fontsize{14pt}{14pt}\selectfont
+	\begin{longtable*}[c]{|c|c|}  
 		\hline
-		% 1 строка
-		%Колонка 1.1 
-		LMSD & 
-		%Колонка 1.2
-		WLLMP &
-		%Колонка 1.3
-		IRNTA & 
-		%Колонка 1.4
-		FLMS &
-		%Колонка 1.5
-		DMD \\ \hline
-
-		% 2 строка
-		\multicolumn{1}{|c}{\thead{$k_{LMS}  = 1.431$}} & \multicolumn{1}{c}{\thead{Размер шага:}} & \multicolumn{1}{c}{\thead{Фактор забвения}} & \multicolumn{1}{c}{\thead{$\mu_{max} =0.024$}} & \multicolumn{1}{c|}{\thead{DFT:}} \\ \hline
-		
-        % 3 строка
-	    \multicolumn{1}{|c}{\thead{$k_{MAF} = 1$}} & \multicolumn{1}{c}{\thead{$ \mu=0.048$}} & \multicolumn{1}{c}{\thead{$\lambda =0.9645$}} & \multicolumn{1}{c}{\thead{$\mu_{min} =0.001$}} & \multicolumn{1}{c|}{\thead{$h_1:$ один \\ цикл треугольный}} \\ \hline
-	    
-	    % 4 строка
-	    \multicolumn{2}{|c}{} & \multicolumn{1}{c}{\thead{Начальное значение \\ ковариации}} & \multicolumn{1}{c}{\thead{$\lambda =0.97$}} & \multicolumn{1}{c|}{\thead{\thead{Сглаживающий \\ фильтр:}}}  \\ \hline
-	   
-		% 5 строка
-		\multicolumn{2}{|c}{} & \multicolumn{1}{c}{\thead{$\delta = 100$}} & \multicolumn{1}{c}{\thead{$\gamma =0.01$}} & \multicolumn{1}{c|}{\thead{\thead{$h_1:$ один  двухтактный \\ фильтр Кея}}}  \\ \hline
-			   
-	   
-	    % 6 строка
-		\multicolumn{3}{|c}{} & \multicolumn{1}{c}{\thead{$\rho=0.99$}} & \multicolumn{1}{c|}{}  \\ \hline
-	\end{tabular}%
+		Окно &
+		Коэффициент увеличение дисперсии  \\
+		\hline			
+		Кайзера ($\beta=4$) & $1.24672$ \\
+		\hline
+		Кайзера ($\beta=7$) & $1.56900$ \\
+		\hline
+		Кайзера ($\beta=10$) & $1.84508$ \\
+		\hline
+		Кайзера ($\beta=15$) & $2.23330$ \\
+		\hline
+		Барлетта (треугольное окно) & $1.33333$ \\
+		\hline
+		Ханна (Хеннинга) & $1.50000$ \\
+		\hline 
+		Хэмминга & $1.36282$ \\
+		\hline
+	\end{longtable*}%
 \end{table}
 
+Предложенная формула \ref{eq:equation7} оценки дисперсии белого шума после наложения на него окна \cite{альтман2020граница} может использоваться при выборе любой из рассмотренных оконных функций для решения задач спектрального анализа. Точность получаемой оценки амплитуды является наиболее значимым критерием.
+Формула \ref{eq:equation11} оценки дисперсии амплитуды \cite{альтман2020граница} дает наилучший результаты при выборе весовых функций: Кайзера ($\beta=4$), Хэмминга, Барлетта. Так как результаты расчетов по формуле и результаты моделирование близки к границе Крамера-Рао. Зависимость дисперсии оценки амплитуды от дисперсии шума (табл. 2) показывают, что чем меньше коэффициент увеличения дисперсии, тем точнее результаты. Наихудший результат показало окно Кайзера с параметром $\beta=15$.
 
 
 
 
 
 
-%\chapter{Длинное название главы, в которой мы смотрим на~примеры того, как будут верстаться изображения и~списки}\label{ch:ch2}
-%
-%\section{Одиночное изображение}\label{sec:ch2/sec1}
-%
-%\begin{figure}[ht]
-%  \centerfloat{
-%    \includegraphics[scale=0.27]{latex}
-%  }
-%  \caption{TeX.}\label{fig:latex}
-%\end{figure}
-%
-%Для выравнивания изображения по-центру используется команда \verb+\centerfloat+, которая является во
-%многом улучшенной версией встроенной команды \verb+\centering+.
-%
-%\section{Длинное название параграфа, в котором мы узнаём как сделать две картинки с~общим номером и названием}\label{sec:ch2/sect2}
-%
-%А это две картинки под общим номером и названием:
-%\begin{figure}[ht]
-%  \begin{minipage}[b][][b]{0.49\linewidth}\centering
-%    \includegraphics[width=0.5\linewidth]{knuth1} \\ а)
-%  \end{minipage}
-%  \hfill
-%  \begin{minipage}[b][][b]{0.49\linewidth}\centering
-%    \includegraphics[width=0.5\linewidth]{knuth2} \\ б)
-%  \end{minipage}
-%  \caption{Очень длинная подпись к изображению,
-%      на котором представлены две фотографии Дональда Кнута}
-%  \label{fig:knuth}
-%\end{figure}
-%
-%Те~же~две картинки под~общим номером и~названием,
-%но с автоматизированной нумерацией подрисунков:
-%\begin{figure}[ht]
-%    \centerfloat{
-%        \hfill
-%        \subbottom[List-of-Figures entry][Первый подрисунок\label{fig:knuth_2-1}]{%
-%            \includegraphics[width=0.25\linewidth]{knuth1}}
-%        \hfill
-%        \subbottom[\label{fig:knuth_2-2}]{%
-%            \includegraphics[width=0.25\linewidth]{knuth2}}
-%        \hfill
-%        \subbottom[Третий подрисунок]{%
-%            \includegraphics[width=0.3\linewidth]{example-image-c}}
-%        \hfill
-%    }
-%    \legend{Подрисуночный текст, описывающий обозначения, например. Согласно
-%    ГОСТ 2.105, пункт 4.3.1, располагается перед наименованием рисунка.}
-%    \caption[Этот текст попадает в названия рисунков в списке рисунков]{Очень
-%    длинная подпись к второму изображению, на~котором представлены две
-%    фотографии Дональда Кнута}\label{fig:knuth_2}
-%\end{figure}
-%
-%На рисунке~\ref{fig:knuth_2-1} показан Дональд Кнут без головного убора.
-%На рисунке~\ref{fig:knuth_2}\subcaptionref*{fig:knuth_2-2}
-%показан Дональд Кнут в головном уборе.
-%
-%Возможно вставлять векторные картинки, рассчитываемые \LaTeX\ <<на~лету>>
-%с~их~предварительной компиляцией. Надписи в таких рисунках будут выполнены
-%тем же~шрифтом, который указан для документа в целом.
-%На~рисунке~\ref{fig:tikz_example} на~странице~\pageref{fig:tikz_example}
-%представлен пример схемы, рассчитываемой пакетом \verb|tikz| <<на~лету>>.
-%Для ускорения компиляции, подобные рисунки могут быть <<кешированы>>, что
-%определяется настройками в~\verb|common/setup.tex|.
-%Причём имя предкомпилированного
-%файла и~папка расположения таких файлов могут быть отдельно заданы,
-%что удобно, если не~для подготовки диссертации,
-%то~для подготовки научных публикаций.
-%\begin{figure}[ht]
-%    \centerfloat{
-%        \ifdefmacro{\tikzsetnextfilename}{\tikzsetnextfilename{tikz_example_compiled}}{}% присваиваемое предкомпилированному pdf имя файла (не обязательно)
-%        \input{Dissertation/images/tikz_scheme.tikz}
-%
-%    }
-%    \legend{}
-%    \caption[Пример \texttt{tikz} схемы]{Пример рисунка, рассчитываемого
-%        \texttt{tikz}, который может быть предкомпилирован}\label{fig:tikz_example}
-%\end{figure}
-%
-%Множество программ имеют либо встроенную возможность экспортировать векторную
-%графику кодом \verb|tikz|, либо соответствующий пакет расширения.
-%Например, в GeoGebra есть встроенный экспорт,
-%для Inkscape есть пакет svg2tikz,
-%для Python есть пакет matplotlib2tikz,
-%для R есть пакет tikzdevice.
-%
-%\section{Пример вёрстки списков}\label{sec:ch2/sec3}
 
-%\noindent Нумерованный список:
+
+
+%\section{Многопоточность} \label{sec:ch2/sec2}
+%% Разобраться в том, что такое многопоточность
+%
+%Система анализа данных(Data analysis System) принимает точные данные из системы сбора и анализа данных. Эта подсистема в основном состоит из частот, гармоник, алгоритма анализа мощности и многопоточности (multi-threading) для повышения эффективности функционирования системы. 
+%
+%Многопоточность была использована из-за следующих причин:
 %\begin{enumerate}
-%  \item Первый пункт.
-%  \item Второй пункт.
-%  \item Третий пункт.
+%	\item Во-первых,АЦП DPQA должны взаимодействовать с пользователями, а это значит, что GUI (Графический Интерфейс Пользователя) должен реагировать за любые внутренние и внешние события. Если применяется последовательное программирование, пользователь может взаимодействовать только с АЦП DPQA, после того как программа завершилась. 
+%	
+%	\item Во-вторых, с АЦП DPQA требуется непрерывно получать данные, как только была нажата кнопка «Старт». Многопоточность представляет собой оптимальный способ, чтобы обеспечить обработку данных и одновременного их получения. В заключение, больше времени эффективно применять многопоточность для анализа алгоритмов с участием нескольких операций (т.~е. оконные функции – windowing, промежуточные – padding, FFT и кросс-корреляцию – cross-correlation). 
 %\end{enumerate}
 %
-%\noindent Маркированный список:
+%\section{Алгоритмы расчета частоты} \label{sec:ch2/sec3}
+%
+%Чтобы рассчитать информацию о качестве электроэнергии, вычисляем сначала входную частоту. Существуют три альтернативных метода для вычисления частоты по дискретизированному сигналу(sampled signal):
 %\begin{itemize}
-%  \item Первый пункт.
-%  \item Второй пункт.
-%  \item Третий пункт.
+%	\item Пересечение (Zero-Crossing).
+%	\item Максимальная точка (Maximum-Point).
+%	\item Дискретное преобразование Фурье (ДПФ).
 %\end{itemize}
-%
-%\noindent Вложенные списки:
-%\begin{itemize}
-%  \item Имеется маркированный список.
-%  \begin{enumerate}
-%    \item В нём лежит нумерованный список,
-%    \item в котором
-%    \begin{itemize}
-%      \item лежит ещё один маркированный список.
-%    \end{itemize}
-%  \end{enumerate}
-%\end{itemize}
-%
-%\noindent Нумерованные вложенные списки:
-%\begin{enumerate}
-%  \item Первый пункт.
-%  \item Второй пункт.
-%  \item Вообще, по ГОСТ 2.105 первый уровень нумерации
-%  (при необходимости ссылки в тексте документа на одно из перечислений)
-%  идёт буквами русского или латинского алфавитов,
-%  а второй "--- цифрами со~скобками.
-%  Здесь отходим от ГОСТ.
-%    \begin{enumerate}
-%      \item в нём лежит нумерованный список,
-%      \item в котором
-%        \begin{enumerate}
-%          \item ещё один нумерованный список,
-%          \item третий уровень нумерации не нормирован ГОСТ 2.105;
-%          \item обращаем внимание на строчность букв,
-%          \item в этом списке
-%          \begin{itemize}
-%            \item лежит ещё один маркированный список.
-%          \end{itemize}
-%        \end{enumerate}
-%
-%    \end{enumerate}
-%
-%  \item Четвёртый пункт.
-%\end{enumerate}
-%
-%\section{Традиции русского набора}
-%
-%Много полезных советов приведено в материале
-%<<\href{http://www.dropbox.com/s/x4hajy4pkw3wdql/wholesome-typesetting.pdf?dl=1\&pv=1}{Краткий курс благородного набора}>> (автор А.\:В.~Костырка).
-%Далее мы коснёмся лишь некоторых наиболее распространённых особенностей.
-%
-%\subsection{Пробелы}
-%
-%В~русском наборе принято:
-%\begin{itemize}
-%    \item единицы измерения, знак процента отделять пробелами от~числа:
-%        10~кВт, 15~\% (согласно ГОСТ 8.417, раздел 8);
-%    \item \(\tg 20\text{\textdegree}\), но: 20~{\textdegree}C
-%        (согласно ГОСТ 8.417, раздел 8);
-%    \item знак номера, параграфа отделять от~числа: №~5, \S~8;
-%    \item стандартные сокращения: т.\:е., и~т.\:д., и~т.\:п.;
-%    \item неразрывные пробелы в~предложениях.
-%\end{itemize}
-%
-%\subsection{Математические знаки и символы}
-%
-%Русская традиция начертания греческих букв и некоторых математических
-%функций отличается от~западной. Это исправляется серией
-%\verb|\renewcommand|.
-%\begin{itemize}
-%%Все \original... команды заранее, ради этого примера, определены в Dissertation\userstyles.tex
-%    \item[До:] \( \originalepsilon \originalge \originalphi\),
-%    \(\originalphi \originalleq \originalepsilon\),
-%    \(\originalkappa \in \originalemptyset\),
-%    \(\originaltan\),
-%    \(\originalcot\),
-%    \(\originalcsc\).
-%    \item[После:] \( \epsilon \ge \phi\),
-%    \(\phi \leq \epsilon\),
-%    \(\kappa \in \emptyset\),
-%    \(\tan\),
-%    \(\cot\),
-%    \(\csc\).
-%\end{itemize}
-%
-%Кроме того, принято набирать греческие буквы вертикальными, что
-%решается подключением пакета \verb|upgreek| (см. закомментированный
-%блок в~\verb|userpackages.tex|) и~аналогичным переопределением в
-%преамбуле (см.~закомментированный блок в~\verb|userstyles.tex|). В
-%этом шаблоне такие переопределения уже включены.
-%
-%Знаки математических операций принято переносить. Пример переноса
-%в~формуле~\eqref{eq:equation3}.
-%
-%\subsection{Кавычки}
-%В английском языке приняты одинарные и двойные кавычки в~виде ‘...’ и~“...”.
-%В России приняты французские («...») и~немецкие („...“) кавычки (они называются
-%«ёлочки» и~«лапки», соответственно). ,,Лапки`` обычно используются внутри
-%<<ёлочек>>, например, <<... наш гордый ,,Варяг``...>>.
-%
-%Французкие левые и правые кавычки набираются
-%как лигатуры \verb|<<| и~\verb|>>|, а~немецкие левые
-%и правые кавычки набираются как лигатуры \verb|,,| и~\verb|‘‘| (\verb|``|).
-%
-%Вместо лигатур или команд с~активным символом "\ можно использовать команды
-%\verb|\glqq| и \verb|\grqq| для набора немецких кавычек и команды \verb|\flqq|
-%и~\verb|\frqq| для набора французских кавычек. Они определены в пакете
-%\verb|babel|.
-%
-%\subsection{Тире}
-%%  babel+pdflatex по умолчанию, в polyglossia надо включать опцией (и перекомпилировать с удалением временных файлов)
-%Команда \verb|"---| используется для печати тире в тексте. Оно несколько короче
-%английского длинного тире. Кроме того, команда задаёт небольшую жёсткую отбивку
-%от слова, стоящего перед тире. При этом, само тире не~отрывается от~слова.
-%После тире следует такая же отбивка от текста, как и~перед тире. При наборе
-%текста между словом и командой, за которым она следует, должен стоять пробел.
-%
-%В составных словах, таких, как <<Закон Менделеева"--~Клапейрона>>, для печати
-%тире надо использовать команду \verb|"--~|. Она ставит более короткое,
-%по~сравнению с~английским, тире и позволяет делать переносы во втором слове.
-%При~наборе текста команда \verb|"--~| не отделяется пробелом от слова,
-%за~которым она следует (\verb|Менделеева"--~|). Следующее за командой слово
-%может быть  отделено от~неё пробелом или перенесено на другую строку.
-%
-%Если прямая речь начинается с~абзаца, то перед началом её печатается тире
-%командой \verb|"--*|. Она печатает русское тире и жёсткую отбивку нужной
-%величины перед текстом.
-%
-%\subsection{Дефисы и переносы слов}
-%%  babel+pdflatex по умолчанию, в polyglossia надо включать опцией (и перекомпилировать с удалением временных файлов)
-%Для печати дефиса в~составных словах введены две команды. Команда~\verb|"~|
-%печатает дефис и~запрещает делать переносы в~самих словах, а~команда \verb|"=|
-%печатает дефис, оставляя \TeX ’у право делать переносы в~самих словах.
-%
-%В отличие от команды \verb|\-|, команда \verb|"-| задаёт место в~слове, где
-%можно делать перенос, не~запрещая переносы и~в~других местах слова.
-%
-%Команда \verb|""| задаёт место в~слове, где можно делать перенос, причём дефис
-%при~переносе в~этом месте не~ставится.
-%
-%Команда \verb|",| вставляет небольшой пробел после инициалов с~правом переноса
-%в~фамилии.
-%
-%\section{Текст из панграмм и формул}
-%
-%Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч. Шеф взъярён тчк щипцы
-%с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в~шкаф. Экс-граф?
-%Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп (юфть) "---
-%вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч. Шеф взъярён тчк
-%щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц в~шкаф.
-%Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен шляп
-%(юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч. Шеф
-%взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг! Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%шляп (юфть) "--- вдрызг!Любя, съешь щипцы, "--- вздохнёт мэр, "--- кайф жгуч.
-%Шеф взъярён тчк щипцы с~эхом гудбай Жюль. Эй, жлоб! Где туз? Прячь юных съёмщиц
-%в~шкаф. Экс-граф? Плюш изъят. Бьём чуждый цен хвощ! Эх, чужак! Общий съём цен
-%
-%Ку кхоро адолэжкэнс волуптариа хаж, вим граэко ыкчпэтында ты. Граэкы жэмпэр
-%льюкяльиюч квуй ку, аэквюы продыжщэт хаж нэ. Вим ку магна пырикульа, но квюандо
-%пожйдонёюм про. Квуй ат рыквюы ёнэрмйщ. Выро аккузата вим нэ.
-%\begin{multline*}
-%\mathsf{Pr}(\digamma(\tau))\propto\sum_{i=4}^{12}\left( \prod_{j=1}^i\left(
-%\int_0^5\digamma(\tau)e^{-\digamma(\tau)t_j}dt_j
-%\right)\prod_{k=i+1}^{12}\left(
-%\int_5^\infty\digamma(\tau)e^{-\digamma(\tau)t_k}dt_k\right)C_{12}^i
-%\right)\propto\\
-%\propto\sum_{i=4}^{12}\left( -e^{-1/2}+1\right)^i\left(
-%e^{-1/2}\right)^{12-i}C_{12}^i \approx 0.7605,\quad
-%\forall\tau\neq\overline{\tau}
-%\end{multline*}
-%Квуй ыёюз омниюм йн. Экз алёквюам кончюлату квуй, ты альяквюам ёнвидюнт пэр.
-%Зыд нэ коммодо пробатуж. Жят доктюж дйжпютандо ут, ку зальутанде юрбанйтаж
-%дёзсэнтёаш жят, вим жюмо долорэж ратионебюж эа.
-%
-%Ад ентэгры корпора жплэндидэ хаж. Эжт ат факэтэ дычэрунт пэржыкюти. Нэ нам
-%доминг пэрчёус. Ку квюо ёужто эррэм зючкёпит. Про хабэо альбюкиюс нэ.
-%\[
-%        \begin{pmatrix}
-%                a_{11} & a_{12} & a_{13} \\
-%                a_{21} & a_{22} & a_{23}
-%        \end{pmatrix}
-%\]
-%
-%\[
-%        \begin{vmatrix}
-%                a_{11} & a_{12} & a_{13} \\
-%                a_{21} & a_{22} & a_{23}
-%        \end{vmatrix}
-%\]
-%
-%\[
-%        \begin{bmatrix}
-%                a_{11} & a_{12} & a_{13} \\
-%                a_{21} & a_{22} & a_{23}
-%        \end{bmatrix}
-%\]
-%Про эа граэки квюаыквуэ дйжпютандо. Ыт вэл тебиквюэ дэфянятйоныс, нам жолюм
-%квюандо мандамюч эа. Эож пауло лаудым инкедыринт нэ, пэрпэтюа форынчйбюж пэр
-%эю. Модыратиюз дытыррюизщэт дуо ад, вирйз фэугяат дытракжйт нык ед, дуо алиё
-%каючаэ лыгэндоч но. Эа мольлиз юрбанйтаж зигнёфэрумквюы эжт.
-%
-%Про мандамюч кончэтытюр ед. Трётанё прёнкипыз зигнёфэрумквюы вяш ан. Ат хёз
-%эквюедым щуавятатэ. Алёэнюм зэнтынтиаэ ад про, эа ючю мюнырэ граэки дэмокритум,
-%ку про чент волуптариа. Ыльит дыкоры аляквюид еюж ыт. Ку рыбюм мюндй ютенам
-%дуо.
-%\begin{align*}
-%        2\times 2       & = 4      & 6\times 8 & = 48 \\
-%        3\times 3       & = 9      & a+b       & = c  \\
-%        10 \times 65464 & = 654640 & 3/2       & =1,5
-%\end{align*}
-%
+%Метод ДПФ (FFT) используется для вычисления входных значений частоты. Формула ДПФ описана [152]:
+%% [152 - Sundararajan D. The discrete Fourier transform: theory, algorithms and applications. – World Scientific, 2001.]
 %\begin{equation}
-%        \begin{aligned}
-%                2\times 2       & = 4      & 6\times 8 & = 48 \\
-%                3\times 3       & = 9      & a+b       & = c  \\
-%                10 \times 65464 & = 654640 & 3/2       & =1,5
-%        \end{aligned}
+%\label{eq:equation1}
+%X(k) = \frac{1}{N} \sum\limits_{n=0}^{N-1} x(n)e^{-j\frac{2 \pi}{N}nk}
 %\end{equation}
 %
-%Пэр йн тальэ пожтэа, мыа ед попюльо дэбетиз жкрибэнтур. Йн квуй аппэтырэ
-%мэнандря, зыд аляквюид хабымуч корпора йн. Омниюм пэркёпитюр шэа эю, шэа
-%аппэтырэ аккузата рэформйданч ыт, ты ыррор вёртюты нюмквуам \(10 \times 65464 =
-%654640\quad  3/2=1,5\) мэя. Ипзум эуежмод \(a+b = c\) мальюизчыт ад дуо. Ад
-%фэюгаят пытынтёюм адвыржаряюм вяш. Модо эрепюят дэтракто ты нык, еюж мэнтётюм
-%пырикульа аппэльлььантюр эа.
+%где $N$ -- это число $k = 0, 1, \cdots, N-1$
 %
-%Мэль ты дэлььынётё такематыш. Зэнтынтиаэ конклььюжионэмквуэ ан мэя. Вёжи лебыр
-%квюаыквуэ квуй нэ, дуо зймюл дэлььиката ку. Ыам ку алиё путынт.
+%Для реализации ДПФ в Python используем алгоритм быстрого преобразования Фурье (БПФ, FFT). БПФ -- это эффективный алгоритм для вычисления ДПФ (DFT). Число операций необходимых для вычисления Дискретного преобразования Фурье пропорционально $N2$ и $N$ наблюдений при этом алгоритм БПФ требует число операций пропорциональное $Nlog(N)$ [153].
+%% [153 -	Cooley J. W., Lewis P. A. W., Welch P. D. The fast Fourier transform and its applications //IEEE Transactions on Education. – 1969. – Т. 12. – №. 1. – С. 27-34.]
+%После того, как реализовали алгоритм вычисления частоты, произошли проблемы разрешением частоты. Для обнаружения потоков сигналов в частотной области,  требуются улучшения разрешения. Сигнал частотной области, рассчитанный БПФ, имеет разрешение $0,5$~Гц. В результате, любое содержимое сигнала, которое существует между двух частот  с разделением $0,5$~Гц, будет полностью игнорироваться, и будет вызван неправильный результат частоты.
 %
-%%Большая фигурная скобка только справа
-%\[\left. %ВАЖНО: точка после слова left делает скобку неотображаемой
-%\begin{aligned}
-%	2 \times x      & = 4 \\
-%	3 \times y      & = 9 \\
-%	10 \times 65464 & = z
-%\end{aligned}\right\}
-%\]
+%Следовательно, разрешение по частоте должно быть улучшено, чтобы минимизировать ошибку вычисления. Используем ноль заполнение для улучшения разрешения БПФ. Из уравнения видно, что длина $X(k)$ полностью зависит от количества образцов $X (n)$.
+%
+%Текущий сигнал задается уравнением:
+%\begin{equation}
+%\label{eq:equation2}
+%I = R_{HallEffect} \times  I_{ADC} + Offset
+%\end{equation}
+%
+%где $R_{HallEffect}$ -- коэффициент выхода напряжения на эффекте Холла;
+%
+%$I_{ADC}$ -- необработанные текущие данные из АЦП, добавлено смещение, постоянное смещение от схемы регулировки;
+%
+%Модификация сигнала напряжения:
+%\begin{equation}
+%\label{eq:equation3}
+%V = R_Trans former\times V_ADC + Offset
+%\end{equation}
+%где $R_Trans former$ -- Коэффициент обмотки трансформатора;
+%$V_{ADC}$ -- представляет собой исходные данные напряжения от АЦП;
+%
+%Из уравнения \labelcref{eq:equation2} длина волны $X(k)$ зависит от количества образцов $X(n)$. Если добавлять нули в конец $X(n)$, способны эффективно увеличить количество образцов $X(n)$ без изменения фактического сигнала. Это будет также увеличивать размер $X(k)$. $X(k)$ не меняется, потому что $X(n)$ остается прежним сигналом. Приращение частоты bins из $X(k)$ мы будем сжимать bins ближе к друг другу, который дает разрешение по частоте.
+%
+%\section{Алгоритмы вычисления амплитуды гармоник} \label{sec:ch2/sec4}
+%
+%Содержание гармоник до $20$ гармоники. Содержание гармоник можно извлечь из частотного спектра, после того как мы получили основную частоту БПФ (FFT) напряжения и текущего значения. Гармоники расположены в частотной области, которые являются положительными целыми числами, кратными основной частоте. Чтобы получить гармоники используем частотный индекс и умножаем его на целые числа. После этого берем амплитуды тока и напряжения от БПФ (FFT) на основе рассчитанного индекса. Результаты гармоник не точные (из результатов тестирования). Причина заключается в том, что измеренный нами сигнал ограничен по времени. При выполнении БПФ (FFT), есть частота сглаживания (frequency aliasing). Если заполнять нулями массив, то длина данных увеличивается, и гармоника может не располагать точным частотным индексом (из-за ошибок в вычислениях).
+%
+%Чтобы решить проблему, вместо использования рассчитанного индекса для получения амплитуды гармоник, ищем индексы. Находим максимальную точку в этом индексе. Тогда максимальная амплитуда будет точкой максимальной амплитуды в пределах диапазона.
+%
+%\section{Коэффициент мощности и алгоритм расчета энергопотребления} \label{sec:ch2/sec5}
+%
+%Для нахождения коэффициента мощности была применена перекрестная корреляция (Cross Correlation), а также идентификация триггера (Trig Identity). Перекрестная корреляция нужна для того, чтобы найти более точные результаты идентификации триггера вместо взаимной корреляции. Рассмотрим два сигнала, первый сигнал представляет напряжение из уравнения \labelcref{eq:equation4}, другой~–-~ток из уравнения 
+%
+%\labelcref{eq:equation5}:
+%\begin{equation}
+%\label{eq:equation4}
+%V = A \cos(\omega t)
+%\end{equation}
+%
+%\begin{equation}
+%\label{eq:equation5}
+%I = B \cos (\omega t + \theta)
+%\end{equation}
+%
+%Ток содержит разность фаз $\theta$. Умножение двух сигналов вместе дает \labelcref{eq:equation6}:
+%
+%\begin{equation}
+%\label{eq:equation6}
+%\left| {V \times I}\right| = \left|A \right| \times \left|B \right| \times \cos \theta  
+%\end{equation}
+%
+%Разность фаз может быть найдена как \labelcref{eq:equation7}:
+%
+%\begin{equation}
+%\label{eq:equation7}
+%\theta = \cos^{-1} \frac{V \times I}{A \times B}  
+%\end{equation}
+%
+%Уравнение \labelcref{eq:equation7} можно записать в дискретной форме:
+%
+%\begin{equation}
+%\label{eq:equation8}
+%\theta = \cos^{-1} \frac{\sum V\left[ n \right] I\left[ n \right]}{\sqrt{\sum{{\left| V\left[ n \right]\right|}^2} \sum{{\left| I\left[ n \right]\right|}^2}}}
+%\end{equation}
+%
+%Функция обратного косинуса может возвращать величину $\theta$, которая означает полярность коэффициента мощности. Чтобы найти полярность коэффициента мощности, используется кросс-корреляцию:
+%
+%\begin{equation}
+%\label{eq:equation9}
+%R_{VI}(l) = \sum_{n=-\infty}^{\infty}V(n)I(n-l)
+%\end{equation}
+%где $l=0,\mp1,\mp2,\dots$
+%
+%$R_{VI}(l)$ -- является наибольшим $l$, в котором напряжение и ток сигнала имеют наибольшее сходство.
+%
+%Знак перед $l$ показывает является ли коэффициент мощности нагрузки опережающим или запаздывающим. Отрицательное $l$ означает, что текущий сигнал смещен влево. Интервал выборки характеризует отстающую нагрузку. Положительное значение $l$ означает, что нагрузка является ведущей нагрузкой, $l=0$ говорит о том, что нагрузка резитивная (purely resistive). Получение коэффициента мощности позволит рассчитать потребляемую мощность нагрузки.
+%
+%Из алгоритма нахождения гармоник и амплитуд находим амплитуду содержания гармоник и рассчитываем реальную реактивную мощность в уравнениях (\labelcref{eq:equation10} и \labelcref{eq:equation11}):
+%
+%\begin{equation}
+%\label{eq:equation10}
+%P_{real} = I\times V \cos \theta
+%\end{equation}
+%
+%\begin{equation}
+%\label{eq:equation11}
+%P_{reactive} = I\times V \sin \theta
+%\end{equation}
 %
 %
-%Конвынёры витюпырата но нам, тебиквюэ мэнтётюм позтюлант ед про. Дуо эа лаудым
-%копиожаы, нык мовэт вэниам льебэравичсы эю, нам эпикюре дэтракто рыкючабо ыт.
-%Вэрйтюж аккюжамюз ты шэа, дэбетиз форынчйбюж жкряпшэрит ыт прё. Ан еюж тымпор
-%рыфэррэнтур, ючю дольор котёдиэквюэ йн. Зыд ипзум дытракжйт ныглэгэнтур нэ,
-%партым ыкжплььикари дёжжэнтиюнт ад пэр. Мэль ты кытэрож молыжтйаы, нам но ыррор
-%жкрипта аппарэат.
+%\section{Оценка частоты энергосистемы с использованием дифференциатора наименьших средних квадратов} \label{sec:ch2/sec7}
 %
-%\[ \frac{m_{t\vphantom{y}}^2}{L_t^2} = \frac{m_{x\vphantom{y}}^2}{L_x^2} +
-%\frac{m_y^2}{L_y^2} + \frac{m_{z\vphantom{y}}^2}{L_z^2} \]
+%Частота энергосистемы является решающим фактором для мониторинга и контроля рабочего состояния сети, а также для синхронизации и управления электронными преобразователями мощности, подключенными к ней. Некоторые методы синхронизации, используемые в преобразователях мощности, подключенных к сети, основаны на точной оценке частоты сети. 
+%\cite{lee2013novel, lee2011active}. Несколько методов было разработано для получения частоты электросети, как описано в \cite{chen2013comparative}. На основе DFT \cite{borkowski2014interpolated,kamwa2004performance}, искусственная нейронная сеть \cite{jiang2014frequency}, частотно-замкнутый контур (FLL) \cite{fedele2014frequency}, широколинейная фаза наименьшего среднего значения (WLLMP) \cite{xia2014widely}, наименьшие квадраты (LS) \cite{kuvsljevic2013ls}, Комплексные наименьшие средние квадраты \cite{1458847, xia2014complex} наименьшие квадраты, примененные к фазовому углу \cite{ramos2015frequency}, улучшенный алгоритм рекурсивного ньютоновского типа (IRNTA) \cite{ray2015improved}, фильтр Калмана \cite{routray2002novel}, Prony \cite{rubeena2014accurate}, улучшенная фазовая автоподстройка частоты (EPLL) ) \cite{karimi2010application}, фаза кадра синхронной автоподстройки частоты (ОСР-ФАПЧ) \cite{golestan2013performance}, и переход через нуль \cite{ramos2005synchronizing} среди доступных методов оценки частоты.
+%Точность оценки частоты сильно зависит от помех в энергосистеме. Нарушения могут быть разделены на две основные группы: стационарное состояние и переходные процессы. Проблемы установившегося состояния включают несбалансированные напряжения, гармоники, низкочастотные колебания амплитуды и отклонения частоты. Временные проблемы включают в себя внезапные изменения основной формы волны напряжения и амплитуд и фаз гармоник, изменения частоты, скачки фазового угла, пики, вырезы, экспоненциальные затухающие компоненты и шум. Поскольку возмущения энергосистемы увеличиваются с распространением систем распределенной генерации и нелинейных нагрузок, крайне важно, чтобы алгоритм оценки частоты был невосприимчив к помехам. Одновременно алгоритм должен иметь достаточную пропускную способность для отслеживания изменений частоты. Компромисс между шириной полосы и отклонением помех является общим свойством для всех методов оценки частоты.
+%В этой статье предлагается метод оценки частоты, основанный на дифференцировании фазового угла комплексной синусоиды, полученной путем применения матрицы преобразования Кларка к напряжениям сетки. Насколько известно авторам, первые случаи использования фазовых углов для получения частоты сложной синусоиды были описаны Треттером \cite{tretter1985estimating} и Кейем \cite{kay1989fast}. МакКиллиам \cite{mckilliam2010frequency} предложил версию, более устойчивую к шуму за счет времени вычислений. Идея в \cite{tretter1985estimating} состоит в том, чтобы использовать метод наименьших квадратов (LSM), чтобы развернуть развернутый фазовый угол в прямую линию, где наклон указывает частоту. Таким образом, частота задается первой производной фаTзового угла. Таким образом, \cite{tretter1985estimating} дает те же результаты, что и применение фильтра Савицкого – Голея первого порядка \cite{schafer2011savitzky} к фазовым углам. Версия Kay \cite{kay1989fast} улучшает оценку, избегая шага разворачивания фазового угла, используя разности фазного угла назад. Другое тонкое улучшение заключается в том, что в версии Kay нет ограничения на то, что количество выборок должно быть нечетным. Вклад этой статьи: добавление фильтра скользящего среднего (MAF) для дальнейшего сглаживания оценки частоты и обеспечения полной оценки устойчивости оценщика к гармоникам напряжения и дисбалансам; разработка метода выбора количества выборок, используемых алгоритмом LMS; рекурсивная реализация алгоритма LMS.
 %
-%Вэре льаборэж тебиквюэ хаж ут. Ан пауло торквюатоз хаж, нэ пробо фэугяат
-%такематыш шэа. Мэльёуз пэртинакёа юлламкорпэр прё ад, но мыа рыквюы конкыптам.
-%Хёз квюот пэртинакёа эи, ельлюд трактатоз пэр ад. Зыд ед анёмал льаборэж
-%номинави, жят ад конгуы льабятюр. Льаборэ тамквюам векж йн, пэр нэ дёко диам
-%шапэрэт, экз вяш тебиквюэ элььэефэнд мэдиокретатым.
+%\subsection{Оценка частоты сетки с использованием фазовых углов и алгоритма LMS} \label{sec:ch2/sec1_1}
 %
-%Нэ про натюм фюйзчыт квюальизквюэ, аэквюы жкаывола мэль ку. Ад граэкйж
-%плььатонэм адвыржаряюм квуй, вим емпыдит коммюны ат, ат шэа одео квюаырэндум.
-%Вёртюты ажжынтиор эффикеэнди эож нэ, доминг лаборамюз эи ыам. Чэнзэрет
-%мныжаркхюм экз эож, ыльит тамквюам факильизиж нык эи. Квуй ан элыктрам
-%тинкидюнт ентырпрытаряш. Йн янвыняры трактатоз зэнтынтиаэ зыд. Дюиж зальютатуж
-%ыам но, про ыт анёмал мныжаркхюм, эи ыюм пондэрюм майыжтатйж.
+%Используя преобразование Кларка, сеточные напряжения выражаются в стационарном $\alpha \beta$ -- кадре :
+%
+%\begin{equation}
+%\label{eq:equation113}
+%[u_{\alpha}[n],u_{\beta}[n]]^T=\dfrac{\sqrt{2}}{2\sqrt{3}} 
+%\begin{bmatrix}
+%2 & -1 & -1\\
+%0 & \sqrt{3} & -\sqrt{3}
+%\end{bmatrix}
+%[u_1[n], u_2[n], u_3[n]]^T ,
+%\end{equation} 
+%
+%где $u_1[n], u_2[n]$  и  $u_3[n]$ представляют текущую выборку трех фазно-нейтральных напряжений сетки, выбранных на частоте $f_s$  и периоде $T_s$.
+%Затем компоненты $u_{\alpha}[n] , u_{\beta}[n]$ используются для формирования сложной синусоиды $u_c[n]$:
+% 
+%\begin{equation}\label{eq:equation114}
+%u_c [n]= u_{\alpha}[n]+j* u_{\beta}[n] ,
+%\end{equation}
+%
+%который также может быть представлен в полярной форме:
+%
+%\begin{equation}\label{eq:equation115}
+%u_c [n]= a[n]exp(j\theta [n] ),
+%\end{equation}
+%
+%где фазовый угол $\theta [n]$ получается выражением:
+%
+%\begin{equation}\label{eq:equation116}
+%\theta[n]=atan (u_{\beta} [n],u_{\alpha}[n] ),
+%\end{equation}
+%
+%и $ atan(y,x)$  функция представляет угол четырех квадрантов из функции $tan^{-1} \dfrac{x}{y}$
+%
+%В незагрязненной сетке текущее значение фазового угла, определяемое как (4), равно фазовому углу основной положительной последовательности $(\theta^{1+})$, и текущая частота сетки        $(f_g [n])$ получается из разности между текущей и последней выборками фазового угла:
+%
+%\begin{equation}\label{eq:equation117}
+%f_{g} [n]=(\theta[n]- \theta[n-1] ) f_{s} /(2\pi)
+%\end{equation}
+%
+%В общей сетке, нарушенной гармониками, дисбалансами и шумом, фазовый угол $\theta$ является основным фазовым углом прямой последовательности $\theta ^{1+}$, на который накладывается фазовый угол ошибки. Значения $\theta ^{1+}$,  можно оценить, поместив развернутую последовательность $N$ элементов  $\theta`$ из значений $\theta$ в прямую линию. Расчетная частота сетки затем получается по наклону линии подгонки. Если метод наименьших квадратов используется для подгонки развернутых значений $\theta`$, текущий оцененный фазовый угол прямой последовательности $\theta ^{1+} [n]$  и текущая расчетная частота  $f_{g} [n] $  определяются как \cite{tretter1985estimating, kay1989fast}:
+%
+%\begin{equation}\label{eq:equation118}
+%\hat{\theta}^{1+}[n] = \dfrac{6}{N(N+1)} \sum\limits_{i=0}^{N-1} i \theta^\prime[n+i-N+1]-\dfrac{2N-4}{N(N+1)} \sum\limits_{i=0}^{N-1} \theta^\prime[n+i-N+1]
+%\end{equation}
+%
+%\begin{equation}\label{eq:equation119}
+%\hat f_{g}[n] = \dfrac{6f_{s}}{N(N^{2}+1)\pi} \sum\limits_{i=0}^{N-1} i \theta^\prime[n+i-N+1]-\dfrac{3f_{s}}{N(N+1\pi)} \sum\limits_{i=0}^{N-1} \theta^\prime[n+i-N+1]
+%\end{equation}
+%
+%Последовательность $\theta^\prime [n+i-N+1], i = {0,1,…,N-1}$ получается путем развертывания последовательности $h$ фазового угла, образованной текущим значением $(i=0)$ и $N-1$ прошлыми элементами.
+%
+%Чтобы избежать трудоемкой операции развертывания фазового угла, оценка частоты сетки 
+%\^f$_{g}$ может быть выражена в функции обратной разности $(\theta)$ фазового угла $(\delta)$, определяемой как:
+%
+%\begin{equation}\label{eq:equation120}
+%\delta[n]  =
+%\begin{cases}
+%\theta[n]-\theta[n-1]-2\pi, &\text{если $\theta[n]-\theta[n-1] >\pi$} \\
+%\theta[n]-\theta[n-1], &\text{если $ -\pi<\theta[n]-\theta[n-1] \leqslant \pi$} \\
+%\theta[n]-\theta[n-1]+2\pi, &\text{если $\theta[n]-\theta[n-1] \leqslant -\pi$} 
+%\end{cases}
+%\end{equation}
+%
+%\begin{figure}[ht]
+%	\centering
+%	%\includegraphics [scale=0.9] {f1.png}
+%	\includegraphics [width=0.9\linewidth] {f1.png}
+%	\caption{Оценщик (9) веса и амплитуды частотной характеристики образца.}
+%	\label{img:picture15}
+%\end{figure}
+%
+%Три случая для вычисления $\delta$ необходимы для учета циклического характера фазового угла. Это позволяет избежать абсолютных разностей фазового угла, превышающих $\pi$ радиан.
+%
+%Используя \labelcref{eq:equation120}, оценка частоты сетки \labelcref{eq:equation119} выражается как:
+%
+%\begin{equation}\label{eq:equation121}
+%\hat f_{g}[n] = \sum\limits_{i=0}^{N+2} \dfrac{3f_{s}}{4\pi} 
+%\dfrac{N^2-4(i-\dfrac{1}{2}N +1)^{2}} {N(N^2 -1)} \delta[n-i] = \sum\limits_{i=0}^{N+2} f_s w [-i]\delta [n-i]
+%\end{equation}
+%
+%где $w[-i]$ представляет вес выборки окна, примененный к каждой разности фаз и углов, задержанной на $i$ выборок$ (\delta [n - 1])$:
+%
+%\begin{equation}\label{eq:equation122}
+%w[-i] =\dfrac{3}{4\pi} \dfrac{N^2-4(i-\dfrac{1}{2}N +1)^{2}} {N(N^2 -1)}, i=2-N, ..., -1, 0
+%\end{equation}
+%
+%На \labelcref{img:picture15}  показан вес выборки окна \labelcref{eq:equation122} и частотная характеристика выражения \labelcref{eq:equation121} для четырех значений $ N $. Без потери общности и по соображениям ясности был выбран диапазон небольших значений $ N $. Частоты $ f_1, f_2 и f_3 $ являются частотами, для которых частотная характеристика имеет нулевое усиление для $ N = 9 $.
+%
+%Как уже упоминалось в \cite{kay1989fast}, \labelcref{eq:equation121} достигает Крамера-Рао для сигнала к шуму (SNR) больше, чем на 6 дБ. Это означает, что этот оценщик будет иметь лучшее подавление шума для SNR более 6 дБ. Однако этот оценщик не может полностью отклонить содержание гармоник сетки, потому что нет значения N, которое приводит к нулевому усилению на всех частотах $ f=hf_g $, где $  h $ - порядок гармоник.
+%
+%\subsection{Фильтрация оценки частоты с помощью фильтра скользящих средних} \label{sec:ch2/sec1_2}
+%
+%В общей сетке, нарушенной гармониками и дисбалансами, выражение фазового угла $ \theta $ не имеет простой замкнутой формы, как в \labelcref{eq:equation116}. Тем не менее, следующие свойства подтверждаются численным моделированием: компонент постоянного тока создает колебание фазового угла с той же частотой, что и сетка; положительная последовательность гармоники n-го порядка дает осцилляцию ошибки фазового угла $ (n - 1) $, умноженную на частоту сетки; отрицательная последовательность гармоники n-го порядка создает осцилляцию ошибки фазового угла $ (n + 1) $, умноженную на частоту сетки; значение ошибки фазового угла в течение периода сетки равно нулю. На \labelcref{img:picture16} показаны четыре примера с различными условиями сетки, где $  \theta^{1+} $- это фазовый угол основной прямой последовательности, а $ \theta $- фазовый угол, полученный из \labelcref{eq:equation116}.
+%
+%Фильтр скользящего среднего, применяемый к оценке частоты LMS $ ({\hat{f}}_g) $, может полностью устранить ошибки частоты из-за гармоник и дисбалансов, если длина фильтра совпадает с периодом сетки. Это происходит потому, что фильтр MAF определяется:
+%
+%\begin{equation}\label{eq:equation123}
+%y[n] =\dfrac{1}{N} \sum\limits_{i=0}^{N-1} x [n-i]
+%\end{equation}
+%
+%\begin{figure}[ht]
+%	\centering
+%	%\includegraphics [scale=0.9] {f1.png}
+%	\includegraphics [width=0.9\linewidth] {f2.png}
+%	\caption{Примеры фазового угла с несколькими устойчивыми состояниями сетки: (а) незагрязненный; (б) загрязнены постоянным током; (в) загрязнены положительной последовательностью 5-й гармоники и (е) загрязнены отрицательной последовательностью 5-й гармоники.}
+%	\label{img:picture16}
+%\end{figure}
+%
+%Имеет частотную характеристику с нулевой величиной в частотах, кратных обратному временному окну, то есть все сигналы в форме:
+%
+%\begin{equation}\label{eq:equation124}
+%x[n]=a cos{(2\pi / Nkn+1)}
+%\end{equation}
+%
+%(где $ a$ и $b $ являются действительными числами; $  N, k$ и $ n $ являются целыми числами), становятся нулевыми после фильтрации по MAF длиной N точек (y [n] = 0).
+%
+%Таким образом, число отсчетов MAF задается как $ N=f_s / f_g $, но это выражение действительно только тогда, когда $ f_s / f_g $ является целым числом. Поскольку в общем случае это не будет так, число выборок MAF должно быть округлено до ближайшего целого числа:
+%
+%\begin{equation}\label{eq:equation125}
+%N=round(f_s / f_g)
+%\end{equation}
+%
+%Однако это означает, что частотная характеристика фильтра MAF на частотах гармоник сетки больше не равна нулю, а имеет значение, которое уменьшается с увеличением $ N $, т.~е. чем больше частота дискретизации, тем меньше усиление MAF на этих частотах. На \labelcref{img:picture17} показана частотная характеристика MAF с длиной $ N = 10 $. Как и ожидалось, усиление на частоте сетки             $ f_g({0.1f}_s) $ и ее гармоники $ ({0.2f}_s,\ {0.3f}_sи {0.4f}_s) $ равны нулю. С $ N $, наложенным (13), $ |H_{MAF}| $ график действителен только для частот сетки между $ f_{g_{min}} = f_s /\ (N+0.5) $ и $ f_{g_{max}} = f_s /\ (N-0.5) $. Если $ f_g<f_{g_{min}}$ $N$ увеличивается на 1 и если $ f_g> f_{g_{max}} $ N уменьшается на 1. Таким образом, максимум $ |H_{MAF}| $ усиления происходят на частотах $ kf_{g_{min}} $ и $ {kf}_{g_{max}}$ для $ k=\left\{\ 1,\ 2,\ \ldots,\ int\left(N\ /\ 2\right)\right\} $.
+%
+%Следует отметить, что можно сделать $ f_s/\ f_g $ целым числом, если можно изменить частоту дискретизации. Однако предложенный оценщик частоты был разработан для управления силовыми электронными преобразователями, которые работают с фиксированной частотой PWM. Поскольку частота дискретизации связана с PWM, изменить ее невозможно.
+%
+%\begin{figure}[ht]
+%	\centering
+%	%\includegraphics [scale=0.9] {f1.png}
+%	\includegraphics [width=0.9\linewidth] {f3.png}
+%	\caption{Частотная характеристика фильтра скользящего среднего с длиной N=10.}
+%	\label{img:picture17}
+%\end{figure}
+%
+%\subsection{Предлагаемый метод оценки частоты сетки} \label{sec:ch2/sec1_3}
+%Предлагаемое ядро оценщика состоит из фильтра MAF \labelcref{eq:equation123}, применяемого к выходу оценщика LMS \labelcref{eq:equation121}. Чтобы дать оценщику возможность работать с широкой сеткой вариаций частоты, количество выборок \labelcref{eq:equation121} и \labelcref{eq:equation123} должно быть переменным. Используя изменяющееся во времени количество выборок \labelcref{eq:equation121} и \labelcref{eq:equation123} переписываются соответственно как:
+%
+%\begin{equation}\label{eq:equation126}
+%f\prime_g[n]= \sum\limits_{i=0}^{N_a[n]-2} \dfrac{3f_s}{4\pi} \dfrac{N_a[n]^2-4(i-\dfrac{1}{2} N_a[n]+1)^2}{N_a[n](N_a[n]^2-1)} \delta [n-i]
+%\end{equation}
+%
+%\begin{equation}\label{eq:equation127}
+%\hat{f}_g[n] =\dfrac{1}{N_b[n]}  \sum\limits_{i=0}^{N_a[n]-1} f^\prime_g[n-1]
+%\end{equation}
+%
+%где 
+%
+%\begin{equation}\label{eq:equation128}
+%N_a[n] = round(k_{LMS} f_s / \hat{f}_g[n-1])
+%\end{equation}
+%
+%и
+%
+%\begin{equation}\label{eq:equation129}
+%N_b[n] = round(k_{MAF} f_s / \hat{f}_g[n-1])
+%\end{equation}
+%
+%представляют количество образцов, используемых \labelcref{eq:equation126} и \labelcref{eq:equation127}. $ N_a[n] $ и $ N_b[n] $ получают на основе предыдущей оценки частоты сетки $ ({\hat{f}}_g[n-1]) $, поскольку текущая оценка $ ({\hat{f}}_g[n) $ еще не доступна, когда вычисляются $ N_a[n] $ и $ N_b[n] $.
+%
+%Общий метод изображен на \labelcref{img:picture18}. Первым этапом является вычисление обратных разностей $ \delta $ фаз и углов сетки с использованием \labelcref{eq:equation113}, \labelcref{eq:equation116} и \labelcref{eq:equation120}. На втором этапе выполняется первая оценка частоты сетки $ (f_g^\prime) $ методом LMS с использованием \labelcref{eq:equation126}. На третьем этапе получают оценку частоты сетки $ ({\hat{f}}_g) $ путем фильтрации первой оценки с использованием фильтра MAF с использованием \labelcref{eq:equation127}. Количество выборок в \labelcref{eq:equation126} и \labelcref{eq:equation127} определяется расчетной частотой сетки.
+%
+%Следует отметить, что дифференциатор LMS \labelcref{eq:equation119}, применяемый к фазовому углу, реализуется с помощью \labelcref{eq:equation120} и \labelcref{eq:equation126}.
+%
+%Оценщик в виде двух параметров: $ k_{LMS} $ и $ k_{MAF} $. Параметр $ k_{MAF} $ установлен в 1, так как это минимальное значение, которое позволяет отклонять гармонические помехи. Устанавливая это значение на минимум, время установления также сохраняется на минимуме. Однако для улучшения подавления гармоник, особенно если $ f_s/\ f_g $ не является целым числом, $ k_{MAF} $ может быть установлено на большее целое число. Недостатком является снижение динамики, увеличивающее время установления оценки.
+%
+%Параметр $ k_{LMS} $ устанавливается для минимизации влияния гармоник напряжения сети и дисбалансов в оценке частоты, как описано в следующем подразделе.
+%
+%\subsection{Метод выбора алгоритма LMS по количеству выборок} \label{sec:ch2/sec1_4}
+%
+%Чтобы выбрать значение параметра $ k_{LMS} $, анализируются коэффициенты усиления частотного отклика в частотах гармоник. Выбранный критерий состоит в том, чтобы минимизировать квадратный корень из суммы квадратов усиления $ (J_H) $ на этих частотах:
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics [width=0.9\linewidth] {f4.png}
+%	\caption{Схема предлагаемого способа оценки частоты сетки.}
+%	\label{img:picture18}
+%\end{figure}
+%
+%\begin{equation}\label{eq:equation130}
+%J_H=\sqrt{\sum_{h=1}^{h_{max}}{H^2(hf_g),}}\ \ \ \ \ \ \ h_{max}=int(\frac{1}{2}f_s/\ f_g)
+%\end{equation}
+%
+%где функция int (x) возвращает целую часть числа x. Гармоника $ h_{max} $- это максимальный порядок гармоник основной частоты $ f_g $, который можно анализировать с частотой дискретизации $ f_s $.
+%
+%В качестве примера на \labelcref{img:picture19} показаны частотные характеристики оценщика LMS $ (H_{LMS}) $, фильтра MAF $ (H_{MAF}) $ и полного оценщика $ (H) $ для заданного набора значений $ f_s $, $ N_a $ и $ N_b $. Точки представляют коэффициенты усиления в гармониках для данной частоты сетки: $ f_g=52.6 Гц $. Сумма квадратов усиления должна быть минимизирована путем правильного выбора $ N_a $.
+%
+%На \labelcref{img:picture20} показана эволюция $ J_H $ как функции параметра $ N_a $ для тех же значений $ f_s $, $ N_b $ и $ f_g $, что и на \labelcref{img:picture19}. Функция имеет два локальных минимума (для показанного диапазона $ N_a $): $ N_a=14 $ и $ N_a=24 $. Чтобы улучшить динамику оценки (сократить время установления), выбирается нижнее значение: $ N_a=14 $. Следует отметить, что если частота дискретизации кратна частоте сетки, точки, представленные на \labelcref{img:picture19} будет соответствовать нулям MAF, а значение $ J_H $ на \labelcref{img:picture20} всегда будет равно нулю.
+%
+%Чтобы получить выражение для значения  $ N_a $ как функции от $ f_s $ и $ f_g $, было выполнено несколько симуляций, как показано на \labelcref{img:picture20}. Моделирование для частоты сетки между 30 Гц и 70 Гц (с шагом 1 МГц) и для частоты дискретизации между 500 Гц и 10 кГц (с шагом 50 Гц) позволяет сделать вывод, что значение $ N_a $, которое минимизирует $  J_H $, составляет:
+%
+%\begin{equation}\label{eq:equation131}
+%N_a=round(1.431 f_s / f_g)
+%\end{equation}
+%
+%и так, параметр $ k_{LMS} $ установлен в:
+%
+%\begin{equation}\label{eq:equation132}
+%k_{LMS}=1.431
+%\end{equation}
+%
+%\labelcref{img:picture21} иллюстрирует эволюцию величины $ J_H $ и число выборок, используемых устройство оценки LMS $ (N_a) $, и с помощью фильтра MAF $ (N_b) $ в зависимости от частоты сетки для конкретной частоты дискретизации с использованием 
+%$ k_{LMS}=1.431 $ и $ k_{MAF}=1 $.
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics [width=0.9\linewidth] {f5.png}
+%	\caption{Частотные характеристики оценки LMS $ (H_{LMS}) $, фильтра MAF $ (H_{MAF}) $ и полной оценки (H) для $ f_s=500 Гц $, $ N_a=12 $ и $ N_b=10 $. $ (vertical\ scale\ =\ x^{1/5}) $.}
+%	\label{img:picture19}
+%\end{figure}
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics [width=0.9\linewidth] {f6.png}
+%	\caption{Эволюция $ J_H $ как функция параметра $ N_a $ для $ f_s=500 Гц $, 
+%		$ N_b=10 $ и $ f_s=52.6 Гц $.}
+%	\label{img:picture20}
+%\end{figure}
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics [width=0.9\linewidth] {f7.png}
+%	\caption{Эволюция $ J_H $, $  N_a $ и $ N_b $ как функция частоты сетки для $ f_s=500 Гц $.}
+%	\label{img:picture21}
+%\end{figure}
+%
+%Значение $ J_H $ равно нулю всякий раз, когда $ f_g $ является фактором $ f_s $. Локальные максимумы $ J_H $ увеличиваются с увеличением частоты сетки.
+%
+%\subsection{Рекурсивная реализация} \label{sec:ch2/sec1_5}
+%
+%Чтобы улучшить вычислительные требования оценщика за счет сокращения количества операций и времени выполнения, должна использоваться рекурсивная реализация.
+%
+%Оценщик частоты LMS в \labelcref{eq:equation126} может быть выражен как:
+%
+%\begin{equation}\label{eq:equation133}
+%f_g^\prime[n]=\frac{3f_s}{\pi} \dfrac{(N_a[n]-1) S_\delta[n] +(N_a[n]-2) S_{i \delta}[n] - S_{i^2 \delta[n]}} {N_a[n] (N_a[n]^2-1}
+%\end{equation}
+%
+%где 
+%
+%\begin{equation}\label{eq:equation134}
+%S_\delta[n] = \sum_{i=0}^{N_a[n]-2} \delta[n-i]
+%\end{equation}
+%
+%\begin{equation}\label{eq:equation135}
+%S_{i\delta}[n] = \sum_{i=0}^{N_a[n]-2} \delta[n-i]
+%\end{equation}
+%
+%и 
+%
+%\begin{equation}\label{eq:equation136}
+%S_{i^2\delta}[n] = \sum_{i=0}^{N_a[n]-2} i^2\delta[n-i]
+%\end{equation}
+%
+%Фильтр MAF в \labelcref{eq:equation127} можно переписать как:
+%
+%\begin{equation}\label{eq:equation137}
+%\hat{f}_g[n] = S_{\hat{f}_g} [n] / N_b[n]
+%\end{equation}
+%
+%где 
+%
+%\begin{equation}\label{eq:equation138}
+%S_{\hat{f}_g} [n] = \sum_{i=0}^{N_a[n]-1} \hat{f}_g [n-i]
+%\end{equation}
+%
+%Если различия $ N_a $ и $ N_b $  между последовательными циклами ограничены до $ ±1 $, суммы $ S_{f_g^\prime}[n] $ могут быть реализованы рекурсивно. Несколько симуляций показали, что различия находятся в этом диапазоне даже при наличии частотного шага для частот дискретизации выше 500 Гц. Однако, если это условие не выполняется, рекурсивный алгоритм все еще работает должным образом, ограничивая различия до $ ±1 $ замедляя обновление $ N_a $ и  $ N_b $.
+%
+%Принимая во внимание это соображение, необходимы три случая, чтобы учесть изменения $ N_a $ и $ N_b $ в суммах, определенных рекурсивно. Рекурсивные версии \labelcref{eq:equation134} - \labelcref{eq:equation137} определяются соответственно \labelcref{eq:equation139} -  \labelcref{eq:equation142}:
+%
+%\begin{equation}\label{eq:equation139}
+%\footnotesize{
+%S_\delta[n]=
+%\begin{cases}
+%S_\delta[n-1]+\delta[n]-\delta_{n1}-\delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+%S_\delta[n-1]+\delta[n]-\delta_{n1} , &\text{если $N_a[n]=N_a[n-1]$} \\
+%S_\delta[n-1]+\delta[n] , &\text{если $N_a[n]=N_a[n-1]+1$}
+%\end{cases}
+%}
+%\end{equation}
+%
+%\begin{equation}\label{eq:equation140}
+%\footnotesize{
+%S_{i\delta}[n]=
+%\begin{cases}
+%S_{i\delta}[n-1]+S_\delta[n-1]-k_1 \delta_{n1}-k_2 \delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+%S_{i\delta}[n-1]+S_\delta[n-1]-k_1 \delta_{n1}, &\text{если $N_a[n]=N_a[n-1]$} \\
+%S_{i\delta}[n-1]+S_\delta[n-1] , &\text{если $N_a[n]=N_a[n-1]+1$}
+%\end{cases}
+%}
+%\end{equation}
+%
+%\begin{equation}\label{eq:equation141}
+%\footnotesize{
+%S_{i^{2}\delta}[n]=
+%\begin{cases}
+%S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1]-k_1^2\delta_{n1}-k_2^2\delta_{n2} , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+%S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1]-k_1^2\delta_{n1}, &\text{если $N_a[n]=N_a[n-1]$} \\
+%S_{i^2\delta}[n-1]+{2S}_{i\delta}[n-1]+S_\delta[n-1] , &\text{если $N_a[n]=N_a[n-1]+1$}
+%\end{cases}
+%}
+%\end{equation}
+%
+%И 
+%
+%\begin{equation}\label{eq:equation142}
+%\footnotesize{
+%S_{f^\prime_g}[n]=
+%\begin{cases}
+%S_{f^\prime_g}[n-1] + f^\prime_g[n] + f^\prime_g[n-N_b[n]] - f^\prime_g[n-N_b[n]-1] , &\text{если $N_a[n]=N_a[n-1]-1$} \\
+%S_{f^\prime_g}[n-1] + f^\prime_g[n] + f^\prime_g[n-N_b[n]], &\text{если $N_a[n]=N_a[n-1]$} \\
+%S_{f^\prime_g}[n-1] + f^\prime_g[n] , &\text{если $N_a[n]=N_a[n-1]+1$}
+%\end{cases}
+%}
+%\end{equation}
+%
+%где $ k_1=1-N_a[n] $, $ k_2=N_a[n] $, $ \delta_{n1}=\delta[n-N_a[n]+1] $ и $ \delta_{n2}=\delta[n-N_a[n]] $
+%
+%Реализация алгоритма с использованием рекурсивных и циклических буферов показана в Алгоритме 1. Алгоритм написан с использованием записи Octave / Matlab и является готовой к использованию функцией. Однако алгоритм не использует какие-либо конкретные функции Octave / Matlab, которые легко адаптируются к другим языкам программирования. При использовании метода циклического буфера оптимизируется время выполнения для доступа к значениям переменных в предыдущих циклах. Если линейно-нейтральные напряжения недоступны, алгоритм может использоваться с линейно-линейными напряжениями путем правильной настройки строки алгоритма с номером 20.
+%
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics [width=0.9\linewidth] {a1.png}
+%	\caption{Алгоритм 1.}
+%	\label{img:picture22}
+%\end{figure}
+%
+%\begin{table} [htbp]
+%	\centering
+%	\caption{Параметры оценщиков.}%
+%	\label{tab:makecell}%
+%	\begin{tabular}{| c  c  c  c  c |}
+%		\hline
+%		% 1 строка
+%		%Колонка 1.1 
+%		LMSD & 
+%		%Колонка 1.2
+%		WLLMP &
+%		%Колонка 1.3
+%		IRNTA & 
+%		%Колонка 1.4
+%		FLMS &
+%		%Колонка 1.5
+%		DMD \\ \hline
+%
+%		% 2 строка
+%		\multicolumn{1}{|c}{\thead{$k_{LMS}  = 1.431$}} & \multicolumn{1}{c}{\thead{Размер шага:}} & \multicolumn{1}{c}{\thead{Фактор забвения}} & \multicolumn{1}{c}{\thead{$\mu_{max} =0.024$}} & \multicolumn{1}{c|}{\thead{DFT:}} \\ \hline
+%		
+%        % 3 строка
+%	    \multicolumn{1}{|c}{\thead{$k_{MAF} = 1$}} & \multicolumn{1}{c}{\thead{$ \mu=0.048$}} & \multicolumn{1}{c}{\thead{$\lambda =0.9645$}} & \multicolumn{1}{c}{\thead{$\mu_{min} =0.001$}} & \multicolumn{1}{c|}{\thead{$h_1:$ один \\ цикл треугольный}} \\ \hline
+%	    
+%	    % 4 строка
+%	    \multicolumn{2}{|c}{} & \multicolumn{1}{c}{\thead{Начальное значение \\ ковариации}} & \multicolumn{1}{c}{\thead{$\lambda =0.97$}} & \multicolumn{1}{c|}{\thead{\thead{Сглаживающий \\ фильтр:}}}  \\ \hline
+%	   
+%		% 5 строка
+%		\multicolumn{2}{|c}{} & \multicolumn{1}{c}{\thead{$\delta = 100$}} & \multicolumn{1}{c}{\thead{$\gamma =0.01$}} & \multicolumn{1}{c|}{\thead{\thead{$h_1:$ один  двухтактный \\ фильтр Кея}}}  \\ \hline
+%			   
+%	   
+%	    % 6 строка
+%		\multicolumn{3}{|c}{} & \multicolumn{1}{c}{\thead{$\rho=0.99$}} & \multicolumn{1}{c|}{}  \\ \hline
+%	\end{tabular}%
+%\end{table}
+
