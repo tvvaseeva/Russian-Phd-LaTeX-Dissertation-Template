@@ -1,0 +1,70 @@
+\documentclass{proc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+%\documentclass{article}
+\usepackage{pgfplots}
+\usetikzlibrary{snakes}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}
+\usepgflibrary{patterns} 
+\usepgflibrary[patterns] 
+\usetikzlibrary{patterns} 
+\usetikzlibrary[patterns]
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\begin{document}
+\begin{center}
+\begin{tikzpicture}
+
+% Значения осей
+\draw[dashed] (0,0.5)node[left,font=\tiny] {$200$};
+\draw[dashed] (0,1)node[left,font=\tiny] {$400$};
+\draw[dashed] (0,1.5)node[left,font=\tiny] {$600$};
+\draw[dashed] (0,2)node[left,font=\tiny] {$800$};
+\draw[dashed] (0,2.5)node[left,font=\tiny] {$1000$};
+\draw[dashed] (0,0)node[left,font=\tiny] {$0$};
+\draw[dashed] (2,0)node[below,font=\tiny] {$0.1$};
+\draw[dashed] (5,0)node[below,font=\tiny] {$0.01$};
+\draw[dashed] (8,0)node[below,font=\tiny] {$0.001$};
+
+ \draw [pattern = north west lines]
+(8,0) rectangle (8.5,2.5);
+\draw [fill=black]
+(1,0) rectangle (3,0.05);
+\draw [fill=black]
+(4.5,0) rectangle (5,0.05);
+\draw [fill=black]
+(7.5,0) rectangle (8,0.05);
+\draw[pattern = north west lines]
+(5,0) rectangle (5.5,0.3);
+\draw[pattern = north west lines]
+(9.5,2) rectangle (10,2.5);
+\node[right,scale=0.5] at (10,2.5){ метод корреляционных функций};
+\draw[fill=black]
+(9.5,1) rectangle (10,1.5);
+\node[right,scale=0.5] at (10,1.5){быстрый метод корреляционных функций};
+
+\draw (0,0) -- (9,0);
+\draw (0,0.5) -- (8,0.5);
+\draw (0,1) -- (8,1);
+\draw (0,1.5) -- (8,1.5);
+\draw (0,2) -- (8,2);
+\draw (0,2.5) -- (8,2.5);
+\draw (8.5,0.5) -- (9,0.5);
+\draw (8.5,1) -- (9,1);
+\draw (8.5,1.5) -- (9,1.5);
+\draw (8.5,2) -- (9,2);
+\draw (8.5,2.5) -- (9,2.5);
+\draw (9,2.5) -- (9,0);
+
+\path[->] (-0.6,0) edge [white] node[above,sloped, black, scale=0.7] {количество переборов} (-0.6,3);
+\node[below,scale=0.8] at (5,-0.5){шаг формирования эталонов};
+% Оси
+\draw[->] (0,0) -- (9.5,0) coordinate (x axis);
+\draw[->] (0,0) -- (0,3) coordinate (y axis);
+\end{tikzpicture}
+\end{center}
+\end{document}
+

@@ -1,0 +1,29 @@
+\documentclass{proc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{pgfplots}
+\usepackage[papersize={20cm,20cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}  
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\pagestyle{empty} % Отключает нумерацию страницы
+\begin{document}
+\begin{tikzpicture}[sibling distance=23em,
+		every node/.style = {shape=rectangle, rounded corners,
+			draw, align=center,
+			top color=white, bottom color=blue!30}]]
+		\node {\textbf{Быстрое}\\ \textbf{вычисление} \\
+				\textbf{2D корреляций} \\ \textbf{и сверток}}
+		child { node {\textbf{На основе} \\ \textbf{преобразований} \\
+				\textbf{(БПФ, ДПФ)} \\ \textbf{(для больших размеров} \\ \textbf{сигнала)}} }
+		child { node {\textbf{На основе}\\ \textbf{разложений}}
+			child { node {\textbf{Общего вида}}
+				child { node {\textbf{Через} \\ \textbf{быстрое} \\ \textbf{одномерное}} }
+				child { node {\textbf{Через} \\\textbf{ разложение} \\ \textbf{на короткие} \\ \textbf{2D корреляции}} }  }
+			child { node {\textbf{Разделяемое} \\ \textbf{ядро 2D фильтр} \\ \textbf{с разделяемым ядром}\\ \textbf{можно представить } \\ \textbf{в виде двух} \\ \textbf{1D фильтров}} } };
+\end{tikzpicture}
+\end{document}

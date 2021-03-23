@@ -1,0 +1,37 @@
+\documentclass{article}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\begin{document}
+\pagestyle{empty}
+
+\tikzstyle{decision} = [ draw,trapezium, trapezium left angle=70, trapezium right angle=110]
+\tikzstyle{block} = [rectangle, draw,minimum width=10em, align=center, minimum height=1em, text centered]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse]
+
+\begin{tikzpicture}[node distance =1.3cm]
+    \node [cloud, fill=red!10] (st) {Начало};
+    \node [decision, fill=blue!10, below of=st] (s){s(t)};
+    \node [block, fill=green!10, below of=s] (o) {Определение h и B};
+    \node [block, fill=green!10, below of=o] (f) {Формирование \\ наборов эталона};
+    \node [block, fill=green!10, below of=f] (P) {Применение весовой \\ функции};
+    \node [block,minimum width=7em, fill=green!10, below of=P] (DPF) {ДПФ};
+    \node [block,minimum width=15em, fill=green!10, below of=DPF] (A) {Определение коэффициентов \\ коррелярии $A_{v}$};
+    \node [block,minimum width=7em, fill=green!10, below of=A] (Amax) {$A_{v\_max}$};
+    \node [decision, fill=blue!10, below of=Amax] (g) {f,A,$\phi$};
+    \node [cloud, fill=red!10, below of=g] (k) {Конец};
+   
+    \path [line] (st) -- (s);
+    \path [line](s)-- ++(left:2cm)|-(P);
+    \path [line] (o) -- (f);
+    \path [line](f)-- ++(right:3cm)|- (A);
+    \path [line] (f) -- (P);
+    \path [line] (P) -- (DPF);
+    \path [line] (DPF) -- (A);
+    \path [line] (A) -- (Amax);
+    \path [line] (Amax) -- (g);
+    \path [line] (g) -- (k);
+\end{tikzpicture}
+\end{document}

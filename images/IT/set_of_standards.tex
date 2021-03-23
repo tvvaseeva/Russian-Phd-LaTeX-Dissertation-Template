@@ -1,0 +1,63 @@
+% Преамбула
+\documentclass{proc}
+\usepackage{mathtext}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+%\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[papersize={30cm,29.7cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+%\pgfplotsset{compat=newest}
+\pagestyle{empty} % Отключить нумерацию странци
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[scale=3,decoration={brace,raise=5pt}]
+
+\draw[ultra thick, black!100] (2.5,0) -- (2.5,5);
+\draw[very thick, black!100, dashed] (2.8,0) -- (2.8,4.95) node {$[-]$};
+\draw[very thick, black!100, dashed] (1.25,0) -- (1.25,4.1) node {$[-]$};
+\draw[very thick, black!100, dashed] (5,0) -- (5,2.69) node {$[-]$} ;
+\draw[very thick, black!100, dashed] (4,0) -- (4,4.1) node {$[-]$};
+\draw[very thick, black!100, dashed] (0.6,0) -- (0.6,2.9) node {$[-]$};
+
+
+% Нумерация по x
+\node[left] at (0,0){$0$};
+\node[left] at (0,0.5){$0.1$};
+\node[left] at (0,1){$0.2$};
+\node[left] at (0,1.5){$0.3$};
+\node[left] at (0,2){$0.4$};
+\node[left] at (0,2.5){$0.5$};
+\node[left] at (0,3){$0.6$};
+\node[left] at (0,3.5){$0.7$};
+\node[left] at (0,4){$0.8$};
+\node[left] at (0,4.5){$0.9$};
+\node[left] at (0,5){$1$};
+\node[below] at (2.8,0){$h$};
+\node[above] at (3.0,0){$B$};
+
+\draw[<->] (2.4,-0.2) -- (2.8,-0.2) coordinate (x axis);
+
+% Оси и сетка
+\draw[->] (0,0) -- (8,0) coordinate (x axis) node[above] {$w$};
+\draw[->] (0,0) -- (0,5) coordinate (y axis) node[right] {$S(w)$};
+
+% Графики
+\draw[ultra thick, cyan] (0,0) (0,0) cos (0,0) sin (2.7,5) cos (7,0.5); 
+\draw[ultra thick, red] (0,0.3) (0,0.3) cos (0,1.5) sin (2.4,5) cos (6,0.9);
+\draw[ultra thick, violet] (0,1.35) (0,3.4) cos (0,2.5) sin (2.2,5) cos (6,0.0);
+
+% Наименования графиков
+%\draw[very thick, black!100, dashed] (5.3, 4.9) -- (5.8, 4.9) node[right, black] {$-\ результат \ ДПФ \ (набор#1)$};
+%\draw[very thick,red!100] (5.3, 4.6) sin (5.8, 4.6) node[right, black] {$-\ набор \ эталонов  \ #1$};
+%\draw[very thick, red!50!blue, dashed] (5.3, 4.3) sin (5.8, 4.3) node[right, black] {$-\ набор\ эталонов  \ #2$};
+%\draw[very thick, red!50!green,  dashed] (5.3, 4) sin (5.8, 4) node[right, black] {$ -\ набор \ эталонов \ #3$};
+\draw[red!50!green,  dotted] (5.3, 4) sin (5.8, 4);
+\end{tikzpicture} 
+\end{center}
+\end{document}

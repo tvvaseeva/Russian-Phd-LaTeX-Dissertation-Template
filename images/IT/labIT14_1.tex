@@ -1,0 +1,31 @@
+%Преамбула
+\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[english, russian] {babel}
+\pgfplotsset{compat=1.9}
+%Содержимое документа
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+	ybar,
+	width = 250pt,
+	/pgf/number format/1000 sep={},
+	symbolic x coords={0.1, 0.01, 0.001, 0.0001},
+	grid = major,
+	legend style={
+		at={(2.1 ,0.5)},
+		anchor=east,
+		legend columns=1
+	}
+]
+\addplot coordinates {
+	(0.1, 10) 	(0.01, 15) (0.001, 20) 
+};
+\addplot coordinates {
+	(0.1, 10) 	(0.01, 100) (0.001, 1000) 
+};
+
+\legend{-быстрый метод корреляционных функций, -метод корреляционных функций}
+\end{axis}
+\end{tikzpicture}
+\end{document}
