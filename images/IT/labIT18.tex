@@ -1,0 +1,46 @@
+\documentclass{article}
+\usepackage[cp1251]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\begin{document}
+\pagestyle{empty}
+
+\tikzstyle{decision} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!30]
+\tikzstyle{block} = [rectangle, draw,minimum width=10em, align=center, minimum height=1em, text centered]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse]
+
+\begin{tikzpicture}[node distance =1.3cm]
+	%level 1
+    \node [cloud, fill=red!10] (1) {Начало};
+    %level 2
+    \node [decision, fill=green!10, below of=1] (2){Счетчик = $1$};
+    %level 3
+    \node [decision, fill=green!10, below of=2] (3) {Инициализация \\ амплитуд и фаз};
+    %level 4
+    \node [decision, fill=green!10, below of=3] (4) {Счетчик $1 = 1$};
+    %level 5
+    \node [decision, fill=green!10, below of=4] (5) {Счетчик = Счетчик+ $1$};
+    %level 6
+    \node [decision, fill=green!10, below of=5] (DPF) {Формулы $(7)$ и $(8)$\\   обновление времени \\ уравнения IEFK};
+    %level 7
+    \node [decision, fill=green!10, below of=DPF] (6) {Счетчик = Счетчик+ $1$ };
+    %level 8
+    \node [decision, minimum width=2em, fill=green!10, below of=6] (Amax) {вычисления матрицы \\ усиления с помощью $(10)$};
+    %level 9
+    \node [decision, fill=green!10, below of=Amax] (7) {$(11)$ и $(12)$ \\ обновления измерений IEKF};
+    %level 10
+    \node [cloud, fill=red!10, below of=7] (k) {Конец};
+   
+    \path [line] (1) -- (2); %level 1
+    \path [line](2)-- (3); %level 2
+    \path [line] (3) -- (4); %level 3
+    \path [line](4)--  (5); %level 4
+    \path [line] (5) -- (DPF); %level 6
+    \path [line] (DPF) -- (6); %level 7
+    \path [line] (6) -- (Amax); %level 8
+    \path [line] (Amax) -- (7); %level 9
+    \path [line] (7) -- (k); %level 10
+\end{tikzpicture}
+\end{document}
