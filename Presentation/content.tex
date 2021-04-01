@@ -1,302 +1,176 @@
-\section{Списки}
-\begin{frame}[plain, noframenumbering]
+\section{Общие положения}
+
+\subsection{Цель, объект и предмет исследования}
+\begin{frame}{Цель, объект и предмет исследования}
+	\textbf{Целью} работы является совершенствование методов оценки параметров гармоник многотонального сигнала. \vspace{1em}
+
+	\textbf{Объектом} исследования являются методы оценки параметров гармоник в силовых электрических сетях. \vspace{1em}
+	
+	\textbf{Предметом} исследования является точность и быстродействие численных методов оценки параметров гармоник.	
+\end{frame}
+
+\subsection{Задачи исследования}
+\begin{frame}{Задачи исследования}
+	\begin{enumerate}
+		\item Анализ математических основ объекта исследования и формулировка математической модели многотонального сигнала.
+		\item Изучение и экспериментальное исследование алгоритмов оценки параметров гармоник.
+		\item Развитие математической модели многотональных сигналов в части расчета точности оценки амплитуды применительно к используемому при оценке параметров гармоник подходу, связанному с применением оконных функций.
+		\item Разработка численных методов для оценки параметров гармоник, позволяющих достичь расчетной точности для амплитуды гармоники.
+		\item Разработка алгоритмов для эффективного выполнения численных методов из предыдущей задачи.
+		\item Разработка комплекса программа для анализа и доработки алгоритмов оценки параметров гармоник многотональных сигналов.
+	\end{enumerate}
+\end{frame}
+
+\subsection{Научная новизна работы}
+\begin{frame}{Научная новизна работы}
+	\begin{enumerate}
+		\item Дополнена математическая модель спектра многотонального сигнала  полученными и экспериментально проверенными формулами для нахождения границы Крамера-Рао при оценке амплитуды гармоники для взвешенного оконной функцией сигнала.
+		\item Предложен численный метод нахождения оптимальной несмещенной оценки амплитуды гармоники на основе корреляционного анализа, а также предложена его быстрая реализация на основе алгоритмов разряженного БПФ.
+		\item Реализован комплекс программ для экспериментальной проверки полученных в работе формул и анализа алгоритмов оценки параметров гармоник многотональных сигналов.
+	\end{enumerate}	
+\end{frame}
+
+\subsection{Практическая значимость работы}
+\begin{frame}{Практическая значимость работы}
+	\begin{enumerate}
+		\item Выведена формула для нахождения границы Крамера-Рао при применении оконной функции, которая позволяет повысить эффективность научных исследований различных алгоритмов обработки сигналов с применением оконных функций, заменив моделирование алгоритма с применением различных окон расчетом по предложенной формуле.
+		\item Предложенный численный метод, вместе с его быстрой реализацией, позволяют повысить точность и достоверность результатов измерительных приборов для электрических сетей.
+		\item Разработанный комплекс программ позволяет проводить научные исследования в области цифровой обработки сигналов и используется в учебном процессе.
+	\end{enumerate}
+\end{frame}
+
+\section{Математическая модель многотонального сигнала}
+\subsection{Ограничение ДПФ}
+\begin{frame}{Ограничение ДПФ}
+	\textsc{Рисунок, на котором показана проблема нахождения гармоники сигнала с частотой, находящейся между дискретными гармониками ДПФ.}
+\end{frame}
+
+\begin{frame}{Виляние оконной функции}
+	\textsc{Рисунок, показывающий, что происходит со спектром гармоники при наложении на него окна. Лучше в двух частях - с прямоугольным окном и окном Кайзера.}	
+\end{frame}
+
+\begin{frame}{Методы интерполирования спектра}
+	\textsc{Справа - поясняющий рисунок и формулы, слева - список основных методов.
+	Можно взять из диссертации Елизарова.}	
+\end{frame}
+
+\begin{frame}{Методы экстраполирования сигнала}
+	\begin{minipage}[t]{0.47\linewidth}
+		\centering 
+		\textbf{Сигнал (частота=5.2)}
+		\includegraphics[width=.9\linewidth]{signal}
+		\textbf{Экстраполированный сигнал }
+		\includegraphics[width=.9\linewidth]{interpolated_signal}		
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.47\linewidth}
+		\centering 
+		\textbf{Спектр}
+		\includegraphics[width=.9\linewidth]{spectrum}
+		\textbf{Спектр экстр. сигнала}
+		\includegraphics[width=.9\linewidth]{spectrum_of_interpolated_signal}
+	\end{minipage}
+\end{frame}
+
+\subsection{Граница Крамера-Рао}
+\begin{frame}{Теоретическая точность определения амплитуды гармоник}
+	\textsc{Формулы для границы Крамера-Рао для амплитуды гармоник.}
+\end{frame}
+\note{Привести ссылку на статью в Скопус}
+
+
+\begin{frame}{Практическая точность методов}
+	\textsc{Рисунки по точности методов с границей.
+	Где-то строили такие графики. Можно взять у Димы.}
+\end{frame}
+
+\subsection{Уточнение границы Крамера-Рао}
+\begin{frame}{Оценка дисперсии амплитуды гармоники}
+	\textsc{Основные результаты из статьи}
+\end{frame}
+
+\begin{frame}{Экспериментальная проверка формулы для оценки дисперсии}
+	\textsc{Графики из статьи}
+\end{frame}
+
+\begin{frame}{Дополненная математическая модель многотонального сигнала}
     \begin{center}
-        \Huge
-        Списки
-    \end{center}
+		\Large
+		Математическая модель многотонального сигнала для оценки параметров гармоник
+	\end{center}	
+	\begin{itemize}
+		\item Математическое описание свойств ДПФ.
+		\item Математическое описание влияния оконных функций.
+		\item \textbf{Формулы для оценки дисперсии результатов измерений}.
+	\end{itemize}
 \end{frame}
 
-\subsection{Нумерованные}
+\section{Анализ многотональных сигналов}
 
-\begin{frame}
-    \frametitle{Нумерованные списки}
-    \begin{enumerate}
-        \item один
-        \item два
-        \item три
-    \end{enumerate}
-\end{frame}
-\note{
-    Этот текст будет виден только если его отображение включено в файле \textbf{Presentation/setup}.
-    Для раздельного вывода презентации и заметок на разные экраны (как в impress или powerpoint) можно использовать программу \textit{pdf-presenter-console}.
-}
-
-\subsection{Не нумерованные}
-
-
-\begin{frame}
-    \frametitle{Перечисления}
-    \begin{itemize}
-        \item Проблема 1
-        \item Проблема 2
-        \item Проблема 3
-    \end{itemize}
-\end{frame}
-\note[itemize]{
-    \item Тезис 1
-    \item Тезис 2
-    \item Тезис 3
-}
-
-\subsection{Комбинированные}
-
-\begin{frame}
-    \frametitle{Комбинация списков}
-    \begin{enumerate}
-        \item \textbf{Задача 1}
-              \begin{itemize}
-                  \item Подзадача 1-1
-                  \item Подзадача 1-2
-              \end{itemize}
-        \item \textbf{Задача 2}
-              \begin{itemize}
-                  \item Подзадача 2-1
-                  \item Подзадача 2-2
-                  \item Подзадача 2-3
-              \end{itemize}
-        \item \textbf{Задача 3}
-              \begin{itemize}
-                  \item Подзадача 3-1
-                  \item Подзадача 3-2
-                  \item Подзадача 3-3
-              \end{itemize}
-    \end{enumerate}
-\end{frame}
-\note[itemize]{
-    \item Задача 1
-    \item Задача 2
-    \item Задача 3
-}
-
-\begin{frame}[allowframebreaks]
-    \frametitle{Разделение слайда}
-    Поясняющий текст
-    \begin{itemize}
-        \item Один
-        \item Два
-        \item Три
-    \end{itemize}
-    \framebreak
-    Продолжение предыдущего слайда
+\subsection{Нахождение гармоники сигнала}
+\begin{frame}{Интерполирование спектра}
+	\textsc{Слева - прямое интерполирование, справа - метод корреляционных функций}
 \end{frame}
 
-\section{Графика}
-\begin{frame}[plain, noframenumbering]
-    \begin{center}
-        \Huge
-        Графика
-    \end{center}
+\begin{frame}{Двойное интерполирование сигнала и спектра}
+	\textsc{Рисунок и формулы напишу чуть позже.}
 \end{frame}
 
-
-\begin{frame}
-    \frametitle{Одиночное изображение}
-    \centering
-    \includegraphics[width=0.8\linewidth]{latex} % окружение figure не требуется
+\begin{frame}{Интерполирование сигнала для оценки параметров гармоник}
+	\textsc{Рисунок и формулы напишу чуть позже.}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Векторная графика}
-    \begin{figure}
-	    \centering
-	    \ifdefmacro{\tikzsetnextfilename}{\tikzsetnextfilename{tikz_presentation}}{}% присваиваемое предкомпилированному pdf имя файла (не обязательно)
-	    \input{Presentation/images/tikz_plot.tikz}
-    \end{figure}
+\begin{frame}{Сравнение корреляционных методов}
+	\begin{tabular}{llll}
+		\toprule Интерполирование: &
+		спектра & 
+		двойное &
+		сигнала\\ 
+		\midrule
+		Точность &
+		Не высокая & 
+		Высокая &
+		Наивысшая\\ 
+		\midrule
+		Быстродействие &
+		Высокое & 
+		Среднее &
+		Низкое \\ 
+		\midrule		
+	\end{tabular}
 \end{frame}
 
-\subsection{Расположение}
-
-\begin{frame}
-    \frametitle{Изображения по-вертикали}
-    \centering
-    \vfill
-    \includegraphics[width=0.8\linewidth,height=0.1\textheight]{latex} \\
-    \TeX
-    \vfill
-    \includegraphics[width=0.8\linewidth,height=0.2\textheight]{latex} \\
-    \LaTeX
-    \vfill
-    \includegraphics[scale=0.2]{latex} \\
-    \vfill
+\subsection{Поиск гармоник}
+\begin{frame}{Алгоритм поиска гармоник}
+	\textsc{ГСА алгоритма поиска гармоник из зарегистрированной программы}
 \end{frame}
 
-
-\begin{frame}
-    \frametitle{Изображения по-горизонтали}
-    \begin{minipage}[t]{0.47\linewidth}
-        \textbf{Составная \\ подпись 1}
-        \center{\includegraphics[width=1\linewidth]{knuth1}}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[t]{0.47\linewidth}
-        \textbf{Составная \\ подпись 2}
-        \center{\includegraphics[width=1\linewidth]{knuth2}}
-    \end{minipage}
+\begin{frame}{Расчет гармоник и интергармоник}
+	\textsc{Свидетельство о регистрации программы}
 \end{frame}
 
-\subsection{Линии}
-
-\begin{frame}
-    \frametitle{Разделяющие линии}
-    \begin{minipage}[c]{0.47\linewidth}
-        \center{\includegraphics[width=1\linewidth]{latex}}
-        \bigskip
-        \hrule{}
-        \bigskip
-        \textbf{Составная \\ подпись 1}
-    \end{minipage}
-    \hfill
-    \vrule{}
-    \hfill
-    \begin{minipage}[c]{0.47\linewidth}
-        \flushright
-        \textbf{Составная \\ подпись 2}
-        \center{\includegraphics[width=1\linewidth]{knuth2}}
-    \end{minipage}
+\subsection{Практическая реализация}
+\begin{frame}{Библиотека SFFT}
+	
 \end{frame}
 
-\section{Остальное}
-\begin{frame}[plain, noframenumbering]
-    \begin{center}
-        \Huge
-        Остальное
-    \end{center}
+\begin{frame}{Разряженное FFT}
+	
 \end{frame}
 
-\subsection{Формулы}
+\section{Заключение}
 
-\begin{frame}
-    \frametitle{Формулы}
-    \[
-    \left\{
-    \begin{array}{rl}
-        \dot x = & \sigma (y-x)  \\
-        \dot y = & x (r - z) - y \\
-        \dot z = & xy - bz
-    \end{array}
-    \right.
-    \]
+\subsection{Результаты работы}
+\begin{frame}{Результаты работы}
+	По результатам работы опубиковано ...
 \end{frame}
 
-\begin{frame}
-    \frametitle{amsmath}
-    \centering
-    \begin{minipage}[t]{0.5\linewidth}
-        \begin{multline*}
-            y = 1 x^1 + 2 x^2 + 3 x^3 + \\ + 4 x^4 + 5 x^5 + \dots
-        \end{multline*}
-    \end{minipage}
-\end{frame}
-
-\begin{frame}[allowframebreaks]
-    \frametitle{Уравнения Максвелла}
-    \centering{
-        \small
-        \def\arraystretch{1.8}%
-        \begin{tabular}{ll}
-            \toprule
-            Интегральная форма                                                                                                                                          & Дифференциальная форма                                                        \\ \midrule
-            \(Q_e(t) = \displaystyle\oiint_S \vec D(t) \cdot d\vec{s} = \displaystyle\iiint_V \rho_v(t) dv\)                                                              & \(\nabla \cdot \vec D(t) = \rho_v(t)\)                                          \\
-            \(\displaystyle\oiint_S \vec B(t) \cdot d\vec{s} = 0\)                                                                                                        & \(\nabla \cdot \vec B(t) = 0\)                                                  \\
-            \(V_{emf}(t) = \displaystyle\oint_L \vec E(t) \cdot d\vec{l}\) = \(- \displaystyle\iint_S \left[\frac{\partial\vec{B}(t)}{\partial t}\right] \cdot d\vec{s}\)   & \(\nabla \times \vec E(t) = - \frac{\partial\vec{B}(t)}{\partial t}\)           \\
-            \(I(t) = \displaystyle\oint_L \vec H(t) \cdot d\vec{l} = \displaystyle\iint_S \left[\vec J(t) + \frac{\partial\vec{D}(t)}{\partial t}\right] \cdot d\vec{s}\) & \(\nabla \times \vec H(t) = \vec J(t) + \frac{\partial\vec{D}(t)}{\partial t}\) \\ \midrule
-            \(\displaystyle\oiint_S \vec J \cdot d\vec{s} = -\frac{\partial Q_e}{\partial t}\)                                                                            & \(\nabla \cdot \vec J = - \frac{\partial \rho_v}{\partial t}\)                  \\
-            \bottomrule
-            \multicolumn{2}{c}{\(\vec D(t) = \left[\varepsilon(t)\right] * \vec E(t)\)}                                                                                                                                                                   \\
-            \multicolumn{2}{c}{\(\vec B(t) = \left[\mu(t)\right] * \vec H(t)\)}                                                                                                                                                                           \\
-        \end{tabular}
-    }
-    \framebreak
-
-    \hspace{0.05\linewidth}
-    \centering{
-        \small
-        \def\arraystretch{1.8}%
-        \begin{tabular}{ll}
-            \toprule
-            Интегральная форма                                                                                                            & Дифференциальная форма                             \\ \midrule
-            \(Q_e = \displaystyle\oiint_S \vec D \cdot d\vec{s} = \displaystyle\iiint_V \rho_v dv\)                                         & \(\nabla \cdot \vec D = \rho_v\)                     \\
-            \(\displaystyle\oiint_S \vec B \cdot d\vec{s} = 0\)                                                                             & \(\nabla \cdot \vec B = 0\)                          \\
-            \(V_{emf} = \displaystyle\oint_L \vec E \cdot d\vec{l}\) = \(- \displaystyle\iint_S \left[j \omega \vec B\right] \cdot d\vec{s}\) & \(\nabla \times \vec E = - j \omega \vec B\)         \\
-            \(I = \displaystyle\oint_L \vec H \cdot d\vec{l} = \displaystyle\iint_S \left[\vec J + j \omega \vec D\right] \cdot d\vec{s}\)  & \(\nabla \times \vec H = \vec J + j \omega \vec{D}\) \\ \midrule
-            \(\displaystyle\oiint_S \vec J \cdot d\vec{s} = - j \omega Q_e\)                                                                & \(\nabla \cdot \vec J = - j \omega \rho_v\)          \\
-            \bottomrule
-            \multicolumn{2}{c}{\(\vec D(t) = \left[\varepsilon\right] \vec E(t)\)}                                                                                                               \\
-            \multicolumn{2}{c}{\(\vec B(t) = \left[\mu\right] \vec H(t)\)}                                                                                                                       \\
-        \end{tabular}
-    }
-\end{frame}
-
-\subsection{Таблицы}
-
-\begin{frame}
-    \frametitle{Таблица}
-    \centering
-    \begin{tabular}{|l|l|}
-        \hline
-        \textbf{Заголовок 1} & \textbf{Заголовок 2} \\
-        \hline
-        Сумма                & \(b+a\)                \\
-        \hline
-        Разность             & \(a-b\)                \\
-        \hline
-        Произведение         & \(a*b\)                \\
-        \hline
-    \end{tabular}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Другая таблица}
-    \centering
-    \begin{tabular}{lc}
-        \toprule
-        \multicolumn{1}{c}{\textbf{Заголовок 1}} & \textbf{Заголовок 2} \\ \midrule
-        Сумма                                    & \(b+a\)                \\
-        Разность                                 & \(a-b\)                \\
-        Произведение                             & \(a*b\)                \\
-        \bottomrule
-    \end{tabular}
-\end{frame}
-
-
-\subsection{Разное}
-
-\begin{frame}
-    \frametitle{Большой многоуровневый список}
-    \begin{itemize}
-        \item \textbf{Пункт 1}
-              \begin{itemize}
-                  \itemi Подпункт 1-1
-                  \itemi Подпункт 1-2
-              \end{itemize}
-        \item \textbf{Пункт 2}
-              \begin{itemize}
-                  \itemi Подпункт 2-1
-              \end{itemize}
-        \item \textbf{Пункт 3}
-              \begin{itemize}
-                  \itemi Подпункт 3-1
-                  \itemi Подпункт 3-2
-              \end{itemize}
-        \item \textbf{Пункт 4}
-              \begin{itemize}
-                  \itemi Подпункт 4-1
-              \end{itemize}
-        \item \textbf{Пункт 5}
-              \begin{itemize}
-                  \itemi Подпункт 5-1
-                  \itemi Подпункт 5-2
-                  \itemi Подпункт 5-3
-              \end{itemize}
-    \end{itemize}
-\end{frame}
-
-\begin{frame}
-    \frametitle{Четыре изображения}
-    \centering
-    \includegraphics[width=0.35\linewidth,angle=35]{latex}
-    \includegraphics[width=0.35\linewidth,angle=135]{latex}\\
-    \includegraphics[width=0.35\linewidth,angle=15]{latex}
-    \includegraphics[width=0.35\linewidth,angle=-15]{latex}
+\subsection{Основные положения выносимые на защиту}
+\begin{frame}{Основные положения выносимые на защиту}
+	\begin{enumerate}
+		\item Дополнение к математической модели многотонального сигнала в виде формулы, позволяющей определить дисперсию оценки амплитуды гармоники, отличающемуся от известной границы Крамера-Рао учетом изменения дисперсии после применения оконных функций.
+		\item Основанный на корреляционном анализе численный метод, позволяющий определить параметры гармоник сигналов с точностью, определяемой уточненной границей Крамера-Рао, включающий в себя вычислительно-эффективную схему расчета корреляций и отличающийся от известных методов отсутствием потерь в точности результатов при интерполировании параметров гармоник.
+		\item Комплекс программ для анализа и построения алгоритмов оценки параметров многотональных сигналов.
+	\end{enumerate}
 \end{frame}
 

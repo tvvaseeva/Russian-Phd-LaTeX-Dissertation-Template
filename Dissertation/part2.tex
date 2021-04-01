@@ -385,45 +385,62 @@ $T_{s}$ -- период.
 Экспериментально проверили формулу \ref{eq:equation11} оценки дисперсии амплитуды гармоники в статье \cite{altman2020boundary}.
 % 1. Альтман Е. А., Васеева Т. В., Александров А. В. Граница Крамера-Рао для амплитуды гармоники при использовании оконных функций //Динамика систем, механизмов и машин. – 2020. – Т. 8. – №. 2. – С. 145-152.
 
-Результаты моделирования приведены на графиках (\ref{fig:windows_barlett_blackman,fig:windows__hamming_hanning, fig:windows__kaiser} 4-6).
-
-
+Результаты моделирования приведены на графиках. 
 \begin{figure}[ht]
-	\begin{minipage}[b][][b]{0.49\linewidth}\centering
-		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_barlett_noise.png} \\ а)
-	\end{minipage}
-	\hfill
-	\begin{minipage}[b][][b]{0.49\linewidth}\centering
-		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_blackman_noise.png} \\ б)
-	\end{minipage}
-	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Барлетта (слева) и Блэкмана (справа)}
-	\label{fig:windows_barlett_blackman}
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_barlett_noise.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Барлетта.}\label{img:windows_barlett}
 \end{figure}
 
 \begin{figure}[ht]
-	\begin{minipage}[b][][b]{0.49\linewidth}\centering
-		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_hamming_noise.png} \\ а)
-	\end{minipage}
-	\hfill
-	\begin{minipage}[b][][b]{0.49\linewidth}\centering
-		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_hanning_noise.png} \\ б)
-	\end{minipage}
-	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Хэмминга (слева) и Ханна(справа)}
-	\label{fig:windows__hamming_hanning}
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_blackman_noise.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Блэкмана.}\label{img:windows_blackman}
 \end{figure}
-
 
 \begin{figure}[ht]
-	\begin{minipage}[b][][b]{0.65\linewidth}\centering
-		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_kaiser(beta=15)_noise.png} \\ а)
-	\end{minipage}
-	\hfill
-	\begin{minipage}[b][][b]{0.65\linewidth}\centering
-		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_kaiser(beta=15)_noise.png} \\ б)
-	\end{minipage}
-	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Кайзера ($\beta=4$) (слева) и Кайзера ($\beta=15$)(справа)}
-	\label{fig:windows__kaiser}
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_hamming_noise.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Хэмминга.}\label{img:windows__hamming}
 \end{figure}
+
+\begin{figure}[ht]
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_hanning_noise.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Ханна.}\label{img:windows_hanning}
+\end{figure}
+
+\begin{figure}[ht]
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_kaiser(beta=4)_noise.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Кайзера ($\beta=4$).}\label{img:windows__kaiser4}
+\end{figure}
+
+\begin{figure}[ht]
+	\centerfloat{
+		\includegraphics[scale=0.9]{estimate_amp_sin_kaiser(beta=15)_noise.png}
+	}
+	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Кайзера ($\beta=15$).}\label{img:windows__kaiser15}
+\end{figure}
+
+
+
+%\begin{figure}[ht]
+%	\begin{minipage}[b][][b]{0.65\linewidth}\centering
+%		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_kaiser(beta=15)_noise.png} \\ а)
+%	\end{minipage}
+%	\hfill
+%	\begin{minipage}[b][][b]{0.65\linewidth}\centering
+%		\includegraphics[width=0.5\linewidth]{estimate_amp_sin_kaiser(beta=15)_noise.png} \\ б)
+%	\end{minipage}
+%	\caption{Зависимость дисперсии оценки амплитуды от дисперсии шума с окном Кайзера ($\beta=4$) (слева) и Кайзера ($\beta=15$)(справа)}
+%	\label{fig:windows__kaiser}
+%\end{figure}
 
 Штриховой линией приведены результаты расчетов по формуле \ref{eq:equation11}, сплошной -- результаты моделирования, линией из точек -- граница Крамера-Рао. 
 В статье \cite{altman2020boundary} введен параметр -- коэффициент увеличение дисперсии. Данный параметр показывает во сколько раз ухудшилась оценка амплитуды гармоники при использовании оконных функций (таблица \ref{tbl:test2_1}).

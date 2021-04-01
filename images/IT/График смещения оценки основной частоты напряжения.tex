@@ -1,0 +1,45 @@
+\documentclass{article}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage[utf8x]{inputenc}
+\usepackage[russian]{babel}
+\pgfplotsset{compat=1.15}
+\begin{document}
+	\begin{tikzpicture}
+		
+	\begin{axis}[
+	axis x line=bottom,
+	axis y line=left,
+	ymax=6.3,
+	xmin=-10,xmax=30]
+	
+	\addplot [solid,line width=1pt, blue]
+	plot coordinates{
+		(-10,5.058)
+		(-8,4.445)
+		(-6,3.955)
+		(-4,3.564)
+		(-2,3.25)
+		(0,3)
+		(2,2.8)
+		(4,2.64)
+		(6,2.511)
+		(8,2.409)
+		(10,2.327)
+		(12,2.262)
+		(14,2.209)
+		(16,2.167)
+		(18,2.134)
+		(20,2.107)
+		(22,2.086)
+		(24,2.068)
+		(26,2.055)
+		(28,2.044)
+		(30,2.035)
+};
+\end{axis}
+\node at (1.8,5.5) {Смещение, Гц$*10^-$$^3$};
+\node at (7,0.3) {$SNR,$  дБ};
+	\end{tikzpicture}
+	
+\end{document} 

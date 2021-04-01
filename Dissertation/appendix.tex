@@ -293,140 +293,151 @@
 
 \chapter{Программа для расчета гармоник и интергармоник тока и напряжения электрической сети прямым корреляционным методом с использованием быстрых алгоритмов обработки сигналов}\label{app:Б}
 
-\begin{verbatim} 
+\begin{lstlisting} 
 from numpy import array, random, kaiser, zeros, cos, angle, absolute
 from numpy.core.umath import pi
 from numpy.fft import fft
 from matplotlib.pyplot import figure, title, plot, xlim, show
+
 #
-# a test signal generation
+#       a test signal generation
 #
+
 # signal parameters
 n = 2048
 harmonics = array([3, 20.1, 35.3, 51.5, 66.9])
 amplitudes = array([10, 3, 1, 1, 0.2])
 phases = array([0, pi/2, pi/4, pi/6, pi/8])
+
 # generation
 signal = zeros(n)
-noise = random.normal(0, 0.5, n) # powerful noise
+noise = random.normal(0, 0.5, n)   # powerful noise
 for i in range(n):
-for j in range(len(harmonics)):
-signal[i] = signal[i] + amplitudes[j] * cos(2 * pi * harmonics[j] * i / n + phases[j])
+    for j in range(len(harmonics)):
+        signal[i] = signal[i] + amplitudes[j] * cos(2 * pi * harmonics[j] * i / n + phases[j])
 signal = signal+noise
-spectrum = fft(signal) # for test purpose
+spectrum = fft(signal)      # for test purpose
+
 #
-# main part, analise of signal
+#       main part, analise of signal
 #
-# algorithm parameters
+
+#       algorithm parameters
 # window parameters
-kaiser_beta = 14 # kaiser window beta
-exp_ratio = 2048 # expansion ratio
-delta = 5 # delta of window for peak detection
-threshold_level = 0.01 # harmonic threshold
-width_window = 10 # width of window
+kaiser_beta = 14            # kaiser window beta
+exp_ratio = 2048            # expansion ratio
+delta = 5                   # delta of window for peak detection
+threshold_level = 0.01      # harmonic threshold
+width_window = 10           # width of window
 # peak finding parameters
-peak_group_distance = 5 # to find candidate to peak
-peak_area_distance = 100 # to find maximum of peak
-# window
+peak_group_distance = 5     # to find candidate to peak
+peak_area_distance = 100    # to find maximum of peak
+
+#       window
 # calculate window
-window = kaiser(n+1, kaiser_beta) # create symmetric window
-window_factor = pi*sum(window)/n # window factor
+window = kaiser(n+1, kaiser_beta)   # create symmetric window
+window_factor = pi*sum(window)/n    # window factor
 # apply window to reduce a number of peak
 signal2 = signal * window[0:n]
-# on board calculation
+
+#       on board calculation
 # expand signal (add zeros)
 signal3 = zeros(n * exp_ratio)
 signal3[0:n] = signal2
 # find spectrum of the expanded signal
 # use SFFT (https://groups.csail.mit.edu/netmit/sFFT/index.html) for fast calculation
-
 spectrum3 = 2 * pi * fft(signal3) / n
-# find peak in region of interest
-sp = lambda x: abs(spectrum3[x]) # for brevity
+
+#       find peak in region of interest
+sp = lambda x: abs(spectrum3[x])    # for brevity
 # find peak candidate
 peaks = []
 for i in range(100 * exp_ratio):
-if (sp(i) &lt; sp(i + delta))\
-&amp; (sp(i + delta) &lt; sp(i + 2 * delta)) \
-&amp; (sp(i + 2 * delta) &gt; sp(i + 3 * delta))\
-&amp; (sp(i + 3 * delta) &gt; sp(i + 4 * delta)):
-peaks.append(i + delta)
+    if (sp(i) < sp(i + delta))\
+            & (sp(i + delta) < sp(i + 2 * delta)) \
+            & (sp(i + 2 * delta) > sp(i + 3 * delta))\
+            & (sp(i + 3 * delta) > sp(i + 4 * delta)):
+        peaks.append(i + delta)
 # find groups of peak
 groups = []
 i = 0
-while i &lt; len(peaks):
-s = set()
-groups.append(s)
-s.add(peaks[i])
-i += 1
-while peaks[i] - peaks[i - 1] &lt; peak_group_distance:
-s.add(peaks[i])
-i += 1
-if i == len(peaks):
-break
+while i < len(peaks):
+    s = set()
+    groups.append(s)
+    s.add(peaks[i])
+    i += 1
+    while peaks[i] - peaks[i - 1] < peak_group_distance:
+        s.add(peaks[i])
+        i += 1
+        if i == len(peaks):
+            break
 # find true peak
 true_peaks = []
 for group in groups:
-middle = sum(group)//len(group)
-harm_range = range(middle - peak_area_distance // 2,
-middle + peak_area_distance // 2)
-ind = 0
-max = 0
-for harm in harm_range:
-if sp(harm) &gt; max:
-ind = harm
-max = sp(harm)
-true_peaks.append(ind)
+    middle = sum(group)//len(group)
+    harm_range = range(middle - peak_area_distance // 2,
+                       middle + peak_area_distance // 2)
+    ind = 0
+    max = 0
+    for harm in harm_range:
+        if sp(harm) > max:
+            ind = harm
+            max = sp(harm)
+    true_peaks.append(ind)
 # clear small peak
 real_peaks = []
 threshold = 0
 for peak in true_peaks:
-if sp(peak) &gt; threshold:
-threshold = sp(peak)
+    if sp(peak) > threshold:
+        threshold = sp(peak)
 threshold = threshold * threshold_level
 for peak in true_peaks:
-if sp(peak) &gt; threshold:
-real_peaks.append(peak)
+    if sp(peak) > threshold:
+        real_peaks.append(peak)
 # find_harmonics
 found_harmonics = zeros(len(real_peaks))
 found_amplitudes = zeros(len(real_peaks))
 fond_phase = zeros(len(real_peaks))
-
 for i in range(len(real_peaks)):
-peak = real_peaks[i]
-found_harmonics[i] = (peak / exp_ratio)
-harmonic = spectrum3[peak]/window_factor
-found_amplitudes[i] = (absolute(harmonic))
-fond_phase[i] = (angle(harmonic, deg=True))
+    peak = real_peaks[i]
+    found_harmonics[i] = (peak / exp_ratio)
+    harmonic = spectrum3[peak]/window_factor
+    found_amplitudes[i] = (absolute(harmonic))
+    fond_phase[i] = (angle(harmonic, deg=True))
+
 #
-# results and graphics
+#       results and graphics
 #
+
 print(found_harmonics)
 print(found_amplitudes)
 print(fond_phase)
+
 errors_harmonics = abs(found_harmonics-harmonics)
 errors_amplitudes = 100*abs(found_amplitudes-amplitudes)/amplitudes
 errors_phase = abs(fond_phase-180*phases/pi)
-print(&quot;Harmonics error&quot;)
+print("Harmonics error")
 print(errors_harmonics)
-print(&quot;Amplitudes error, % &quot;)
+print("Amplitudes error, % ")
 print(errors_amplitudes)
-print(&quot;Phase error, degree &quot;)
+print("Phase error, degree ")
 print(errors_phase)
 # plot parameters
 fmax = 100
+
 figure(1)
-title(&quot;signal&quot;)
+title("signal")
 plot(signal)
+
 figure(2)
-title(&quot;spectrum of expanded signal&quot;)
+title("spectrum of expanded signal")
 plot(abs(spectrum3))
 xlim(0, fmax * exp_ratio)
+
 show()
-\end{verbatim}
+\end{lstlisting}
 
-
-\chapter{}\label{app:В}
+\chapter{Свидетельство о государственной регистрации программ для ЭВМ}\label{app:В}
 \begin{figure}[ht]
 	\centering
 	\includegraphics [scale=0.70] {Computer_program.jpg}
@@ -476,7 +487,7 @@ plt.show()
 \end{verbatim}
 
 \chapter{Оценка амплитуды при использовании разных окон}\label{app:Д}
-\begin{verbatim}
+\begin{lstlisting}
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -499,21 +510,21 @@ window_mean_2 = np.zeros(n_beta)
 i_space = range(n_point)
 
 for i_betas in range(n_beta):
-kaiser_beta = betas[i_betas]
-window_tmp = np.kaiser(n_point + 1, kaiser_beta)  # create symmetric window
-window = window_tmp[0:n_point]
-window_spec = np.fft.fft(window) / n_point
-window_factors[i_betas] = np.sum(window) / n_point  # abs(window_spec[0])
-window_mean_2[i_betas] = np.sum([window[i] ** 2 for i in range(n_point)]) / n_point
+    kaiser_beta = betas[i_betas]
+    window_tmp = np.kaiser(n_point + 1, kaiser_beta)  # create symmetric window
+    window = window_tmp[0:n_point]
+    window_spec = np.fft.fft(window) / n_point
+    window_factors[i_betas] = np.sum(window) / n_point  # abs(window_spec[0])
+    window_mean_2[i_betas] = np.sum([window[i] ** 2 for i in range(n_point)]) / n_point
 
-for i_test in range(n_test):
-noise = np.random.normal(0, np.sqrt(variance), n_point)
-signal = amp * np.sin([2 * np.pi * freq * i / n_point + np.pi/4 for i in range(n_point)])
-signal_noise_win = (signal + noise) * window
-spectrum = 2 * np.fft.fft(signal_noise_win) / n_point
-amp_est = abs(spectrum[freq]) / window_factors[i_betas]
-errors_var[i_betas] += (abs(amp_est) - amp) ** 2
-errors_mean[i_betas] += (abs(amp_est) - amp)
+    for i_test in range(n_test):
+        noise = np.random.normal(0, np.sqrt(variance), n_point)
+        signal = amp * np.sin([2 * np.pi * freq * i / n_point + np.pi/4 for i in range(n_point)])
+        signal_noise_win = (signal + noise) * window
+        spectrum = 2 * np.fft.fft(signal_noise_win) / n_point
+        amp_est = abs(spectrum[freq]) / window_factors[i_betas]
+        errors_var[i_betas] += (abs(amp_est) - amp) ** 2
+        errors_mean[i_betas] += (abs(amp_est) - amp)
 
 errors_mean /= n_test
 errors_var /= n_test
@@ -529,7 +540,7 @@ plt.xlabel("Дисперсия амплитуды (variance)")
 plt.grid()
 plt.legend()
 plt.show()
-\end{verbatim}
+\end{lstlisting}
 
 \chapter{Оценки амплитуды при различных уровнях шума}\label{app:Е}
 \begin{verbatim}
@@ -585,7 +596,7 @@ plt.show()
 
 
 \chapter{Алгоритм вычисления одномерной свертки}\label{app:Ё}
-\begin{verbatim}
+\begin{lstlisting}
 #include <stdio.h>                                  // библиотека ввода и вывода на экран
 #include <string.h>                                 // стандартная библиотека работы со строками
 #include <math.h>                                   // математическая библиотека
@@ -596,105 +607,105 @@ plt.show()
 
 //      Глобальные переменные
 // Константы
-#define NRUN 1000                                       // Директива, количество запусков
+#define NRUN 1000                                     // Директива, количество запусков
 #define NH1 100                                       // Директива, длина фильтра (начальное значение)
 #define NH2 1000                                      // Директива, длина фильтра (конечное значение)
 #define NHstep 100                                    // Директива,  шаг длина фильтра NH
 
-#define NX1 1000                                        // Директива, длина сигнала (начальное значение)
-#define NX2 3000                                        // Директива, длина сигнала (начальное значение)
-#define NXstep 1000                                      // Директива,  шаг длина сигнала NX
+#define NX1 1000                                      // Директива, длина сигнала (начальное значение)
+#define NX2 3000                                      // Директива, длина сигнала (начальное значение)
+#define NXstep 1000                                   // Директива,  шаг длина сигнала NX
 
 
-int _nout;                                               // Длина результата
-int _nh;                                                 // текущая длина фильтра
-float h[NH2];                                          // Одномерный массив h, с длинной NH=1000
-float x[NX2];                                          // Одномерный массив x, с длинной NX=3000
-float dir_out[NX2-NH2+1];                                    // Одномерный массив dir_out результат, с длинной NOUT
-float result[NH2/NHstep][NX2/NXstep];                   // Результаты измерения времени
+int _nout;                                            // Длина результата
+int _nh;                                              // текущая длина фильтра
+float h[NH2];                                         // Одномерный массив h, с длинной NH=1000
+float x[NX2];                                         // Одномерный массив x, с длинной NX=3000
+float dir_out[NX2-NH2+1];                             // Одномерный массив dir_out результат, с длинной NOUT
+float result[NH2/NHstep][NX2/NXstep];                 // Результаты измерения времени
 
 //      Для проверки правильности работы методов
 
-void fill_array(float* arr, int n) {                // Функция fill_array
-	int i;
-	for (i = 0; i < n; i++)                         // Цикл for (инициализация; условие; шаг)
-	arr[i] = i + 1;
+void fill_array(float* arr, int n) {                  // Функция fill_array
+    int i;
+    for (i = 0; i < n; i++)                           // Цикл for (инициализация; условие; шаг)
+        arr[i] = i + 1;
 }
-void print_array(float*arr, int n){                  // Печать функция fill_array
-	int i;
-	for (i = 0; i < n; i++)
-	printf("%f \n", arr[i]);
+void print_array(float*arr, int n){                   // Печать функция fill_array
+    int i;
+    for (i = 0; i < n; i++)
+        printf("%f \n", arr[i]);
 }
 //      Реализация 1D свертки (Convolution)
 void dir_conv() {
-	int i,j;
-	for (i = 0; i < _nout; i++) {
-		float sum = 0;
-		float*ph = h;
-		float*px = x + i;
-		for (j = 0; j < _nh; j++)
-		sum += *ph++ * *px++;
-		dir_out[i] = sum;
-		
-	}
+    int i,j;
+    for (i = 0; i < _nout; i++) {
+        float sum = 0;
+        float*ph = h;
+        float*px = x + i;
+        for (j = 0; j < _nh; j++)
+            sum += *ph++ * *px++;
+        dir_out[i] = sum;
+
+    }
 }
 
 //       Подсчет времени функции
-std::chrono::milliseconds measure_func_time(void(*f)()) {   // продолжительность в миллисекундах, соотношение 1: 1000 с секундами
-	using clock = std::chrono::high_resolution_clock;       // high_resolution_clock-часы с высоким разрешением
-	clock::time_point start = clock::now();                 // time_point-момент времени
-	(*f)();
-	clock::time_point end = clock::now();
-	return std::chrono::duration_cast<std::chrono::milliseconds>(end - start );    //duration_cast-длительность
+std::chrono::milliseconds measure_func_time(void(*f)()) {// продолжительность в миллисекундах, соотношение 1: 1000 с секундами
+    using clock = std::chrono::high_resolution_clock;    // high_resolution_clock-часы с высоким разрешением
+    clock::time_point start = clock::now();              // time_point-момент времени
+    (*f)();
+    clock::time_point end = clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(end - start );    //duration_cast-длительность
 }
 
 void test_func(){
-	for(int j=0; j<NRUN; j++) {            			// loops - количество повторений
-		dir_conv();
-	}
+    for(int j=0; j<NRUN; j++) {            			      // loops - количество повторений
+        dir_conv();
+    }
 }
 
 void convolv_time(){
-	std::chrono::milliseconds duration;
-	for (int nx = NX1; nx < NX2; nx+=NXstep){
-		fill_array(x, nx);
-		printf("nx - %i \n",nx);
-		for (int nh = NH1; nh < NH2; nh+=NHstep) {
-			fill_array(h, nh);
-			printf("    nh - %i \n",nh);
-			_nout = nx-nh+1;                             // длина сигнала на выходе
-			_nh = nh;                                    // длина фильтра
-			duration = measure_func_time(&test_func);           // тестирование ф-и
-			result[(nh-NH1)/NHstep][(nx-NX1)/NXstep] = duration.count();
-		}
-	}
+    std::chrono::milliseconds duration;
+    for (int nx = NX1; nx < NX2; nx+=NXstep){
+        fill_array(x, nx);
+        printf("nx - %i \n",nx);
+        for (int nh = NH1; nh < NH2; nh+=NHstep) {
+            fill_array(h, nh);
+            printf("    nh - %i \n",nh);
+            _nout = nx-nh+1;                              // длина сигнала на выходе
+            _nh = nh;                                     // длина фильтра
+            duration = measure_func_time(&test_func);     // тестирование ф-и
+            result[(nh-NH1)/NHstep][(nx-NX1)/NXstep] = duration.count();
+        }
+    }
 }
 // Функция сохранения в csv
 void convolv_csv(int row, int col, float *matrix, char *file_name) {
-	int i, j;
-	FILE *file;
-	file = fopen(file_name, "w");
-	if (file == 0)
-	printf("file error");
-	for (i = 0; i < row; i++) {
-		for (j = 0; j < col; j++)
-		fprintf(file, "%f; ", matrix[i*col+j]);
-		fprintf(file, "\n");
-	}
+    int i, j;
+    FILE *file;
+    file = fopen(file_name, "w");
+    if (file == 0)
+        printf("file error");
+    for (i = 0; i < row; i++) {
+        for (j = 0; j < col; j++)
+            fprintf(file, "%f; ", matrix[i*col+j]);
+        fprintf(file, "\n");
+    }
 }
 
 int main()
 {
-	convolv_time();
-	char file_name[] = "convolution.csv";
-	convolv_csv(NH2/NHstep, NX2/NXstep, (float*)result, file_name);
-	return  0;                                          // Возврат результата
+    convolv_time();
+    char file_name[] = "convolution.csv";
+    convolv_csv(NH2/NHstep, NX2/NXstep, (float*)result, file_name);
+    return  0;                                                // Возврат результата
 }
 
-\end{verbatim}
+\end{lstlisting}
 
 
 
 
-\chapter{Акт о внедрении результатов диссертационной работы}\label{app:Ж}
+%\chapter{Акт о внедрении результатов диссертационной работы}\label{app:Ж}
 

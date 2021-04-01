@@ -1,0 +1,55 @@
+\documentclass{proc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+%\documentclass{article}
+\usepackage{pgfplots}
+\usetikzlibrary{snakes}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\begin{document}
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) -- (9,0);
+\node[right,scale=1] at (0,8){Смещение Гц};
+%Значения осей
+\draw[dashed] (0,1)node[left,font=\tiny] {\small{$1$}};
+\draw[dashed] (0,2)node[left,font=\tiny] {\small{$2$}};
+\draw[dashed] (0,3)node[left,font=\tiny] {\small{$3$}};
+\draw[dashed] (0,4)node[left,font=\tiny] {\small{$4$}};
+\draw[dashed] (0,5)node[left,font=\tiny] {\small{$5$}};
+\draw[dashed] (0,6)node[left,font=\tiny] {\small{$6$}};
+\draw[dashed] (0,7)node[left,font=\tiny] {\small{$7 \cdot 10^{-3}$}};
+\draw[dashed] (0,0)node[below,font=\tiny] {\small{$-10$}};
+\draw[dashed] (1,0)node[below,font=\tiny] {\small{$-5$}};
+\draw[dashed] (2,0)node[below,font=\tiny] {\small{$0$}};
+\draw[dashed] (3,0)node[below,font=\tiny] {\small{$5$}};
+\draw[dashed] (4,0)node[below,font=\tiny] {\small{$10$}};
+\draw[dashed] (5,0)node[below,font=\tiny] {\small{$15$}};
+\draw[dashed] (6,0)node[below,font=\tiny] {\small{$20$}};
+\draw[dashed] (7,0)node[below,font=\tiny] {\small{$25$}};
+\draw[dashed] (8,0)node[below,font=\tiny] {\small{$30$}};
+\node[left,font=\tiny] at (0,0){\small{$0$}};
+\node[above,scale=1] at (9,0.2){SNR, дБ};
+% Оси
+\draw[->] (0,0) -- (9,0) coordinate (x axis);
+\draw[->] (0,0) -- (0,8) coordinate (y axis);
+%График
+\draw[ultra thick, blue] (0,5.7) -- (1,3.5);
+\draw[ultra thick, blue] (1,3.5) -- (3,1.5);
+\draw[ultra thick, blue] (3,1.5) -- (5,1.1);
+\draw[ultra thick, blue] (5,1.1) -- (7,1);
+\draw[ultra thick, blue] (7,1) -- (8,1);
+\draw[ultra thick, magenta!100, dashdotted] (0,6.8) -- (1.1,3.5);
+\draw[ultra thick, magenta!100, dashdotted] (1.1,3.5) -- (3.1,1.5);
+\draw[ultra thick, magenta!100, dashdotted] (3.1,1.5) -- (5,1);
+\draw[ultra thick, magenta!100, dashdotted] (5,1) -- (8,1);
+% Легенда
+\draw[ultra thick, blue] (1, 6.3) -- (1.5, 6.3) node[right, black, font=\small] {- Модернизированный метод корреляционных функций};
+\draw[ultra thick, magenta!100, dashdotted] (1, 5.9) -- (1.5, 5.9) node[right, black, font=\small] {- Быстпый метод корреляциооных функций};
+\end{tikzpicture}
+\end{center}
+\end{document}

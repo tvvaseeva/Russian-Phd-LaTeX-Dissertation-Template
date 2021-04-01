@@ -1,4 +1,3 @@
-% Преамбула
 \documentclass{proc}
 \usepackage{mathtext}
 \usepackage[T1,T2A]{fontenc}
@@ -11,35 +10,30 @@
 \usepackage[papersize={30cm,29.7cm}]{geometry}
 \usetikzlibrary{snakes}
 \usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
-\pagestyle{empty} % Отключить нумерацию странци
-
+\pagestyle{empty} 
 \begin{document}
 \begin{center}
 \begin{tikzpicture}[scale=3,decoration={brace,raise=5pt}]
-\draw[ultra thick, red!100] (2.5,0) -- (2.5,5);
+\draw[ultra thick, red!100, line width=5pt] (2.5,0) -- (2.5,5);
 \draw[ultra thick, black!100] (2.5,5) -- (2.5,5.3);
-\draw[ultra thick, magenta!100, dashed] (2.8,0) -- (2.8,4.95) node {$*$};
+\draw[ultra thick, magenta!100, dashed] (2.8,0) -- (2.8,4.95) node {\LARGE{$*$}};
 \draw[ultra thick, black!100] (2.8,4.93) -- (2.8,5.3);
-\draw[ultra thick, magenta!100, dashed] (1.25,0) -- (1.25,4.0) node {$*$};
-\draw[ultra thick, magenta!100, dashed] (4,0) -- (4,4.1) node {$*$};
+\draw[ultra thick, magenta!100, dashed] (1.25,0) -- (1.25,4.0) node {\LARGE{$*$}};
+\draw[ultra thick, magenta!100, dashed] (4,0) -- (4,4.1) node {\LARGE{$*$}};
 
-% Нумерация по x
-\node[left] at (0,0){$0$};
-\node[below] at (2.5,0){$k_{peak}$};
-\node[above] at (2.9,0){$k$};
-\node[above] at (2.65,5.25){$\delta$};
-\node[above] at (1.46,0){$k-1$};
-\node[above] at (4.2,0){$k+1$};
+\node[left] at (0,0){\LARGE{$0$}};
+\node[below] at (2.5,0){\LARGE{\textbf{$K_{peak}$}}};
+\node[above] at (2.9,0){\LARGE{$k$}};
+\node[above] at (2.65,5.25){\LARGE{$\delta$}};
+\node[above] at (1.55,0){\LARGE{$k-1$}};
+\node[above] at (4.3,0){\LARGE{$k+1$}};
 
-% Оси и сетка
-\draw[->] (0,0) -- (6,0) coordinate (x axis) node[above] {$w$};
-\draw[->] (0,0) -- (0,5.5) coordinate (y axis) node[right] {$S(w)$};
+\draw[->] (0,0) -- (6,0) coordinate (x axis) node[above] {\LARGE{$w$}};
+\draw[->] (0,0) -- (0,5.5) coordinate (y axis) node[right] {\LARGE{$S(w)$}};
 
-% Графики
-\draw[ultra thick, blue] (0,1.5) sin (2.5,5); 
-\draw[ultra thick, blue] (2.5,5) cos (6,0.9);
+\draw[ultra thick, blue, line width=2pt] (0,1.5) sin (2.5,5); 
+\draw[ultra thick, blue, line width=2pt] (2.5,5) cos (6,0.9);
 
-% Фигурная скобка
 \draw[<->](2.5,5.2) sin (2.8,5.2); coordinate (x axis);
 
 \end{tikzpicture} 
