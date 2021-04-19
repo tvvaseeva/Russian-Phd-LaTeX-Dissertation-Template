@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{5}
+\author{kolpakova_polina2002 }
+\date{December 2020}
+
+\usepackage{mathtext}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+%\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[papersize={20cm,9.7cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\pagestyle{empty} % Отключить нумерацию страниц
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[scale=1,decoration={brace,raise=5pt}]
+
+% Нумерация по y
+\node[left,font=\tiny] at (0,0){$-1$};
+\node[left,font=\tiny] at (0,0.5){$-0.8$};
+\node[left,font=\tiny] at (0,1){$-0.6$};
+\node[left,font=\tiny] at (0,1.5){$-0.4$};
+\node[left,font=\tiny] at (0,2){$-0.2$};
+\node[left,font=\tiny] at (0,2.5){$0$};
+\node[left,font=\tiny] at (0,3){$0.2$};
+\node[left,font=\tiny] at (0,3.5){$0.4$};
+\node[left,font=\tiny] at (0,4){$0.6$};
+\node[left,font=\tiny] at (0,4.5){$0.8$};
+
+% Нумерация по x
+\node[below,font=\tiny] at (2,0){$500$};
+\node[below,font=\tiny] at (4,0){$1000$};
+\node[below,font=\tiny] at (6,0){$1500$};
+\node[below,font=\tiny] at (8,0){$2000$};
+
+% Оси и сетка
+\draw[->] (0,0) -- (9,0) coordinate (x axis) node[above, font=\tiny] {$t$};
+\draw[->] (0,0) -- (0,5) coordinate (y axis) node[left, font=\tiny] {$w(t)$};
+
+% Графики
+\draw[ semithick , blue] plot[smooth]
+coordinates{(0,2) (0.5,5) (1,0) (1.5,5) (2,0) (2.5, 5) (3,0) (3.5,5) (4,0) (4.5,5) (5,0) (5.5,5) (6,0) (6.5,5) (7,0) (7.5,5) (8,0) (8.2,3)};
+
+\end{tikzpicture} 
+\end{center}
+\end{document}

@@ -1,0 +1,60 @@
+\documentclass{proc}
+\usepackage{mathtext}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+%\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[papersize={30cm,29.7cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pagestyle{empty} 
+\begin{document}
+%\begin{center}
+\begin{tikzpicture}[scale=3,decoration={brace,raise=5pt}]
+\draw[ultra thick, blue!100, line width=5pt] (2.5,0) -- (2.5,5.5);
+\draw[ultra thick, black!100] (2.5,0) -- (2.5,-0.5);
+\draw[ultra thick, blue!100, dashed] (2.8,0) -- (2.85,5.3) node {\Huge{$*$}};
+\draw[ultra thick, black!100] (2.8,0) -- (2.8,-0.5);
+\draw[ultra thick, blue!50, dashed] (1.6,0) -- (1.6,4.2) node {\Huge{$*$}};
+\draw[ultra thick, blue!100, dashed] (4.1,0) -- (4.1,1.9) node {\Huge{$*$}};
+% горизонтальные линии
+\draw[ultra thick, blue!100, dashed] (0,5.3) -- (2.85,5.3) node {\Huge{$*$}};
+\draw[ultra thick, blue!100, dashed] (0,5.5) -- (2.5,5.5) node {\Huge{$*$}};
+\draw[ultra thick, black!100] (2.52,5.52) -- (3.3,5.52);
+\draw[ultra thick, black!100] (2.85,5.3) -- (3.3,5.3);
+\draw[ultra thick, blue!100, dashed] (0,4.2) -- (1.6,4.2) node {\Huge{$*$}};
+\draw[ultra thick, blue!100, dashed] (0,1.9) -- (4.1,1.9) node {\Huge{$*$}};
+
+\node[left] at (0,0){\Huge{$0$}};
+\node[below] at (2.6,-0.50){\Huge{\textbf{$\bigtriangleup f$}}};
+\node[above] at (3,-0.4){\Huge{$f_k$}};
+\node[above] at (2.58,5.6){\Huge{$f_{peak}$}};
+\node[above] at (1.7,-0.4){\Huge{$f_{k-1}$}};
+\node[above] at (4.2,-0.4){\Huge{$f_{k+1}$}};
+\node[above] at (3.6,5.2){\Huge{$\bigtriangleup A$}};
+\node[above] at (-0.55,4){\Huge{$|X_{k-1}|$}};
+\node[above] at (-0.55,1.7){\Huge{$|X_{k+1}|$}};
+\node[above] at (-0.55,5.4){\Huge{$|X_{peak}|$}};
+\node[above] at (-0.4,5){\Huge{$|X_{k}|$}};
+
+
+\draw[->] (0,0) -- (5,0) coordinate (x axis) node[above] {\Huge{$w$}};
+\draw[->] (0,0) -- (0,5.7) coordinate (y axis) node[right] {\Huge{$S(w)$}};
+
+%\draw[ultra thick, blue, line width=2pt] (0,1.5) sin (2.5,5);
+%\draw[ultra thick, blue, line width=2pt] (2.5,5) cos (6,0.9);
+
+\draw[ultra thick, black, line width=2pt] (0.5,0.2) sin (2.5,5.5);
+\draw[ultra thick, black, line width=2pt] (2.5,5.5) cos (4.5,0.2);
+
+
+\draw[ultra thick,<->](2.5,-0.4) sin (2.8,-0.4); coordinate (x axis);
+\draw[ultra thick,<->](3.2,5.5) sin (3.2,5.3); coordinate (x axis);
+
+
+\end{tikzpicture} 
+%\end{center}
+\end{document}

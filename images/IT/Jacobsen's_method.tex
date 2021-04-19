@@ -1,0 +1,134 @@
+\documentclass{proc}
+%\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{pgfplots}
+\usepackage[papersize={30cm,9.7cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}  
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\pagestyle{empty} % Отключить нумерацию странци
+
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[scale=1,decoration={brace,raise=5pt}]
+\node[left,font=\tiny] at (3.5,0){\normalsize{$0$}};
+\node[right,scale=1] at (9.5,-0.7){Номер отчета ДПФ}; 
+\draw[dashed] (4.1,6)node[left,font=\tiny] {\Large{A}};
+
+
+%\foreach \x in {0,0.5,...,15}{\draw (\x,-0.1)node [below,font=\tiny,] {\x} -- (\x,0.1) ;}
+
+% Оси
+\draw[->] (3.5,0) -- (12.5,0) coordinate (x axis);
+\draw[->] (3.5,-0.5) -- (3.5,6) coordinate (y axis);
+
+%Значения осей Y
+\draw[dashed] (3.5,1.5)node[left,font=\tiny] {\normalsize{$20$}};
+\draw[dashed] (3.5,3)node[left,font=\tiny] {\normalsize{$40$}};
+\draw[dashed] (3.5,4.5)node[left,font=\tiny] {\normalsize{$60$}};
+\draw[dashed] (3.5,6)node[left,font=\tiny] {\normalsize{$80$}};
+
+%Значения осей X
+\draw[dashed] (4.2,-0.3)node[left,font=\tiny] {\normalsize{$4$}};
+\draw[dashed] (5.4,-0.3)node[left,font=\tiny] {\normalsize{$6$}};
+\draw[dashed] (6.6,-0.3)node[left,font=\tiny] {\normalsize{$8$}};
+\draw[dashed] (7.8,-0.3)node[left,font=\tiny] {\normalsize{$10$}};
+\draw[dashed] (9,-0.3)node[left,font=\tiny] {\normalsize{$12$}};
+\draw[dashed] (10.2,-0.3)node[left,font=\tiny] {\normalsize{$14$}};
+\draw[dashed] (11.4,-0.3)node[left,font=\tiny] {\normalsize{$16$}};
+
+
+
+% DFT Output2
+\draw[ultra thick, red] (4.25,0.5) -- (4.75,0.75);
+\draw[ultra thick, red] (4.75,0.75) -- (5.25,1);
+\draw[ultra thick, red] (5.25,1) -- (5.75,1.25);
+\draw[ultra thick, red] (5.75,1.25) cos (6.25,1.5);
+\draw[ultra thick, red] (6.25,1.5) -- (7.05,4.6);
+\draw[ultra thick, red] (7.05,4.6) -- (8,4.6);
+\draw[ultra thick, red] (8,4.6) -- (8.75,1.5);
+\draw[ultra thick, red] (8.75,1.5) sin (9.25,1.25);
+\draw[ultra thick, red] (9.25,1.25) -- (9.75,1);
+\draw[ultra thick, red] (9.75,1) -- (10.25,0.75);
+\draw[ultra thick, red] (10.25,0.75) -- (10.75,0.5);
+
+% DFT Output
+%\draw[ultra thick, red] (3.5,0.6) cos (4.79,0.7);
+%\draw[ultra thick, red] (4.79,0.7) cos (5.74,0.85);
+%\draw[ultra thick, red] (5.74,0.85) cos (6.39,1.5);
+%\draw[ultra thick, red] (6.39,1.5) sin (7.2,4.6);
+%\draw[ultra thick, red] (7.2,4.6) cos (8.19,4.6);
+%\draw[ultra thick, red] (8.19,4.6) cos (9,1.5);
+%\draw[ultra thick, red] (9,1.5) sin (9.65,0.85);
+%\draw[ultra thick, red] (9.65,0.85) sin (10.6,0.7);
+%\draw[ultra thick, red] (10.6,0.7) sin (12,0.6);
+
+% Cibic Spline Interpolated
+%\draw[ultra thick, cyan] (3.5,0.6) cos (3.8,0.70);
+%\draw[ultra thick, cyan] (3.8,0.70) sin (4,0.8);
+%\draw[ultra thick, cyan] (4,0.8) cos (4.2,0.7);
+%\draw[ultra thick, cyan] (4.2,0.7) sin (4.5,0.6);
+%\draw[ultra thick, cyan] (4.5,0.6) cos (4.8,0.7);
+%\draw[ultra thick, cyan] (4.8,0.7) sin (5.3,1);
+%\draw[ultra thick, cyan] (5.3,1) cos (5.8,0.85);
+%\draw[ultra thick, cyan] (5.8,0.85) sin (6.2,0.7);
+%\draw[ultra thick, cyan] (6.2,0.7) cos (6.3,1);
+%
+%\draw[ultra thick, cyan] (6.3,1) sin (7,5);
+%\draw[ultra thick, cyan] (7,5) cos (7.7,0);
+%\draw[ultra thick, cyan] (7.7,0) sin (8.4,5);
+%\draw[ultra thick, cyan] (8.4,5) cos (9.1,1);
+%
+%\draw[ultra thick, cyan] (9.1,1) sin (9.2,0.7);
+%\draw[ultra thick, cyan] (9.2,0.7) cos (9.6,0.85);
+%\draw[ultra thick, cyan] (9.6,0.85) sin (10.1,1);
+%\draw[ultra thick, cyan] (10.1,1) cos (10.6,0.7);
+%\draw[ultra thick, cyan] (10.6,0.7) sin (10.9,0.6);
+%\draw[ultra thick, cyan] (10.9,0.6) cos (11.2,0.7);
+%\draw[ultra thick, cyan] (11.2,0.7) sin (11.4,0.8);
+%\draw[ultra thick, cyan] (11.4,0.8) cos (11.6,0.7);
+%\draw[ultra thick, cyan] (11.6,0.7) sin (11.9,0.6);
+
+% Zero Padded
+
+\draw[ultra thick, cyan, dashed] (4.25,0.5) cos (4.5,0);
+\draw[ultra thick, cyan, dashed] (4.5,0) sin (4.75,0.75);
+\draw[ultra thick, cyan, dashed] (4.75,0.75) cos (5,0);
+\draw[ultra thick, cyan, dashed] (5,0) sin (5.25,1);
+\draw[ultra thick, cyan, dashed] (5.25,1) cos (5.5,0);
+\draw[ultra thick, cyan, dashed] (5.5,0) sin (5.75,1.25);
+\draw[ultra thick, cyan, dashed] (5.75,1.25) cos (6,0);
+\draw[ultra thick, cyan, dashed] (6,0) sin (6.25,1.5);
+\draw[ultra thick, cyan, dashed] (6.25,1.5) cos (6.5,0);
+
+\draw[ultra thick, cyan, dashed] (6.5,0) sin (7.5,6);
+\draw[ultra thick, cyan, dashed] (7.5,6) cos (8.5,0);
+
+\draw[ultra thick, cyan, dashed] (8.5,0) sin (8.75,1.5);
+\draw[ultra thick, cyan, dashed] (8.75,1.5) cos (9,0);
+\draw[ultra thick, cyan, dashed] (9,0) sin (9.25,1.25);
+\draw[ultra thick, cyan, dashed] (9.25,1.25) cos (9.5,0);
+\draw[ultra thick, cyan, dashed] (9.5,0) sin (9.75,1);
+\draw[ultra thick, cyan, dashed] (9.75,1) cos (10,0);
+\draw[ultra thick, cyan, dashed] (10,0) sin (10.25,0.75);
+\draw[ultra thick, cyan, dashed] (10.25,0.75) cos (10.5,0);
+\draw[ultra thick, cyan, dashed] (10.5,0) sin (10.75,0.5);
+
+
+% Легенда
+%\draw[ultra thick, red] (4, 6.3) -- (4.5, 6.3) node[right, black, font=\small] {- Выход ДПФ};
+%\draw[ultra thick, cyan] (4, 5.9) -- (4.5, 5.9) node[right, black, font=\small] {- Кубический сплайн };
+%\node[right, black, font=\small] at (4.75, 5.5){интерполированный};
+
+\draw[ultra thick, red] (9, 5.3) -- (9.3, 5.3) node[right, black, font=\small] {- Выход ДПФ};
+\draw[ultra thick, cyan, dashed] (9, 5) -- (9.3, 5) node[right, black, font=\small] {- Интерполированный};
+\node[right, black, font=\small] at (9.54, 4.7) {сигнал};
+\end{tikzpicture}
+
+\end{center}
+\end{document}

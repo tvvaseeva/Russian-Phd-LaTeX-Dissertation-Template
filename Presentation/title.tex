@@ -1,7 +1,7 @@
 \setbeamertemplate{title page}
 {
     \ifnumequal{\value{logotitle}}{1}{
-        \IfFileExists{images/logo.pdf}{
+        \IfFileExists{images/omgups.png}{
             \begin{minipage}[c]{0.15\textwidth}
                 \begin{flushleft}
                     \usebeamercolor[fg]{titlegraphic}\inserttitlegraphic
@@ -37,15 +37,14 @@
     \texorpdfstring{%
         \emph{Выступающий:}~\thesisAuthorShort\\%
         \emph{Руководитель:}~\supervisorRegaliaShort~\supervisorFioShort\\%
-        %
-    }{\thesisAuthor}%
+         }{\thesisAuthor}%
 }
 \date{\texorpdfstring{\thesisCity, \thesisYear}{}}
 \institute{\texorpdfstring{\thesisOrganization}{}}
-\IfFileExists{images/logo.pdf}{
-    \titlegraphic{\includegraphics[width=\textwidth]{images/logo}}
+\IfFileExists{images/omgups.png}{
+    \titlegraphic{\includegraphics[width=\textwidth]{images/omgups.png}}
     \ifnumequal{\value{logoother}}{1}{
-        \logo{\includegraphics[width=0.15\textwidth]{images/logo}}
+        \logo{\includegraphics[width=0.15\textwidth]{images/omgups.png}}
     }{}
 }{}
 \subtitle{Представление на соискание учёной степени \thesisDegree\ по специальности \thesisSpecialtyNumber\ \thesisSpecialtyTitle}

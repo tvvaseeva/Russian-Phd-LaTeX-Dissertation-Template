@@ -42,20 +42,96 @@
 \section{Математическая модель многотонального сигнала}
 \subsection{Ограничение ДПФ}
 \begin{frame}{Ограничение ДПФ}
-	\textsc{Рисунок, на котором показана проблема нахождения гармоники сигнала с частотой, находящейся между дискретными гармониками ДПФ.}
+\begin{tabular}{m{0.5\linewidth}m{0.55\linewidth}}
+\textbf{Модель сигнала}:	
+\begin{equation}
+\label{eq:equation1}
+s(t) = \displaystyle\sum_{k=0}^{N-1} A_k \cos \left({\frac{2 \pi}{T_s} f_{peak} t  + \varphi_k} \right)+ \eta(t)  
+\end{equation}
+\textbf{ДПФ}:		
+\begin{equation}
+\label{eq:equation3}
+	\dot{X}(n)= \displaystyle\sum_{k=0}^{N-1} x(k) \cdot \exp\left( -j \cdot \frac{2 \pi n k}{N}\right)
+\end{equation}  
+%при $k=0,1, \cdots > N - 1$
+&
+\begin{figure}[ht]
+%\centering
+\includegraphics [scale=0.27] {Maximum_DFT.pdf}
+\begin{flushright}
+\caption{Случай несовпадения максимума ДПФ и максимума спектра гармоник.}	
+\end{flushright}
+\label{img:picture1}
+\end{figure}
+\end{tabular}
+% E. Jacobsen and P. Kootsookos, "Fast, Accurate Frequency Estimators [DSP Tips & Tricks]," in IEEE Signal Processing Magazine, vol. 24, no. 3, pp. 123-125, May 2007, doi: 10.1109/MSP.2007.361611.
+%Jacobsen E. On local interpolation of DFT outputs //Available online: http://www. ericjacobsen. org/FTinterp. pdf.[Accessed January 2013]. – 1994.
 \end{frame}
 
-\begin{frame}{Виляние оконной функции}
-	\textsc{Рисунок, показывающий, что происходит со спектром гармоники при наложении на него окна. Лучше в двух частях - с прямоугольным окном и окном Кайзера.}	
+\begin{frame}{Влияние оконной функции}
+%	\textsc{Рисунок, показывающий, что происходит со спектром гармоники при наложении на него окна. Лучше в двух частях - с прямоугольным окном и окном Кайзера.}	
+\begin{minipage}[t]{0.47\linewidth}
+	\centering 
+	\textbf{Прямоугольное окно}
+	\includegraphics[width=.9\linewidth]{Rectangular windows.png}
+	\textbf{Окно Кайзера}
+	\includegraphics[width=.9\linewidth]{Kaiser window.png}		
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.47\linewidth}
+	\centering 
+	\textbf{Спектр с прям-ым окном}
+	\includegraphics[width=.9\linewidth]{Influence_of_the_Rectangular_Window_on_the_Signal_Spectrum.png}
+	\textbf{Спектр с окном Кайзера}
+	\includegraphics[width=.9\linewidth]{Influence_of_the_Kaiser_window_on_the_Signal_Spectrum.png}
+\end{minipage}
 \end{frame}
 
 \begin{frame}{Методы интерполирования спектра}
-	\textsc{Справа - поясняющий рисунок и формулы, слева - список основных методов.
-	Можно взять из диссертации Елизарова.}	
+\begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
+\begin{itemize}	
+	\item метод Якобсена;
+	\item два метода Квина;
+	\item два метода Маклеода;
+	\item метод Грэндка;
+	\item алгоритм параболической интерполяции;
+	\item алгоритм интерполяции Гаусса;
+	\item алгоритм, рекомендованный в ГОСТ 30804.4.7-2003;
+	\item метод корреляционных функций;
+	\item Модернизированный метод корреляционных функций.				
+\end{itemize}
+&	
+%\textbf{Разность между дискретными гармониками:}
+\begin{equation}
+	\label{eq:equation2}
+	\bigtriangleup f = \frac{(|X_{k+1}|-|X_{k-1}|)}{(4|X_{k}|-2|X_{k-1}|-2|X_{k+1}|)}
+\end{equation}
+
+\begin{equation}
+	\label{eq:equation7}
+	f_{peak} = f_k + \bigtriangleup f
+\end{equation}
+\begin{equation}
+	\label{eq:equation8}
+	f=f_{peak} \cdot \frac{f_s}{N}
+\end{equation}
+\begin{equation}
+	\label{eq:equation4}
+	u(f_k-1) = a \cdot (f_k-1-\bigtriangleup f)^2 + b
+\end{equation}
+\begin{equation}
+	\label{eq:equation5}
+	u(f_k) = a \cdot (f_k-\bigtriangleup f)^2+b,
+\end{equation}
+\begin{equation}
+	\label{eq:equation6}
+	u(f_k+1) = a\cdot (f_k+1-\bigtriangleup f)^2 +b
+\end{equation}
+\end{tabular}
 \end{frame}
 
 \begin{frame}{Методы экстраполирования сигнала}
-	\begin{minipage}[t]{0.47\linewidth}
+	\begin{minipage}[t]{0.45\linewidth}
 		\centering 
 		\textbf{Сигнал (частота=5.2)}
 		\includegraphics[width=.9\linewidth]{signal}
@@ -63,7 +139,7 @@
 		\includegraphics[width=.9\linewidth]{interpolated_signal}		
 	\end{minipage}
 	\hfill
-	\begin{minipage}[t]{0.47\linewidth}
+	\begin{minipage}[t]{0.45\linewidth}
 		\centering 
 		\textbf{Спектр}
 		\includegraphics[width=.9\linewidth]{spectrum}
@@ -73,24 +149,194 @@
 \end{frame}
 
 \subsection{Граница Крамера-Рао}
-\begin{frame}{Теоретическая точность определения амплитуды гармоник}
-	\textsc{Формулы для границы Крамера-Рао для амплитуды гармоник.}
+\begin{frame}{Общая формула границы Крамера-Рао}
+%Теоретическая точность определения амплитуды гармоник	
+\begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
+\textbf{Граница Крамера-Рао:}
+\begin{equation}
+\label{eq:equation13}
+var(\theta)\geq \frac{1}{I(\theta)}
+\end{equation}
+$\theta$ – оцениваемый параметр;
+		
+$var(\theta)$ – дисперсия (variance) несмещенной оценки параметра.
+
+\textbf{Информация Фишера:}
+\begin{equation}
+	\label{eq:equation14}
+	I(\theta) = -E \left[\frac{\delta^2 ln p(x;\theta)}{\delta\theta^2}\right]
+\end{equation}
+где $E$ – среднее значение;
+
+$p(x;\theta)$ – функция правдоподобия.
+&
+\textbf{Общая оценка границы Крамера-Рао для сигналов в белом Гауссовом шуме:}
+\begin{equation}
+	\label{eq:equation14}
+x[n] = A + s[n;\theta] + w[n], n=0,1,...,N-1	
+\end{equation}
+$x[n]$ -- среднее значение;
+
+$A$ и $\theta$  -- оцениваемые параметры;
+
+$w[n]$ -- белый шум Гаусса;
+
+$s[n;\theta]$ -- детерминированный сигнал.
+\begin{equation}
+\label{eq:equation14}
+var(\hat{\theta}) \geq \frac{\sigma^2}{\displaystyle\sum_{n=0}^{N-1} \left(\frac{\partial s [n; \theta]}{\partial\theta}\right)^2} 
+\end{equation}
+\end{tabular}
 \end{frame}
-\note{Привести ссылку на статью в Скопус}
+
+\begin{frame}{Неравенство Крамера-Рао для амплитуды, частоты и фазы гармоник}
+\textbf{Матрица Фишера:}
+\begin{equation}
+\label{eq:equation15}
+I(\theta) = \frac{1}{\sigma^2}
+\begin{bmatrix}
+	\frac{N}{2} & 0 & 0 \\
+	0 & 2A^2 \pi^2 \displaystyle\sum_{n=0}^{N-1} n^2 & A^2 \pi \displaystyle\sum_{n=0}^{N-1} n \\
+	0 & A^2 \pi \displaystyle\sum_{n=0}^{N-1} n & \dfrac{NA^2}{2}
+\end{bmatrix}
+\end{equation}
+\begin{equation}
+\label{eq:equation16}
+var(\hat{A})\geq \frac{2  \sigma^2}{N} 
+\end{equation}
+\begin{equation}
+\label{eq:equation17}
+var(\hat{f_0})\geq \frac{12}{(2\pi)^2 \eta  N(N^2 - 1)}  
+\end{equation}
+%(3.41), C.34
+\begin{equation}
+\label{eq:equation18}
+var(\hat{\varphi})\geq \frac{2(2N-1)}{\eta N(N+1)}  
+\end{equation}
+\end{frame}
+
+\begin{frame}{Нахождение дисперсии результата оценки амплитуды}
+\begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
+% ПЕРЕДЕЛАТЬ СЛАЙД
+\textcolor{red}{\textbf{Граница Крамера-Рао для величины $\alpha$}:
+\begin{equation}
+\label{eq:equation19}
+var(\theta)\geq \frac{\left(\frac{\delta^2 g}{\delta\theta}\right)}{-E\left[\frac{\delta^2 ln p(x;\theta)}{\delta \theta^2}\right]^{'}}
+\end{equation}
+\textbf{Значение нулевой гармоники сигнала для оконной функции:}
+\begin{equation}
+\label{eq:equation20}
+w_0= \frac{\sum_{n=0}^{N-1} w_n}{N}.	  
+\end{equation}}
+&
+\textcolor{red}{\begin{equation}
+\label{eq:equation21}
+A^{'}=\frac{A}{w_0} ,		  
+\end{equation}
+Величина $\theta$ с известной границей Крамера-Рао это $A$, 
+величина $\alpha$  с неизвестной границей $A^{'}$
+\begin{equation}
+\label{eq:equation22}
+g(\theta)=\frac{\theta}{w_0}
+\end{equation}
+\begin{equation}
+\label{eq:equation23}
+\left(\frac{\delta^2 g}{\delta \theta}\right)^2=\frac{1}{w_0^2}
+\end{equation}}
+\end{tabular}
+\end{frame}
+
+
+\begin{frame}{Математическая модель для оценки точности нахождения амплитуды гармоники}
+\begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
+\begin{equation}
+	\label{eq:equation24}
+	var(A)\geq \frac{2\sigma^2}{N} \frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n \right)^2} 			  
+\end{equation}
+где $\sigma$ -- среднее квадратичное отклонение шума;
+
+$n$ – номер отчета.
+
+$N$ – число отсчетов в дискретном сигнале;
+ 
+$x(n;\theta)$ – наблюдаемый сигнал;
+
+$A$ – амплитуда гармоники.
+&
+\textbf{Введем обозначение коэффициент окна:} 
+\begin{equation}
+	\label{eq:equation25}
+	F_{win}=\frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n\right)^2}
+\end{equation}
+Данный коэффициент показывает, во сколько ухудшится оценка амплитуды гармоники при использовании окна $w$.
+\end{tabular}
+\end{frame}
+\note{\cite{altman2020boundary}}
 
 
 \begin{frame}{Практическая точность методов}
-	\textsc{Рисунки по точности методов с границей.
-	Где-то строили такие графики. Можно взять у Димы.}
+\begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.57] {Fundamental frequency offset versus noise level.pdf}
+	\caption{Графики зависимостей смещения основной частоты от уровня шума.}
+	\label{img:Fundamental_frequency_offset_versus_noise_level}
+\end{figure}
+&
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.45] {Dispersion in the estimation of the fundamental frequency of the voltage.pdf}
+	\caption{Дисперсия при оценке основной частоты напряжения.}
+	\label{img:Dispersion_in_the_estimation_of_the_fundamental_frequency_of_the_voltage}
+\end{figure}
+\end{tabular}
 \end{frame}
 
 \subsection{Уточнение границы Крамера-Рао}
 \begin{frame}{Оценка дисперсии амплитуды гармоники}
-	\textsc{Основные результаты из статьи}
+	\textsc{Основные результаты из статьи <<Граница Крамера-Рао для амлитуды гармоники при использовании оконных функций>>}:
+\begin{itemize}
+\item Оценку точности результатов для данных, которые сами по себе являются оценкой точности, выполнить на прямую довольно затруднительно. Во всех трех экспериментах с увеличением числа опытов экспериментальные кривые сглаживались и становились визуально не отличимые от расчетных данных.
+\item Эксперименты были проведены при различных входных параметрах (число точек, амплитуда, частота и фаза сигналов, дисперсия шума или коэффициент окна). Ни в одном случае не было зафиксировано отклонение результатов эксперимента от результатов, полученных по предложенной формуле.
+\item Таким образом, результаты моделирования алгоритма оценки амплитуды гармоники в условиях шума при наложении оконной функции подтверждают полученные соотношения для оценки дисперсии оценки амплитуды.
+\end{itemize}	
 \end{frame}
 
 \begin{frame}{Экспериментальная проверка формулы для оценки дисперсии}
-	\textsc{Графики из статьи}
+\begin{tabular}{m{0.32\linewidth}m{0.32\linewidth}m{0.32\linewidth}}
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.25] {noise_win_var.png}
+	\caption{\scriptsize{Изменение дисперсии шума после наложении на него окна.}}
+	\label{img:noise_win_var}
+\end{figure}
+\scriptsize{\begin{equation}
+		\label{eq:equation7}
+		\sigma^{'2}=\frac{\sum_{n=0}^{N-1} w_n^2}{N}*\sigma^2
+\end{equation}}
+& 
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.25] {estimate_amp_sin_kaiser_beta.png}
+	\caption{\scriptsize{Зависимость дисперсии оценки амплитуды от параметра окна.}}
+	\label{img:estimate_amp_sin_kaiser_beta}
+\end{figure}
+\scriptsize{\begin{equation}
+		\label{eq:equation11}
+		var(A)\geq \frac{2\sigma^2}{N} \frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n \right)^2} 			  
+\end{equation}}
+&
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.25] {estimate_amp_sin_kaiser_noise.png}
+	\caption{\scriptsize{Зависимость дисперсии оценки амплитуды от дисперсии шума.}}
+	\label{img:estimate_amp_sin_kaiser_noise}
+\end{figure}
+\scriptsize{\begin{equation}
+		\label{eq:equation11}
+		var(A)\geq \frac{2\sigma^2}{N} \frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n \right)^2} 			  
+\end{equation}}
+\end{tabular}
 \end{frame}
 
 \begin{frame}{Дополненная математическая модель многотонального сигнала}
@@ -109,63 +355,275 @@
 
 \subsection{Нахождение гармоники сигнала}
 \begin{frame}{Интерполирование спектра}
-	\textsc{Слева - прямое интерполирование, справа - метод корреляционных функций}
+
+\scriptsize{
+\begin{equation}
+	\label{eq:equation3.10}
+	A_{\nu} =  \sqrt{\left({\displaystyle\sum_{i=1}^{i=M}\mathrm{Re}(Y_i) \cdot W_{ji}} \right)^2 + \left({\displaystyle\sum_{i=1}^{i=M}\mathrm{Im}(Y_i) \cdot W_{ji}} \right)^2}
+\end{equation}
+\begin{equation}
+	\label{eq:equation3.8.9}
+	\varphi = \arctan \left({\frac{\displaystyle\sum_{i=1}^{i=M} \mathrm{Im}(Y_i) \cdot W_{ji}}{\displaystyle\sum_{i=1}^{i=M} \mathrm{Re}(Y_i) \cdot W_{ji}}
+	}\right) 
+\end{equation}}
+\begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}	
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.45] {Jacobsen's_method.pdf}
+	\caption{Интерполяция пиков.}
+	\label{img:Jacobsen's_method}
+\end{figure}
+%\textsc{Слева - прямое интерполирование, справа - метод корреляционных функций}
+&
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.2] {set_of_standards.pdf}
+	\caption{Пример построения наборов эталонов.}
+	\label{img:set_of_standards}
+\end{figure}	
+\end{tabular}
 \end{frame}
 
 \begin{frame}{Двойное интерполирование сигнала и спектра}
-	\textsc{Рисунок и формулы напишу чуть позже.}
+	\begin{minipage}[t]{0.43\linewidth}
+		\centering 
+		\textbf{Сигнал (частота=5.2)}
+		\includegraphics[width=.9\linewidth]{signal}
+		\textbf{Экстраполированный \\ сигнал ($k_{i1}=4$)}
+		\includegraphics[width=.9\linewidth]{interpolated_signal}		
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.43\linewidth}
+		\centering 
+		\textbf{Спектр сигнала}
+		\includegraphics[width=.9\linewidth]{spectrum_double}
+		\textbf{Спектр с двойной интерполяцией ($k_{i2}=4$)}
+		\includegraphics[width=.9\linewidth]{spectrum_double_interpolated}
+	\end{minipage}
 \end{frame}
 
-\begin{frame}{Интерполирование сигнала для оценки параметров гармоник}
-	\textsc{Рисунок и формулы напишу чуть позже.}
-\end{frame}
-
-\begin{frame}{Сравнение корреляционных методов}
-	\begin{tabular}{llll}
-		\toprule Интерполирование: &
-		спектра & 
-		двойное &
-		сигнала\\ 
-		\midrule
-		Точность &
-		Не высокая & 
-		Высокая &
-		Наивысшая\\ 
-		\midrule
-		Быстродействие &
-		Высокое & 
-		Среднее &
-		Низкое \\ 
-		\midrule		
-	\end{tabular}
-\end{frame}
+%\begin{frame}{Сравнение корреляционных методов}
+%	\begin{tabular}{llll}
+%		\toprule Интерполирование: &
+%		спектра & 
+%		двойное &
+%		сигнала\\ 
+%		\midrule
+%		Точность &
+%		Не высокая & 
+%		Высокая &
+%		Наивысшая\\ 
+%		\midrule
+%		Быстродействие &
+%		Высокое & 
+%		Среднее &
+%		Низкое \\ 
+%		\midrule		
+%	\end{tabular}
+%\end{frame}
 
 \subsection{Поиск гармоник}
 \begin{frame}{Алгоритм поиска гармоник}
-	\textsc{ГСА алгоритма поиска гармоник из зарегистрированной программы}
+%	\textsc{ГСА алгоритма поиска гармоник из зарегистрированной программы}
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.40] {Diagram_GSA2.png}
+	\caption{ГСА алгоритма поиска гармоник.}
+	\label{img:Diagram_GSA}
+\end{figure}
 \end{frame}
 
 \begin{frame}{Расчет гармоник и интергармоник}
 	\textsc{Свидетельство о регистрации программы}
+\begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.2] {Computer_program.jpg}
+	\caption{Свидетельство.}
+	\label{img:Computer_program}
+\end{figure}
+&
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.3] {Diagram_Computer_program2.jpg}
+	\caption{Функционал в зарегистрированной программе.}
+	\label{img:Diagram_Computer_program}
+\end{figure}
+%Предлагаемая полезная модель относится к электроизмерительной технике и может быть использована для определения гармоник.
+\end{tabular}
 \end{frame}
 
 \subsection{Практическая реализация}
-\begin{frame}{Библиотека SFFT}
-	
+\begin{frame}{Метод нахождения параметров гармоник}
+	\begin{block}{При заданной точности по частоте}
+		$k_i=\frac{f_1}{f_{eps}}$, 
+		
+		${f_{eps}}$ -- заданная точность
+	\end{block}	
+	\begin{block}{При заданной точности по амплитуде}
+		$f_{eps}=a_{eps}*\frac{sw_0-w_1}{sw_0}$,  
+		
+		$a_{eps}$ -- заданная точность, $sw_i$ -- отсчеты спектра окна.
+	\end{block}
+	\begin{block}{При заданном шуме}
+		$a_{eps} = var(A)\geq \frac{2\sigma^2}{N} \frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n \right)^2}$ Формула для оценки дисперсии амплитуды
+	\end{block}
 \end{frame}
 
-\begin{frame}{Разряженное FFT}
-	
+\begin{frame}{Анализ быстродействия}
+	\begin{block}{}
+		\begin{minipage}[t]{0.47\linewidth}
+			\centering \textcolor{blue}{\textbf{Прямой метод}}
+			%\textsc{Найти график, желательно с CUDA}	
+			\begin{figure}[ht]
+			\centering
+			\includegraphics [scale=0.25] {CUDA.PNG}
+			%\caption{CUDA.}
+			\label{img:CUDA}
+			\end{figure}			
+			\textcolor{blue}{\textit{Не подходит для встроенных систем}}
+		\end{minipage}
+		\begin{minipage}[t]{0.47\linewidth}
+			\centering \textcolor{blue}{\textbf{Sparse FFT}}
+			%\textsc{График с сайта}		
+			\begin{figure}[ht]
+				\centering
+				\includegraphics [scale=0.2] {Sparse_Fourier_Transform_Performance.png}
+				%\caption{Sparse FFT.}
+				\label{img:Sparse_Fourier_Transform_Performance}
+			\end{figure}
+			\textcolor{blue}{\textit{Не работает с интерполированными сигналами}}
+		\end{minipage}
+	\end{block}
+	\hfil
+	\begin{block}{}
+		\begin{minipage}[t]{0.47\linewidth}
+			\centering \textcolor{blue}{\textbf{Быстрая корреляция}}
+			%\textsc{Найти график}	
+			\begin{figure}[ht]
+			\centering
+			\includegraphics [scale=0.25] {Прямая_корреляция2.PNG}
+			%\caption{Быстрая корреляция.}
+			\label{img:Прямая_корреляция}
+			\end{figure}			
+			\textcolor{blue}{\textit{Высокое быстродействие при малом коэффициенте интерполирования}}	
+		\end{minipage}
+		\begin{minipage}[t]{0.47\linewidth}
+			\centering \textcolor{blue}{\textbf{Pruned БПФ}}
+			%\textsc{Найти график}	
+			\begin{figure}[ht]
+			\centering
+			\includegraphics [scale=0.2] {Pruned_DFT.PNG}
+			%\caption{Pruned БПФ.}
+			\label{img:Pruned_DFT}
+			\end{figure}			
+			\textcolor{blue}{\textit{Относительно высокое быстродействие, слабо зависит от коэффициента интерполирования}}	
+		\end{minipage}
+	\end{block}
 \end{frame}
+
+\begin{frame}{Использование корреляции}
+\end{frame}
+
+\begin{frame}{Pruned FFT}
+\end{frame}
+
+
+%\begin{frame}{Библиотека SFFT}
+%\end{frame}
+
+%\begin{frame}{Разряженное FFT}
+%\begin{figure}[ht]
+%	\centering
+%	\includegraphics [scale=0.7] {Sparse_Fourier_Transform_Performance}
+%	\caption{Производительность разреженного преобразования Фурье.}
+%	\label{img:picture3}
+%\end{figure}	
+%\end{frame}
 
 \section{Заключение}
 
 \subsection{Результаты работы}
+\begin{frame}{Список опубликованных работ}
+\scriptsize{
+\textbf{В изданиях из перечня ВАК Минобрнауки России:}	
+\begin{itemize}
+	\item Альтман Е.~А., Захаренко Е.~И., Васеева Т.~В. Применение метода разложения двумерной свертки при реализации цифровых фильтров // Научный вестник Новосибирского государственного технического университета. – $2017$. – \textnumero.~$4$. – С. $95$-$104$.
+	
+	\item Лаврухин А.~А., Малютин А.~Г., Васеева Т.~В. Повышение эффективности информационно-измерительного комплекса автоматизированной системы мониторинга и учета электроэнергии // Известия Транссиба. – $2018$. – \textnumero.~$4 (36)$.
+\end{itemize}}	
+\scriptsize{
+\textbf{SCOPUS:}	
+\begin{itemize}
+	\item Altman E.~A., Vaseeva T.~V., Aleksandrov A.~V. Cache-aware algorithm for multidimensional correlations //Journal of Physics: Conference Series. – IOP Publishing, $2019$. – Т. $1260$. – \textnumero.~$4$. – С. $042001$.
+\end{itemize}}
+
+\scriptsize{
+\textbf{В прочих изданиях:}
+\begin{itemize}
+	\item Васеева, Т.~В. Граница Крамера-Рао амплитуды однотонального сигнала для методов ее оценки с использованием оконных функций / Т.~В. Васеева, Е.~А. Альтман //Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2021$. – С. $301$-$307$.
+	
+	\item Васеева Т.~В., Альтман Е.~А., Александров А.~В. Cравнительное исследование гармонических и интергармонических методов оценки сигналов //Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2020$. – С. $51$-$57$.
+		
+	\item Малютин А.~Г. и др. Математическое моделирование и численные методы для исследования алгоритмов обработки сигналов и анализа систем массового обслуживания. – $2020$.
+\end{itemize}}
+\end{frame}	
+
 \begin{frame}{Результаты работы}
-	По результатам работы опубиковано ...
+\scriptsize{
+\begin{itemize}
+	\item Альтман Е.~А., Васеева Т.~В., Александров А.~В. Граница Крамера-Рао для амплитуды гармоники при использовании оконных функций // Динамика систем, механизмов и машин. – $2020$. – Т. $8$. – \textnumero.~$2$. – С. $145$-$152$.
+	
+	\item Малютин А.~Г. и др. Математическое моделирование, численные методы и комплексы программ для решения задач обработки сигналов и измерения характеристик технических систем. – $2019$.
+	
+	\item  Малютин А.~Г. и др. Совершенствование подходов, архитектур и алгоритмов информационно-управляющих систем и средств измерения. – $2019$.
+		
+	\item Альтман Е.~А., Васеева Т.~В., Александров А. В. Оценка сложности алгоритма БПФ при моделировании его работы // Инновации в информационных технологиях, машиностроении и автотранспорте. – $2019$. – С. $116$-$118$.
+	
+	
+	\item Альтман Е.~А., Александров А.~В., Васеева Т.~В. Современные информационные технологии разработки программ для обработки радиотехнических сигналов на примере БПФ // Надежность функционирования и информационная безопасность инфокоммуникационных, телекоммуникационных и радиотехнических сетей и систем. – $2019$. – С. $132$-$139$.
+	
+	\item Васеева Т.~В., Альтман Е.~А., Елизаров Д.~А. Сравнительный анализ методов определения параметров гармоник сигнала электрической сети // Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2019$. – С. $261$-$267$.
+
+	\item Васеева Т.~В., Альтман Е.~А., Александров А.~В. Сравнительный анализ применения алгоритмов определения частоты при оценке гармоник в электрических сетях // Системы управления, информационные технологии и математическое моделирование. – $2019$. – С. $61$-$66$.
+
+	\item Альтман Е.~А., Васеева Т.~В., Александров А.~В. Кэш-ориентированный алгоритм для вычисления многомерной корреляции // Проблемы машиноведения. – $2019$. – С. $385$-$389$.
+\end{itemize}}
 \end{frame}
 
-\subsection{Основные положения выносимые на защиту}
+\begin{frame}{Результаты работы}
+\scriptsize{
+\begin{itemize}
+	\item Малютин А. Г. и др. Математическое моделирование, численные методы и комплексы программ для решения задач обработки сигналов и анализа структуры информационной системы. – 2018.
+	
+	\item Васеева Т.~В., Альтман Е.~А., Малютин А.~Г. Применение быстрых алгоритмов для выполнения фильтрации изображений // Современные проблемы радиоэлектроники. – $2018$. – С. $162$-$165$.
+	
+	\item Альтман Е.~А., Афанасьева Н.~С., Васеева Т.~В. Расширение глубины резкости изображений программным способом // Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2018$. – С. $222$-$227$.
+	
+	\item Васеева Т.~В., Альтман Е.~А. Исследование точности математических моделей алгоритмов реализованных на языках высокого уровня // Информационные и управляющие системы на транспорте и в. – $2018$. – С. $236$.
+	
+	\item Александров А.~А., Васеева Т.~В., Ананьева Н.~Г. Оценка эффективности алгоритма корреляции для различных аппаратных платформ // Тезисы $XIX$ Всероссийской конференции молодых учёных по математическому моделированию и информационным технологиям. – $2018$. – С. $54$-$54$.
+	
+	\item Васеева Т.~В., Альтман Е.~А., Елизаров Д.~А. Информационно-измерительная система для анализа гармоник сигнала в электрической сети // САПР и моделирование в современной электронике. – $2018$. – С. $131$-$135$.
+	
+	\item Васеева Т.~В., Александров А.~В. Реализация алгоритмов вычисления корреляции для диагностирования подвижного состава методами корреляционного анализа // Технологическое обеспечение ремонта и повышение динамических качеств железнодорожного подвижного состава. – $2017$. – С. $138$-$142$.
+\end{itemize}}
+\end{frame}
+
+\begin{frame}{Результаты работы}
+\scriptsize{
+\begin{itemize}
+	\item Терентьева А.~В., Васеева Т.~В., Кильдибеков А.~Б. Алгоритм детектирования лиц в различных ракурсах и наклонах // Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2017$. – С. $250$-$255$.
+	
+	\item Васеева Т.~В., Альтман Е.~А. Распознавание границ движущихся объектов методами компьютерного зрения // Информационно-телекоммуникационные системы и технологии. – $2017$. – С. $304$-$306$.
+	
+	\item Альтман Е.~А., Васеева Т.~В., Кузнецов Д.~И. Моделирование алгоритмов обработки сигналов с целью оптимизации их аппаратной реализации // Современные научные исследования и разработки. – $2017$. – \textnumero.~$4$. – С. $27$-$29$.	
+	
+	\item Альтман Е.~А., Дикаревич Н.~С., Васеева Т.~В. Детекторы локальных особенностей в системах компьютерного зрения, применяемых на железнодорожном транспорте // Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2016$. – С. $272$-$280$.
+\end{itemize}}
+\end{frame}
+
+\subsection{Основные положения, выносимые на защиту}
 \begin{frame}{Основные положения выносимые на защиту}
 	\begin{enumerate}
 		\item Дополнение к математической модели многотонального сигнала в виде формулы, позволяющей определить дисперсию оценки амплитуды гармоники, отличающемуся от известной границы Крамера-Рао учетом изменения дисперсии после применения оконных функций.

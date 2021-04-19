@@ -1,0 +1,49 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\begin{document}
+\pagestyle{empty}
+
+\tikzstyle{decision} = [ draw,trapezium, trapezium left angle=70, trapezium right angle=110]
+\tikzstyle{block} = [rectangle, draw, align=center, minimum height=1em, text centered]
+\tikzstyle{line} = [draw, -latex']
+\tikzstyle{cloud} = [draw, ellipse]
+
+\begin{tikzpicture}[node distance =1.4cm, auto]
+    \node [cloud] (st) {Начало};
+    \node [decision, below of=st] (s){$\epsilon$, g, i};
+    \node [block, below of=s] (o) {формирование \\ набора эталонов};
+    \node [block, below of=o] (f) {i=1};
+    \node [block, below of=f] (Ab) {определение \\ первых двух точек \\ $x_1$ и $x_2$ для \\ сравнения};
+    \node [block, below of=Ab] (P) {i=i+1};
+    \node [shape aspect=1, diamond, draw, below of=P] (DPF) {$F_1$<$F_2$};
+    \node [block, below left of=DPF, node distance=2.7cm] (DDD) {max находится \\ в левой части \\ отрезка};
+    \node [block, below right of=DPF, node distance=2.7cm] (FFF) {max находится \\ в правой части \\ отрезка};
+    \node [shape aspect=1, diamond, draw, below of=DPF, node distance=4cm] (A) {d!=1};
+    \node [block, below of=A] (Amax) {delta=(a+b)/2};
+    \node [block, below of=Amax] (Amin) {f=base point + delta \\ A=Fmax};
+    \node [decision, below of=Amin] (g) {f, A, $\phi$};
+    \node [cloud, below of=g] (k) {конец};
+    \node[coordinate, above of= P, node distance=0.4cm] (Us) {};
+    \node[coordinate, below of= DPF, node distance=3cm] (Ds) {};
+   
+    \path [line] (st) -- (s);
+    \path [line] (s)--(o);
+    \path [line] (o) -- (f);
+    \path [line] (f) -- (Ab);
+    \path [line] (Ab) -- (P);
+    \path [line](DPF) -| node [above left] {нет} (FFF);
+    \path [line](DPF) -| node [above right] {да} (DDD);
+    \draw [] (DDD) |- (Ds);
+    \draw [] (FFF) |- (Ds);
+    \path [line] (Ds) -- (A);
+    \path [line](A)-- node [above right] {да} ++(left:4cm)|- (Us);
+    \path [line] (P) -- (DPF);
+    \path [line] (A) -- (Amax);
+    \path [line] (Amax) -- (Amin);
+    \path [line] (Amin) -- (g);
+    \path [line] (g) -- (k);
+\end{tikzpicture}
+\end{document}
