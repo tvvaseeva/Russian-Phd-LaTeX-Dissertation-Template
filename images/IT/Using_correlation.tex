@@ -1,0 +1,76 @@
+\documentclass{proc}
+%\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{pgfplots}
+\usepackage[papersize={30cm,9.7cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}  
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\pagestyle{empty} % Отключить нумерацию странци
+
+\begin{document}
+%\begin{center}
+\begin{tikzpicture}[scale=1,decoration={brace,raise=5pt}]
+\node[left,font=\tiny] at (3.5,0){\normalsize{$0$}};
+\node[right,scale=1] at (9.5,-0.7){Номер отчета ДПФ}; 
+\draw[dashed] (4.1,7)node[left,font=\tiny] {\Large{A}};
+\draw[dashed] (7.95,6.4)node[left,font=\tiny] {\Large{$A_{j}$}};
+\draw[dashed] (7.7,-0.35)node[left,font=\tiny] {\Large{$f_{max}$}};
+\draw[dashed] (9.1,-0.35)node[left,font=\tiny] {\Large{$f_{max'}$}};
+\draw[dashed] (7.8,-0.85)node[left,font=\tiny] {\Large{$j$}};
+% Засечки на оси X
+\draw[ultra thick, black] (4.7,0) -- (4.7,0) node {\Large{$\shortmid$}};
+\draw[ultra thick, black] (6.4,0) -- (6.4,0) node {\Large{$\shortmid$}};
+\draw[ultra thick, black] (7.05,0) -- (7.05,0) node {\Large{$\shortmid$}};
+\draw[ultra thick, black] (8.05,0) -- (8.05,0) node {\Large{$\shortmid$}};
+\draw[ultra thick, black] (9.3,0) -- (9.3,0) node {\Large{$\shortmid$}};
+
+
+\draw[ultra thick, blue, ->] (7,-1.1) -- (8.1,-1.1) coordinate (x axis);
+
+%\foreach \x in {0,0.5,...,15}{\draw (\x,-0.1)node [below,font=\tiny,] {\x} -- (\x,0.1) ;}
+
+% Оси
+\draw[->] (3.5,0) -- (12.5,0) coordinate (x axis);
+\draw[->] (3.5,-2) -- (3.5,7) coordinate (y axis);
+
+
+\draw[ultra thick, red] (4.75,0.75) -- (5.25,1);
+\draw[ultra thick, red] (5.25,1) -- (5.75,1.25);
+\draw[ultra thick, red] (5.75,1.25) cos (6.25,1.5);
+\draw[ultra thick, red] (6.25,1.5) -- (7.05,4.6);
+\draw[ultra thick, red] (7.05,4.6) -- (8,4);
+\draw[ultra thick, red] (8,4) -- (8.75,1.5);
+\draw[ultra thick, red] (8.75,1.5) sin (9.25,1.25);
+% Звездочки
+\draw[ultra thick, red!100, dashed] (4.75,0.75) -- (4.75,0.75) node {\Large{$*$}};
+\draw[ultra thick, red!100, dashed] (6.25,1.5) -- (6.25,1.5) node {\Large{$*$}};
+\draw[ultra thick, red!100, dashed] (7.05,4.6) -- (7.05,4.6) node {\Large{$*$}};
+\draw[ultra thick, red!100, dashed] (8,4) -- (8,4) node {\Large{$*$}};
+\draw[ultra thick, red!100, dashed] (9.25,1.25) -- (9.25,1.25) node {\Large{$*$}};
+
+\draw[ultra thick, blue, dashed] (8,4.2) -- (8,4.2) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (8,4.6) -- (8,4.6) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (7.95,4.9) -- (7.95,4.9) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (7.85,5.25) -- (7.85,5.25) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (7.75,5.6) -- (7.75,5.6) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (7.55,5.95) -- (7.55,5.95) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (7.3,5.7) -- (7.3,5.7) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (7.2,5.3) -- (7.2,5.3) node {\Large{$*$}};
+\draw[ultra thick, blue, dashed] (7.1,5) -- (7.1,5) node {\Large{$*$}};
+
+
+\draw[ultra thick, blue, dashed] (7.05,4.6) sin (7.5,6);
+\draw[ultra thick, blue, dashed] (7.5,6) cos (8,4.6);
+\draw[ultra thick, blue, dashed] (8,4.6) -- (8,0) coordinate (y axis);
+\draw[ultra thick, blue, dashed] (7.05,4.6) -- (7.05,0) coordinate (y axis);
+
+
+\end{tikzpicture}
+%\end{center}
+\end{document}

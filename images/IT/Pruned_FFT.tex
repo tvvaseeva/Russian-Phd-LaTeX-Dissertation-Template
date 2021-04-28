@@ -1,0 +1,60 @@
+% Преамбула
+\documentclass{proc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+
+%\documentclass{article}
+\usepackage{pgfplots}
+\usepackage[papersize={30cm,30cm}]{geometry}
+\usetikzlibrary{snakes}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}  
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}
+\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\pagestyle{empty} % Отключить нумерацию страницы
+
+\begin{document}
+\begin{center}
+	\begin{tikzpicture}
+\tikzstyle{line} = [thick, blue]
+	
+% Координаты и названия осей 
+\node[right] at (12.5,5.3){\huge{$X_i$}}; 
+\draw[ultra thick, dashed] (5,5) -- (5,7) coordinate (y axis);
+\draw[ultra thick, dashed] (12,5) -- (12,7) coordinate (y axis);
+\draw[<->, ultra thick] (5,6.8) -- (12,6.8) coordinate (x axis);
+\node[right,scale=0.7] at (5,7.3){\textbf{\huge{ДОПОЛНЕНИЕ НУЛЯМИ}}}; 
+\node[right] at (11.2,4.6){\huge{$K \cdot N$}}; 
+\node[right] at (5.1,4.6){\huge{$N$}};
+\node[right] at (-0.8,10.5){\huge{$Y_i$}};  
+\node[right] at (-0.8,5){\huge{$0$}};  
+
+% График синусоиды
+\draw[ultra thick, blue] (0,5) sin (0.25,10); \draw[ultra thick, blue] (0.25,10) cos (0.5,5); 
+\draw[ultra thick, blue] (0.5,5) sin (0.75,0); \draw[ultra thick, blue] (0.75,0) cos (1,5); 
+\draw[ultra thick, blue] (1,5) sin (1.25,10); \draw[ultra thick, blue] (1.25,10) cos (1.5,5); 
+\draw[ultra thick, blue] (1.5,5) sin (1.75,0); \draw[ultra thick, blue] (1.75,0) cos (2,5); 
+\draw[ultra thick, blue] (2,5) sin (2.25,10); \draw[ultra thick, blue] (2.25,10) cos (2.5,5); 
+\draw[ultra thick, blue] (2.5,5) sin (2.75,0); \draw[ultra thick, blue] (2.75,0) cos (3,5);
+\draw[ultra thick, blue] (3,5) sin (3.25,10); \draw[ultra thick, blue] (3.25,10) cos (3.5,5); 
+\draw[ultra thick, blue] (3.5,5) sin (3.75,0); \draw[ultra thick, blue] (3.75,0) cos (4,5);
+\draw[ultra thick, blue] (4,5) sin (4.25,10); \draw[ultra thick, blue] (4.25,10) cos (4.5,5); 
+\draw[ultra thick, blue] (4.5,5) sin (4.75,0); \draw[ultra thick, blue] (4.75,0) cos (5,5); 
+%\draw[ultra thick, blue] (5,5) sin (5.25,10); \draw[ultra thick, blue] (5.25,10) cos (5.5,5); 
+%\draw[ultra thick, blue] (5.5,5) sin (5.75,0); \draw[ultra thick, blue] (5.75,0) cos (6,5); 
+%\draw[ultra thick, blue] (6,5) sin (6.25,10); \draw[ultra thick, blue] (6.25,10) cos (6.5,5); 
+%\draw[ultra thick, blue] (6.5,5) sin (6.75,0); \draw[ultra thick, blue] (6.75,0) cos (7,5);
+%\draw[ultra thick, blue] (7,5) sin (7.25,10); \draw[ultra thick, blue] (7.25,10) cos (7.5,5); 
+%\draw[ultra thick, blue] (7.5,5) sin (7.75,0); \draw[ultra thick, blue] (7.75,0) cos (8,5);
+
+\draw[ultra thick, blue] (5,5) -- (12,5);
+
+% Оси рисунков
+\draw[->] (0,5) -- (13,5) coordinate (x axis);
+\draw[->] (0,0) -- (0,11) coordinate (y axis);
+\end{tikzpicture} 
+\end{center}
+\end{document}

@@ -595,7 +595,7 @@ plt.show()
 \end{verbatim}
 
 
-\chapter{Алгоритм вычисления одномерной свертки}\label{app:Ё}
+\chapter{Алгоритм вычисления одномерной свертки}\label{app:Ж}
 \begin{lstlisting}
 #include <stdio.h>                                  // библиотека ввода и вывода на экран
 #include <string.h>                                 // стандартная библиотека работы со строками
@@ -703,6 +703,68 @@ int main()
 }
 
 \end{lstlisting}
+
+
+\chapter{Разница между действительными и комплексными  значениями}\label{app:И}
+\begin{table} [htbp]
+	\centering
+	\changecaptionwidth\captionwidth{16cm}
+	\caption{Название таблицы}\label{tab:Ts}%
+	\begin{tabular}{| p{4cm} || p{6cm} | p{6cm} |}
+		\hline
+		\hline
+		Название & Действительные значения & Комплексные значения \\
+		\hline
+		Случайные переменные & X & $\widetilde{X}=U+jV (U and V independent)$ \\
+		\hline
+		Значение & $E{[}x{]} = \int xp(x)dx$ & $E[\widetilde{X}]=\int up_U (u)du+j\int up_V(\upsilon)d\upsilon$ \\
+		\hline 
+		Дисперсия &  
+		$var(X)=E[(X-E[X]^2) \linebreak =\int(x-E[x])^2px(x)dx$   & 
+		$var(\widetilde{X})=E[|\widetilde{X}-E[\widetilde{X}]|^2]  =\int |\widetilde{x}-E[\widetilde{X}]|^2pU,V(u,\upsilon)dud\upsilon$ \\
+		\hline
+		Нормальное распределение &
+		$px(x)=\frac{1}{\sqrt{2\pi\sigma^2}} exp [-\frac{1}{2\sigma^2}(x-\mu)^2]$  
+		& $p\widetilde{x}(\widetilde{x})=\frac{1}{\sqrt{2\pi\sigma^2}} exp [-\frac{1}{2\sigma^2}|\widetilde{x}-\widetilde{\mu}|^2]$	\\
+		\hline
+		Свертка & $cov(X,Y)=E[(X-E[X])(Y-E[Y])]$  
+		& $cov(X,Y)=E[(\widetilde{X}-E[\widetilde{X}])(\widetilde{Y}-E[\widetilde{Y}])]$ \\
+		\hline
+		Произвольный вектор &$X=[X_1X_2...X_L]^T$            
+		&$X=[\widetilde{X}_1\widetilde{X}_2...\widetilde{X}_L]^T$ \\
+		\hline
+		Среднее значение вектора &$E[X]=[E[X_1]E[X_2]...E[X_L]]^T$ 
+		&$E[\widetilde{X}]=[E[\widetilde{X}_1]E[\widetilde{X}_2]...E[\widetilde{X}_L]]^T$ 
+		\\
+		\hline
+		Матрица свертки  &$C_x=E[(X-E[X])(X-E[X])^T]$ $(C_x^T =C_x)$    
+		&$C_x=E[(X-E[X])(X-E[X])^H]$ $(C_x^H =C_x)$ \\
+		\hline
+		Многомерное нормальное распределение &$px(x)=\frac{1}{(2\pi)^(L/2) det^(1/2)(C_x)}$ $.exp[\frac{1}{2}(x-\mu)^T C_x^(-1)(x-\mu)]$  
+		&$p\widetilde{x}(\widetilde{x})=\frac{1}{(\pi)^L det(C_x)}$ 
+		\linebreak
+		$.exp[-(\widetilde{x}-\widetilde{\mu})^H C_x^(-1)(\widetilde{x}-\widetilde{\mu})]$ \\
+		\hline
+		Автокорреляция &$r_x[k]=E[x[n]x[n+k]]$        
+		&  $r_x[k]=E[x^*[n]x[n+k]]$ \\
+		\hline
+		Cпектральная плотность мощности & $P_x(f)=\Sigma_k^\infty=\infty r_x[k](-j2\pi fk)$  
+		$(P(-f)=P_x(f))$               
+		& $P_x(f)=\Sigma_k^\infty=\infty r_x[k](-j2\pi fk)$ \\
+		\hline
+		Аддитивный белый гауссовский шум & $w{[}n{]}$                       
+		&$\widetilde{w}[n]=u[n]+j\upsilon[n]  
+		(u[n),\upsilon[n]$ \linebreak) \\
+		\hline
+		Авторегрессионный метод &
+		$x[n]=-\Sigma_k^p a[k]x[n-k]+u[n] (u[n] is WGN)$
+		& $\widetilde{x}[n]=-\Sigma_k^p a[k]\widetilde{x}[n-k]+\widetilde{u}[n]$  \linebreak  
+		($a[k]^s$ complex and $u[n]$ is CWGN) \\
+		\hline
+		\hline
+	\end{tabular}
+\end{table}
+
 
 
 

@@ -1,3 +1,4 @@
+\captionsetup[figure]{labelformat=simple, labelsep=period}
 \section{Общие положения}
 
 \subsection{Цель, объект и предмет исследования}
@@ -17,7 +18,7 @@
 		\item Развитие математической модели многотональных сигналов в части расчета точности оценки амплитуды применительно к используемому при оценке параметров гармоник подходу, связанному с применением оконных функций.
 		\item Разработка численных методов для оценки параметров гармоник, позволяющих достичь расчетной точности для амплитуды гармоники.
 		\item Разработка алгоритмов для эффективного выполнения численных методов из предыдущей задачи.
-		\item Разработка комплекса программа для анализа и доработки алгоритмов оценки параметров гармоник многотональных сигналов.
+		\item Разработка комплекса программ для анализа и доработки алгоритмов оценки параметров гармоник многотональных сигналов.
 	\end{enumerate}
 \end{frame}
 
@@ -42,7 +43,7 @@
 \section{Математическая модель многотонального сигнала}
 \subsection{Ограничение ДПФ}
 \begin{frame}{Ограничение ДПФ}
-\begin{tabular}{m{0.5\linewidth}m{0.55\linewidth}}
+\begin{tabular}{m{0.5\linewidth}m{0.54\linewidth}}
 \textbf{Модель сигнала}:	
 \begin{equation}
 \label{eq:equation1}
@@ -73,33 +74,34 @@ s(t) = \displaystyle\sum_{k=0}^{N-1} A_k \cos \left({\frac{2 \pi}{T_s} f_{peak} 
 \begin{minipage}[t]{0.47\linewidth}
 	\centering 
 	\textbf{Прямоугольное окно}
-	\includegraphics[width=.9\linewidth]{Rectangular windows.png}
+	\includegraphics[width=.9\linewidth]{Прямоугольное окно230421.png}
 	\textbf{Окно Кайзера}
-	\includegraphics[width=.9\linewidth]{Kaiser window.png}		
+	\includegraphics[width=.9\linewidth]{ОкноКазера230421.png}		
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.47\linewidth}
 	\centering 
 	\textbf{Спектр с прям-ым окном}
-	\includegraphics[width=.9\linewidth]{Influence_of_the_Rectangular_Window_on_the_Signal_Spectrum.png}
+	\includegraphics[width=.9\linewidth]{ПрямоугольныйСпект230421.png}
 	\textbf{Спектр с окном Кайзера}
-	\includegraphics[width=.9\linewidth]{Influence_of_the_Kaiser_window_on_the_Signal_Spectrum.png}
+	\includegraphics[width=.9\linewidth]{СпектрОкняКайзера230421.png}
 \end{minipage}
 \end{frame}
 
 \begin{frame}{Методы интерполирования спектра}
 \begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
+\small{
 \begin{itemize}	
-	\item метод Якобсена;
-	\item два метода Квина;
-	\item два метода Маклеода;
-	\item метод Грэндка;
-	\item алгоритм параболической интерполяции;
-	\item алгоритм интерполяции Гаусса;
-	\item алгоритм, рекомендованный в ГОСТ 30804.4.7-2003;
-	\item метод корреляционных функций;
+	\item Метод Якобсена;
+	\item Два метода Квина;
+	\item Два метода Маклеода;
+	\item Метод Грэндка;
+	\item Алгоритм параболической интерполяции;
+	\item Алгоритм интерполяции Гаусса;
+	\item Алгоритм, рекомендованный в ГОСТ 30804.4.7-2003;
+	\item Метод корреляционных функций;
 	\item Модернизированный метод корреляционных функций.				
-\end{itemize}
+\end{itemize}}
 &	
 %\textbf{Разность между дискретными гармониками:}
 \begin{equation}
@@ -113,20 +115,20 @@ s(t) = \displaystyle\sum_{k=0}^{N-1} A_k \cos \left({\frac{2 \pi}{T_s} f_{peak} 
 \end{equation}
 \begin{equation}
 	\label{eq:equation8}
-	f=f_{peak} \cdot \frac{f_s}{N}
+	f_{tone} = f_{peak} \cdot \frac{f_s}{N}
 \end{equation}
-\begin{equation}
-	\label{eq:equation4}
-	u(f_k-1) = a \cdot (f_k-1-\bigtriangleup f)^2 + b
-\end{equation}
-\begin{equation}
-	\label{eq:equation5}
-	u(f_k) = a \cdot (f_k-\bigtriangleup f)^2+b,
-\end{equation}
-\begin{equation}
-	\label{eq:equation6}
-	u(f_k+1) = a\cdot (f_k+1-\bigtriangleup f)^2 +b
-\end{equation}
+%\begin{equation}
+%	\label{eq:equation4}
+%	u(f_k-1) = a \cdot (f_k-1-\bigtriangleup f)^2 + b
+%\end{equation}
+%\begin{equation}
+%	\label{eq:equation5}
+%	u(f_k) = a \cdot (f_k-\bigtriangleup f)^2+b,
+%\end{equation}
+%\begin{equation}
+%	\label{eq:equation6}
+%	u(f_k+1) = a\cdot (f_k+1-\bigtriangleup f)^2 +b
+%\end{equation}
 \end{tabular}
 \end{frame}
 
@@ -217,32 +219,33 @@ var(\hat{\varphi})\geq \frac{2(2N-1)}{\eta N(N+1)}
 
 \begin{frame}{Нахождение дисперсии результата оценки амплитуды}
 \begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
-% ПЕРЕДЕЛАТЬ СЛАЙД
-\textcolor{red}{\textbf{Граница Крамера-Рао для величины $\alpha$}:
+\textbf{Изменение дисперсии шума:}
 \begin{equation}
 \label{eq:equation19}
-var(\theta)\geq \frac{\left(\frac{\delta^2 g}{\delta\theta}\right)}{-E\left[\frac{\delta^2 ln p(x;\theta)}{\delta \theta^2}\right]^{'}}
+w g N_i = w_i \cdot w g N_i
 \end{equation}
-\textbf{Значение нулевой гармоники сигнала для оконной функции:}
+${\sigma^2}' = (w_i \cdot w g N_i - 0)^2=$
 \begin{equation}
-\label{eq:equation20}
-w_0= \frac{\sum_{n=0}^{N-1} w_n}{N}.	  
-\end{equation}}
+\label{eq:equation19}
+(w_i \cdot w g N_i)^2 =\frac{\displaystyle\sum_{i=1}^{N-1} w_i^2}{N} \cdot \sigma^2
+\end{equation}
+\textbf{При изменении оцениваемой величины $\alpha=g(\theta)$ дисперсия изменяется:}
+
 &
-\textcolor{red}{\begin{equation}
-\label{eq:equation21}
-A^{'}=\frac{A}{w_0} ,		  
-\end{equation}
-Величина $\theta$ с известной границей Крамера-Рао это $A$, 
-величина $\alpha$  с неизвестной границей $A^{'}$
 \begin{equation}
-\label{eq:equation22}
-g(\theta)=\frac{\theta}{w_0}
+	\label{eq:equation19}
+	var (\alpha) = \frac{ \left({\frac{\partial^2 g}{\partial \theta}}\right)^2}{-E \left(\frac{\partial ^2 \ln P(x; \theta)}{\partial \theta^2} \right) }
 \end{equation}
+\textbf{В нашем случае:}
 \begin{equation}
-\label{eq:equation23}
-\left(\frac{\delta^2 g}{\delta \theta}\right)^2=\frac{1}{w_0^2}
-\end{equation}}
+\label{eq:equation19}
+A'= \frac{A}{w_0}
+\end{equation}
+\textbf{Получаем:}
+\begin{equation}
+	\label{eq:equation19}
+	var(A)= \frac{2\sigma^2}{N}\cdot \frac{N}{\displaystyle\sum_{i=1}^{N-1} w_i^2}
+\end{equation}
 \end{tabular}
 \end{frame}
 
@@ -402,26 +405,6 @@ $A$ – амплитуда гармоники.
 	\end{minipage}
 \end{frame}
 
-%\begin{frame}{Сравнение корреляционных методов}
-%	\begin{tabular}{llll}
-%		\toprule Интерполирование: &
-%		спектра & 
-%		двойное &
-%		сигнала\\ 
-%		\midrule
-%		Точность &
-%		Не высокая & 
-%		Высокая &
-%		Наивысшая\\ 
-%		\midrule
-%		Быстродействие &
-%		Высокое & 
-%		Среднее &
-%		Низкое \\ 
-%		\midrule		
-%	\end{tabular}
-%\end{frame}
-
 \subsection{Поиск гармоник}
 \begin{frame}{Алгоритм поиска гармоник}
 %	\textsc{ГСА алгоритма поиска гармоник из зарегистрированной программы}
@@ -470,76 +453,147 @@ $A$ – амплитуда гармоники.
 	\end{block}
 \end{frame}
 
-\begin{frame}{Анализ быстродействия}
-	\begin{block}{}
-		\begin{minipage}[t]{0.47\linewidth}
-			\centering \textcolor{blue}{\textbf{Прямой метод}}
-			%\textsc{Найти график, желательно с CUDA}	
-			\begin{figure}[ht]
-			\centering
-			\includegraphics [scale=0.25] {CUDA.PNG}
-			%\caption{CUDA.}
-			\label{img:CUDA}
-			\end{figure}			
-			\textcolor{blue}{\textit{Не подходит для встроенных систем}}
-		\end{minipage}
-		\begin{minipage}[t]{0.47\linewidth}
-			\centering \textcolor{blue}{\textbf{Sparse FFT}}
-			%\textsc{График с сайта}		
-			\begin{figure}[ht]
-				\centering
-				\includegraphics [scale=0.2] {Sparse_Fourier_Transform_Performance.png}
-				%\caption{Sparse FFT.}
-				\label{img:Sparse_Fourier_Transform_Performance}
-			\end{figure}
-			\textcolor{blue}{\textit{Не работает с интерполированными сигналами}}
-		\end{minipage}
-	\end{block}
-	\hfil
-	\begin{block}{}
-		\begin{minipage}[t]{0.47\linewidth}
-			\centering \textcolor{blue}{\textbf{Быстрая корреляция}}
-			%\textsc{Найти график}	
-			\begin{figure}[ht]
-			\centering
-			\includegraphics [scale=0.25] {Прямая_корреляция2.PNG}
-			%\caption{Быстрая корреляция.}
-			\label{img:Прямая_корреляция}
-			\end{figure}			
-			\textcolor{blue}{\textit{Высокое быстродействие при малом коэффициенте интерполирования}}	
-		\end{minipage}
-		\begin{minipage}[t]{0.47\linewidth}
-			\centering \textcolor{blue}{\textbf{Pruned БПФ}}
-			%\textsc{Найти график}	
-			\begin{figure}[ht]
-			\centering
-			\includegraphics [scale=0.2] {Pruned_DFT.PNG}
-			%\caption{Pruned БПФ.}
-			\label{img:Pruned_DFT}
-			\end{figure}			
-			\textcolor{blue}{\textit{Относительно высокое быстродействие, слабо зависит от коэффициента интерполирования}}	
-		\end{minipage}
-	\end{block}
-\end{frame}
 
 \begin{frame}{Использование корреляции}
+\begin{tabular}{m{0.45\linewidth}m{0.49\linewidth}}
+	\begin{figure}[ht]
+		\centering
+		\includegraphics [scale=0.5] {Using_correlation.pdf}
+		\caption{Использование корреляции.}
+		\label{img:Using_correlation}
+	\end{figure}
+&
+\begin{equation}
+\label{eq:equation3.10}
+j = 0, 1, \cdots M-1
+\end{equation}
+\begin{equation}
+\label{eq:equation3.10}
+f_j = \frac{\left| f_{max}- f_{max'} \right| }{M} + f_{max'}
+\end{equation}
+\begin{equation}
+\label{eq:equation3.10}
+A_j = 
+\displaystyle\sum_{k=0}^{M-1} x(k) \cdot \exp \left( -f_j \cdot \frac{2 \pi k}{N}\right) 
+\end{equation}
+
+$f_{max}$ -- частота гармоники ДПФ с наибольшей амплитудой.
+
+$f_{max}'$ -- частота гармоники ДПФ со 2 по величине амплитуде.
+\end{tabular}
 \end{frame}
 
 \begin{frame}{Pruned FFT}
+\begin{tabular}{m{0.45\linewidth}m{0.49\linewidth}}
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.3] {Pruned_FFT.pdf}
+	\caption{Исходный сигнал.}
+	\label{img:Pruned_FFT}
+\end{figure}
+\textbf{Матричная форма:}
+\tiny{
+\begin{center}
+	$\longrightarrow N$	
+\end{center}
+\begin{equation}
+\label{eq:equation111}
+\downarrow K 
+	\begin{pmatrix}
+	X_{0} & X_{1} & \cdots & X_{n-1} \\
+	X_{N} & X_{n+1} & \cdots & X_{2n-1} \\
+	\vdots  & \vdots  & \ddots & \vdots  \\
+	X_{N(k-1)} & \cdots & \cdots & X_{N(k-1)} 
+	\end{pmatrix}
+\Bigg \} {\text{НУЛИ}}
+\end{equation}} 
+&
+\textbf{Обобщаем алгоритм Кули-Тьюки:}
+\begin{enumerate}
+	\item Вычисляем БПФ столбцов;
+	\item Умножаем на поворачивающие множители;
+	\item Вычисляем БПФ строк.
+\end{enumerate}
+\textbf{Pruned FFT}
+\begin{itemize}
+	\item Не требует $1$-й стадии вычислений;
+	\item Сложность алгоритма $N \cdot \log(N) \cdot K$;
+	\item Сложность растет линейно с ростом $K$.
+\end{itemize}
+\end{tabular}
+\end{frame}
+
+%\begin{frame}{Анализ быстродействия}
+%	\begin{block}{}
+%		\begin{minipage}[t]{0.47\linewidth}
+%			\centering \textcolor{blue}{\textbf{Прямой метод}}
+%			%\textsc{Найти график, желательно с CUDA}	
+%			\begin{figure}[ht]
+%				\centering
+%				\includegraphics [scale=0.27] {CUDA.PNG}
+%				%\caption{CUDA.}
+%				\label{img:CUDA}
+%			\end{figure}			
+%			%\textcolor{blue}{\textit{Не подходит для встроенных систем}}
+%		\end{minipage}
+%		\begin{minipage}[t]{0.47\linewidth}
+%			\centering \textcolor{blue}{\textbf{Sparse FFT}}
+%			%\textsc{График с сайта}		
+%			\begin{figure}[ht]
+%				\centering
+%				\includegraphics [scale=0.25] {Sparse_Fourier_Transform_Performance.png}
+%				%\caption{Sparse FFT.}
+%				\label{img:Sparse_Fourier_Transform_Performance}
+%			\end{figure}
+%			%\textcolor{blue}{\textit{Не работает с интерполированными сигналами}}
+%		\end{minipage}
+%	\end{block}
+%	\hfil
+%	\begin{block}{}
+%		\begin{minipage}[t]{0.47\linewidth}
+%			\centering \textcolor{blue}{\textbf{Быстрая корреляция}}
+%			%\textsc{Найти график}	
+%			\begin{figure}[ht]
+%				\centering
+%				\includegraphics [scale=0.3] {Прямая_корреляция2.PNG}
+%				%\caption{Быстрая корреляция.}
+%				\label{img:Прямая_корреляция}
+%			\end{figure}			
+%			%\textcolor{blue}{\textit{Высокое быстродействие при малом коэффициенте интерполирования}}	
+%		\end{minipage}
+%		\begin{minipage}[t]{0.47\linewidth}
+%			\centering \textcolor{blue}{\textbf{Pruned БПФ}}
+%			%\textsc{Найти график}	
+%			\begin{figure}[ht]
+%				\centering
+%				\includegraphics [scale=0.25] {Pruned_DFT.PNG}
+%				%\caption{Pruned БПФ.}
+%				\label{img:Pruned_DFT}
+%			\end{figure}			
+%			%\textcolor{blue}{\textit{Относительно высокое быстродействие, слабо зависит от коэффициента интерполирования}}	
+%		\end{minipage}
+%	\end{block}
+%\end{frame}
+
+\begin{frame}{Анализ быстродействия}
+	\begin{minipage}[t]{0.43\linewidth}
+	\centering 
+	\textbf{Быстрая корреляция}
+	\includegraphics[width=.9\linewidth]{Direct correlation.pdf}
+	\textbf{Pruned БПФ}
+	\includegraphics[width=.9\linewidth]{Pruned_DFT.PNG}		
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.43\linewidth}
+	\centering 
+	\textbf{Прямой метод}
+	\includegraphics[width=.9\linewidth]{CUDA.pdf}
+	\textbf{Sparse FFT}
+	\includegraphics[width=.9\linewidth]{Sparse Fourier Transform.pdf}
+\end{minipage}
 \end{frame}
 
 
-%\begin{frame}{Библиотека SFFT}
-%\end{frame}
-
-%\begin{frame}{Разряженное FFT}
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics [scale=0.7] {Sparse_Fourier_Transform_Performance}
-%	\caption{Производительность разреженного преобразования Фурье.}
-%	\label{img:picture3}
-%\end{figure}	
-%\end{frame}
 
 \section{Заключение}
 
@@ -580,20 +634,19 @@ $A$ – амплитуда гармоники.
 		
 	\item Альтман Е.~А., Васеева Т.~В., Александров А. В. Оценка сложности алгоритма БПФ при моделировании его работы // Инновации в информационных технологиях, машиностроении и автотранспорте. – $2019$. – С. $116$-$118$.
 	
-	
 	\item Альтман Е.~А., Александров А.~В., Васеева Т.~В. Современные информационные технологии разработки программ для обработки радиотехнических сигналов на примере БПФ // Надежность функционирования и информационная безопасность инфокоммуникационных, телекоммуникационных и радиотехнических сетей и систем. – $2019$. – С. $132$-$139$.
 	
 	\item Васеева Т.~В., Альтман Е.~А., Елизаров Д.~А. Сравнительный анализ методов определения параметров гармоник сигнала электрической сети // Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2019$. – С. $261$-$267$.
 
 	\item Васеева Т.~В., Альтман Е.~А., Александров А.~В. Сравнительный анализ применения алгоритмов определения частоты при оценке гармоник в электрических сетях // Системы управления, информационные технологии и математическое моделирование. – $2019$. – С. $61$-$66$.
-
-	\item Альтман Е.~А., Васеева Т.~В., Александров А.~В. Кэш-ориентированный алгоритм для вычисления многомерной корреляции // Проблемы машиноведения. – $2019$. – С. $385$-$389$.
 \end{itemize}}
 \end{frame}
 
 \begin{frame}{Результаты работы}
 \scriptsize{
 \begin{itemize}
+	\item Альтман Е.~А., Васеева Т.~В., Александров А.~В. Кэш-ориентированный алгоритм для вычисления многомерной корреляции // Проблемы машиноведения. – $2019$. – С. $385$-$389$.
+	
 	\item Малютин А. Г. и др. Математическое моделирование, численные методы и комплексы программ для решения задач обработки сигналов и анализа структуры информационной системы. – 2018.
 	
 	\item Васеева Т.~В., Альтман Е.~А., Малютин А.~Г. Применение быстрых алгоритмов для выполнения фильтрации изображений // Современные проблемы радиоэлектроники. – $2018$. – С. $162$-$165$.
@@ -604,15 +657,15 @@ $A$ – амплитуда гармоники.
 	
 	\item Александров А.~А., Васеева Т.~В., Ананьева Н.~Г. Оценка эффективности алгоритма корреляции для различных аппаратных платформ // Тезисы $XIX$ Всероссийской конференции молодых учёных по математическому моделированию и информационным технологиям. – $2018$. – С. $54$-$54$.
 	
-	\item Васеева Т.~В., Альтман Е.~А., Елизаров Д.~А. Информационно-измерительная система для анализа гармоник сигнала в электрической сети // САПР и моделирование в современной электронике. – $2018$. – С. $131$-$135$.
-	
-	\item Васеева Т.~В., Александров А.~В. Реализация алгоритмов вычисления корреляции для диагностирования подвижного состава методами корреляционного анализа // Технологическое обеспечение ремонта и повышение динамических качеств железнодорожного подвижного состава. – $2017$. – С. $138$-$142$.
+	\item Васеева Т.~В., Альтман Е.~А., Елизаров Д.~А. Информационно-измерительная система для анализа гармоник сигнала в электрической сети // САПР и моделирование в современной электронике. – $2018$. – С. $131$-$135$.	
 \end{itemize}}
 \end{frame}
 
 \begin{frame}{Результаты работы}
 \scriptsize{
 \begin{itemize}
+	\item Васеева Т.~В., Александров А.~В. Реализация алгоритмов вычисления корреляции для диагностирования подвижного состава методами корреляционного анализа // Технологическое обеспечение ремонта и повышение динамических качеств железнодорожного подвижного состава. – $2017$. – С. $138$-$142$.
+	
 	\item Терентьева А.~В., Васеева Т.~В., Кильдибеков А.~Б. Алгоритм детектирования лиц в различных ракурсах и наклонах // Инновационные проекты и технологии в образовании, промышленности и на транспорте. – $2017$. – С. $250$-$255$.
 	
 	\item Васеева Т.~В., Альтман Е.~А. Распознавание границ движущихся объектов методами компьютерного зрения // Информационно-телекоммуникационные системы и технологии. – $2017$. – С. $304$-$306$.
