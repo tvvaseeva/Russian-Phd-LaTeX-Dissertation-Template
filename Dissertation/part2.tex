@@ -459,8 +459,50 @@ $T_{s}$ -- период.
 Предложенная формула \ref{eq:equation7} оценки дисперсии белого шума после наложения на него окна \cite{altman2020boundary} может использоваться при выборе любой из рассмотренных оконных функций для решения задач спектрального анализа. Точность получаемой оценки амплитуды является наиболее значимым критерием.
 Формула \ref{eq:equation11} оценки дисперсии амплитуды \cite{altman2020boundary} дает наилучший результаты при выборе весовых функций: Кайзера ($\beta=4$), Хэмминга, Барлетта. Так как результаты расчетов по формуле и результаты моделирование близки к границе Крамера-Рао. Зависимость дисперсии оценки амплитуды от дисперсии шума (табл. 2) показывают, что чем меньше коэффициент увеличения дисперсии, тем точнее результаты. Наихудший результат показало окно Кайзера с параметром $\beta=15$.
 
+\section{Алгоритмы оценки частот гармоник} \label{sec:ch2/sec5}
+Исследованы методы оценки спектральных составляющих:
+\begin{enumerate}
+\item	Метод Якобсена (Jacobsen's Modified Quadratic Estimator)\cite{4205098, jacobsen1994local, jacobsen2007fast, ericjacobsen_cite};
+\item	Два метода Квина (Quinn's Estimator, Quinn's Second Estimator)\cite{558515, 295186, 330402};
+\item	Два метода Маклеода (Macleod's Estimator) \cite{651200, 1055282};
+\item	Метод Грэндка (Grandke's method) \cite{4315077};
+\item	Алгоритм параболической интерполяции (Parabolic Interpolation) \cite{Konopatskiy_2020, LACHANCE1991143, gasior2004improving, 7818824};
+\item	Алгоритм интерполяции Гаусса (Gaussian Interpolation) \cite{gasior2004improving, gu2005leaf, gilboa2014image};
+\item	Алгоритм, рекомендованный в ГОСТ 30804.4.7-2013 \cite{GOST30804.4.7-2013};
+\item	Метод корреляционных функций (Correlation function method) \cite{Altman2012definition, Altman2012promotion, Altman2012improvement, WANG20175}.
+\item Модернизированный метод корреляционных функций (Modernized method of correlation functions) \cite{Altman2012promotion, Elizarov2016analysis, Increase_Accuracy_Yelizarov2014}.
+\end{enumerate}
+%B. G. Quinn, "Estimation of frequency, amplitude, and phase from the DFT of a time series," in IEEE Transactions on Signal Processing, vol. 45, no. 3, pp. 814-817, March 1997, doi: 10.1109/78.558515.
+% B. G. Quinn, "Estimating frequency by interpolation using Fourier coefficients," in IEEE Transactions on Signal Processing, vol. 42, no. 5, pp. 1264-1268, May 1994, doi: 10.1109/78.295186.
+% B. G. Quinn and P. J. Kootsookos, "Threshold behavior of the maximum likelihood estimator of frequency," in IEEE Transactions on Signal Processing, vol. 42, no. 11, pp. 3291-3294, Nov. 1994, doi: 10.1109/78.330402.
 
-\section{Вывод по разделу} \label{sec:ch2/sec5}
+% D. Rife and R. Boorstyn, "Single tone parameter estimation from discrete-time observations," in IEEE Transactions on Information Theory, vol. 20, no. 5, pp. 591-598, September 1974, doi: 10.1109/TIT.1974.1055282.
+% M. D. Macleod, "Fast nearly ML estimation of the parameters of real or complex single tones or resolved multiple tones," in IEEE Transactions on Signal Processing, vol. 46, no. 1, pp. 141-148, Jan. 1998, doi: 10.1109/78.651200.
+
+
+%T. Grandke, "Interpolation Algorithms for Discrete Fourier Transforms of Weighted Signals," in IEEE Transactions on Instrumentation and Measurement, vol. 32, no. 2, pp. 350-355, June 1983, doi: 10.1109/TIM.1983.4315077.
+
+%Konopatskiy E. V., Bezditnyi A. A. Geometric modeling of multifactor processes and phenomena by the multidimensional parabolic interpolation method //Journal of Physics: Conference Series. – IOP Publishing, 2020. – Т. 1441. – №. 1. – С. 012063.
+% S. Djukanović, T. Popović and A. Mitrović, "Precise sinusoid frequency estimation based on parabolic interpolation," 2016 24th Telecommunications Forum (TELFOR), 2016, pp. 1-4, doi: 10.1109/TELFOR.2016.7818824.
+
+
+% Gasior M., Gonzalez J. L. Improving FFT frequency measurement resolution by parabolic and Gaussian spectrum interpolation //AIP Conference Proceedings. – American Institute of Physics, 2004. – Т. 732. – №. 1. – С. 276-285.
+% Gu X., Du JX., Wang XF. (2005) Leaf Recognition Based on the Combination of Wavelet Transform and Gaussian Interpolation. In: Huang DS., Zhang XP., Huang GB. (eds) Advances in Intelligent Computing. ICIC 2005. Lecture Notes in Computer Science, vol 3644. Springer, Berlin, Heidelberg. https://doi.org/10.1007/11538059_27
+% Gilboa E. et al. Image interpolation and denoising for division of focal plane sensors using Gaussian processes //Optics express. – 2014. – Т. 22. – №. 12. – С. 15277-15291.
+
+% Альтман Е. А., Елизаров Д. А. Повышение точности оценки параметров сигналов в электрической сети в системе тягового электроснабжения //Известия Транссиба. – 2012. – №. 3 (11).
+% Wang Z. et al. Nonlinearity-tolerant OSNR estimation method based on correlation function and statistical moments //Optical Fiber Technology. – 2017. – Т. 39. – С. 5-11.
+
+% Елизаров Д. А. Анализ методов оценки гармонических составляющих напряжения в электроэнергетических системах //Омский научный вестник. – 2016. – №. 2 (146).
+
+Алгоритмы являются интерполяционными для нахождения параметров гармоник, кроме трех последних методов (метод корреляционных функций, модернизированный метод корреляционных функций и метод по ГОСТу). Сутью метода интерполирования является нахождение промежуточных значений величины по имеющемуся дискретному набору известных значений, то есть кривая построенной функции должна точно пройти через имеющиеся точки данных.
+
+В результате анализа выявлено, что метод корреляционных функций
+наиболее точен, но использует большее количество математических операций,
+поэтому требует большего времени на выполнение.
+
+
+\section{Вывод по разделу} \label{sec:ch2/sec6}
 \begin{enumerate}
 \item  Математической основой для анализа спектра сигналов является преобразование Фурье. Для дискретных сигналов применяется дискретное преобразование Фурье.
 
@@ -474,6 +516,9 @@ $T_{s}$ -- период.
 
 \item   Алгоритмы для нахождения оптимальной несмещенной оценки параметров могут быть построены на основе методов оптимального приема, изучаемых в радиотехники, в частости, с помощью корреляционного анализа.
 \end{enumerate}
+
+
+
 
 
 %\section{Многопоточность} \label{sec:ch2/sec2}

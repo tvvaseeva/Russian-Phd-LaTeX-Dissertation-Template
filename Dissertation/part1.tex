@@ -420,7 +420,6 @@ $s[n;\theta]$ -- детерминированный сигнал.
 	\sigma^2 = 10^{- \frac{SNR}{10}}
 \end{equation}
 
-Неравенство Крамера-Рао для амплитуды, частоты и фазы гармоник.
 Матрицу Фишера можно представить в виде формулы:
 \begin{equation}
 	\label{eq:equation15}
@@ -431,16 +430,18 @@ $s[n;\theta]$ -- детерминированный сигнал.
 		0 & A^2 \pi \displaystyle\sum_{n=0}^{N-1} n & \dfrac{NA^2}{2}
 	\end{bmatrix}
 \end{equation}
+Неравенство Крамера-Рао для амплитуды:
 \begin{equation}
 	\label{eq:equation16}
 	var(\hat{A})\geq \frac{2  \sigma^2}{N} 
 \end{equation}
-
+Неравенство Крамера-Рао для частоты:
 \begin{equation}
 	\label{eq:equation17}
 	var(\hat{f_0})\geq \frac{12}{(2\pi)^2 \eta  N(N^2 - 1)}  
 \end{equation}
 %(3.41), C.34
+Неравенство Крамера-Рао для фазы гармоник:
 \begin{equation}
 	\label{eq:equation18}
 	var(\hat{\varphi})\geq \frac{2(2N-1)}{\eta N(N+1)}  
@@ -492,9 +493,6 @@ $s[n;\theta]$ -- детерминированный сигнал.
 	\label{img:Fundamental frequency offset versus noise level}
 \end{figure}
 
-Разница между действительными и комплексными значениями представлена в приложении \ref{app:И}
-% C.508 Fundamentals of Statistical Signal Processing, Volume III_ Practical Algorithm Development - Steven M. Kay
-
 
 \section{Обзор обнаружения и измерения гармоник в энергосистеме} \label{sec:ch1/sec4}
 % Durdhavale S. R., Ahire D. D. A review of harmonics detection and measurement in power system //International Journal of Computer Applications. – 2016. – Т. 143. – №. 10. – С. 42-45.
@@ -503,14 +501,14 @@ $s[n;\theta]$ -- детерминированный сигнал.
 
 \begin{equation}
 	\label{eq:equation1.11}
-	fh = n * fundamental frequency
+	fh = n * f
 \end{equation} 
 
 где $fh$ – порядок гармоник;
 
 $n$ – целое число;
 
-основная частота – равна $50$~Гц или $60$~Гц.
+f – основная частота, которая равна $50$~Гц или $60$~Гц.
 
 Если система имеет основную частоту $60$~Гц, то ее вторая и третьи гармоники будут иметь частоты $120$~Гц и $180$~Гц соответственно.
 % 10. Harmonics Detection and Filtering [Электронный ресурс] / Life is on. – Электрон.текстовые дан. Режим доступа: https://www.se.com/ww/en/download/document/DBTP152GUI_EN/
@@ -542,12 +540,12 @@ $f1$ – основная амплитуда тока.
 	THC = \sqrt{\displaystyle\sum_{n=2}^{n=40} Ih^2}
 \end{equation} 
 
-Общий гармонический ток искажения (THDi – Total Harmonic Distortion Current) -- это значение дает общее гармоническое искажение формы волны. Это значение можно рассчитать, взяв отношение THC к основному току. Это может быть дано как:
-
+Общий гармонический ток искажения (THDi – Total Harmonic Distortion Current) -- это значение дает общее гармоническое искажение формы волны. Это значение можно рассчитать, взяв отношение Обшего гармонического тока (THC) к основному току:
 \begin{equation}
 	\label{eq:equation1.14}
 	THDi = \frac{\sqrt{\displaystyle\sum_{n=2}^{n=40} Ih^2}}{I1} = \frac{THC}{I1}
 \end{equation} 
+
 где $I1$ – основной ток.
 
 Общее гармоническое искажение напряжения (THDv – Total Harmonic Distortion of Voltage) показывает общую величину искажения в напряжении. Его можно рассчитать путем вычисления отношения гармонического напряжения к основному напряжению. Это можно записать как:
@@ -605,16 +603,270 @@ $V1$ – основная амплитуда напряжения.
 
 Сбои низкого уровня в автоматических выключателях, вызванные высокой степенью тока гармонической нагрузки. Высокие значения при пересечении нуля для синусоидальной формы волны делают комплекс разрушения для искажения нагрузки. Следовательно, токи гармонической нагрузки приводят к отказам цепи.
 
-%\section{Оценка гармоник в реальном времени по мощности системы} \label{sec:ch1/sec5}
+\section{Улучшенный алгоритм частоты путем развертывания фазы методом наименьших квадратов} \label{sec:ch1/sec5}
+
+% Zhou S., Shancong Z. Improved frequency estimation algorithm by least squares phase unwrapping //Circuits, Systems, and Signal Processing. – 2018. – Т. 37. – №. 12. – С. 5680-5687.
+
+Оценка частоты сложной синусоидальной формы является фундаментальной проблемой в обработке сигналов и находит применение во многих областях \cite{zhou2018improved}. Модель сигнала можно представить в виде формулы:
+
+\begin{equation}
+	\label{eq:equation1.41}	
+	y(n)=Ae^{j2 \pi(\theta+fn)}+ \omega(n), n = 0, 1, \cdots, N-1 
+\end{equation}
+
+где $f$  -- частота;
+
+$\theta$ -- фаза;
+
+$A$ -- амплитуда;
+
+$N$ -- количество выборок;
+
+$\omega(n) = \omega_I(n) + j\omega_Q(n)$ -- это комплексный белый гауссовский шум.
+
+S.~Tretter \cite{1057115} доказал, что фазовый шум приблизительно представляет собой белый гауссовский шум, и фаза может быть развернута. 
+% S. Tretter, "Estimating the frequency of a noisy sinusoid by linear regression (Corresp.)," in IEEE Transactions on Information Theory, vol. 31, no. 6, pp. 832-835, November 1985, doi: 10.1109/TIT.1985.1057115.
+Общая оценка развертки фазы была впервые предложена  S.~Kay \cite{kay1989fast}. Вычисляя первые разности аргументов $y(n)$, оценка параметра может рассматриваться как линейная задача. 
+% S. Kay, "A fast and accurate single frequency estimator," in IEEE Transactions on Acoustics, Speech, and Signal Processing, vol. 37, no. 12, pp. 1987-1990, Dec. 1989, doi: 10.1109/29.45547.
+Этот вид модели имеет простую структуру и хорошо работает при высоком отношении сигнал/шум (SNR). Но плохо работает при низком отношении сигнал/шум.
+
+В статье \cite{zhou2018improved} рассмотрен алгоритм улучшения частоты путем развертывания фазы методом наименьших квадратов (ILSPUE -- Improved Least Squares Phase Unwrapping Estimator). Алгоритм улучшения частоты путем развертывания фазы методом наименьших квадратов выполняет развертывание фазы по методу наименьших квадратов на основе новой фазовой модели. Фазовая модель более точная и имеет лучшую производительность.
+Аргумент $y(n)$, обозначенный $\angle y(n)$, имеет вид:
+\begin{equation}
+	\label{eq:equation1.42}	
+	\angle y(n)=2 \pi(\theta+fn+u_n)(mod2 \pi)
+\end{equation}
+
+где $u_n$ -- фазовый шум. 
+
+Пусть $Y_n = \dfrac{y(n)}{2 \pi}$, тогда:
+
+\begin{equation}
+	\label{eq:equation1.43}	
+	Y_n =<\theta+fn+u_n>
+\end{equation}
+
+где $<x> = x - [x]$ -- дробная часть $x$, а $[x]$ обозначает ближайшее к $x$ целое число. 
+
+Формулу \ref{eq:equation1.43} можно представить в виде:
+
+\begin{equation}
+	\label{eq:equation1.44}	
+	Y_n= \theta+fn+u_n-k_n
+\end{equation}
+
+где $kn =[\theta + fn + un]$.
+ 
+Для оценки развертывания фазы методом наименьших квадратов в \cite{mckilliam2010frequency, 7456233} фазовая модель \ref{eq:equation1.44} основана на модели из \cite{1057115}, а фазовый шум $u_n$ аппроксимируется как: $u_n=\dfrac{\omega_Q(n)}{(2 \pi A)}$
+% R. G. McKilliam, B. G. Quinn, I. V. L. Clarkson and B. Moran, "Frequency Estimation by Phase Unwrapping," in IEEE Transactions on Signal Processing, vol. 58, no. 6, pp. 2953-2963, June 2010, doi: 10.1109/TSP.2010.2045786.
+% Z. Xu, T. Lu and B. Huang, "Fast Frequency Estimation Algorithm by Least Squares Phase Unwrapping," in IEEE Signal Processing Letters, vol. 23, no. 6, pp. 776-779, June 2016, doi: 10.1109/LSP.2016.2555933.
+
+%S. Tretter, "Estimating the frequency of a noisy sinusoid by linear regression (Corresp.)," in IEEE Transactions on Information Theory, vol. 31, no. 6, pp. 832-835, November 1985, doi: 10.1109/TIT.1985.1057115.
+Поскольку $\omega_Q(n)$ -- это белый Гауссовский шум, $A$ -- константа, согласно \ref{eq:equation1.44} функцию суммы квадратов (SSF) можно представить:
+\begin{equation}
+	\label{eq:equation1.45}		
+	\sum_{n=0}^{N-1} (Y_n- \theta -fn +k_n)^2
+\end{equation}
+
+Оценка разворачивания фазы методом наименьших квадратов должна найти оптимальные $f$ и $\theta$ \ref{eq:equation1.44}.
+
+Усовершенствованная фазовая модель в \cite{6408166}, которая оказалась более точной, чем модель в \cite{1057115}. 
+%H. Fu and P. Kam, "Phase-Based, Time-Domain Estimation of the Frequency and Phase of a Single Sinusoid in AWGN—The Role and Applications of the Additive Observation Phase Noise Model," in IEEE Transactions on Information Theory, vol. 59, no. 5, pp. 3175-3188, May 2013, doi: 10.1109/TIT.2013.2238604.
+% S. Tretter, "Estimating the frequency of a noisy sinusoid by linear regression (Corresp.)," in IEEE Transactions on Information Theory, vol. 31, no. 6, pp. 832-835, November 1985, doi: 10.1109/TIT.1985.1057115.
+Используя эту фазовую модель для \ref{eq:equation1.44}, $u_n$ аппроксимируется как $u_n = \dfrac{\omega_Q(n)}{(2 \pi \sqrt{Arn})}$, где $rn = | y (n) |$ -- абсолютное значение $y(n)$. Учитывая, что $r_n$ является переменной, согласно \ref{eq:equation1.44}  улучшенная функция суммы квадратов (ISSF) задается как:
+\begin{equation}
+	\label{eq:equation1.46}	
+	S(f, \theta, k_n) = \sum_{n=0}^{N-1} r_n (Y_n- \theta -fn +k_n)^2
+\end{equation}
+
+Алгоритм улучшения частоты путем развертывания фазы методом наименьших квадратов должен найти наилучшие $f$ и $\theta$. На основе модернизированной линейно-фазовой модели улучшеной функция суммы квадратов \ref{eq:equation1.46} является точной и может быть получен наилучший результат оценки.
+
+Целевая функция \ref{eq:equation1.46} более точная, чем функция \ref{eq:equation1.45}. Учитывая, что $y(n) = r_ne^{ j2\pi (Y_n + k_n)}$, согласно \ref{eq:equation1.41} функция суммы квадратов равна $J(f, \theta, k_n)$ и является:
+
+$$
+J (f, \theta, k_n) = \sum_{n=0}^{N-1} (r_n \cos(2 \pi (Y_n+k_n)) -A\cos(2 \pi(\theta+fn)))^2
+$$
+
+\begin{equation}
+	\label{eq:equation1.47}		
+	+(r_n \sin(2\pi(Y_n+k_n))-A\sin(2\pi(\theta+fn)))^2 
+\end{equation}
+
+$$ = \sum_{n=0}^{N-1} r_n^2+A^2-2Ar_n\cos(2\pi(Y_n-\theta-fn+k_n))$$
+
+$$ \infty \sum_{n=0}^{N-1} -Ar_n\cos(2\pi(Y_n-\theta-fn+k_n))$$
+
+В условиях комплексного белого гауссовского шума $\omega (n), J(f, \theta, k_n) = \sum_{n=0}^{N-1}-Ar_n\cos(2\pi$
+$(Y_n-\theta-fn+k_n))$ 
+является точной целевой функцией без какого-либо приближения. Поскольку $J(f, \theta, k_n)$ соответствует нелинейной модели, мы должны приближенно обозначать. Применяя разложение Тейлора второго порядка к $J(f, \theta, k_n)$, получаем:
+
+$$
+J(f, \theta, k_n) \approx \sum_{n=0}^{N-1} -Ar_n+2\pi^2Ar_n(Y_n-\theta-fn+k_n)^2
+$$
+
+\begin{equation}
+	\label{eq:equation1.48}	
+	\infty \sum_{n=0}^{N-1} r_n (Y_N-\theta-FN+K_N)^2
+\end{equation}
+$$
+=S(f,\theta,k_n)
+$$
+
+Следовательно, $S (f, \theta, k_n)$ -- это приближение второго порядка для $J (f, \theta, k_n)$. Для \ref{eq:equation1.45} приближение выглядит как:
+
+$$
+J(f, \theta, k_n) \approx \sum_{n=0}^{N-1} -Ar_n+2\pi^2Ar_n(Y_n-\theta-fn+k_n)^2
+$$
+
+$$
+\infty \sum_{n=0}^{N-1} Ar_n (Y_N-\theta-FN+K_N)^2
+$$
+
+\begin{equation}
+	\label{eq:equation1.49}	
+	\approx \sum_{n=0}^{N-1} A^2(Y_n-\theta-fn+k_n)^2
+\end{equation}
+
+$$
+\infty \sum_{n=0}^{N-1} (Y_n-\theta-fn+k_n)^2
+$$
+
+Очевидно, что для \ref{eq:equation1.45} делается другое приблизительное значение. По сравнению с \ref{eq:equation1.45}, $S (f, \theta, k_nn)$ является более точной аппроксимацией (приблизительным значением) $J (f, \theta, k_n)$.
+
+Было доказано, что быстрая оценка разворачивания фазы методом наименьших квадратов (LSPUE) -- из \cite{7456233} имеет ту же производительность, что и оценка разворачивания фазы методом наименьших квадратов (LSPUE) из \cite{mckilliam2010frequency}, а вычислительная сложность составляет $O(N^2)$. Мы реализуем улучшенную оценку развертки фазы методом наименьших квадратов, используя этот алгоритм. 
+Для улучшенного алгоритма частоты путем развертывания фазы методом наименьших квадратов ключевая проблема состоит в том, как найти правильный $k_n$.
+% Учитывая, что и $f$, и $\theta$ находятся в $[−1/2,1/2)$, получаем $- N / 2 \leq \theta  + fn < N / 2$. Поскольку $k_n$ увеличивается с увеличением $n$, когда $f > 0$, и $k_n$ уменьшается с увеличением $n$, когда $f < 0$, мы определяем:
+
+\begin{equation}
+	\label{eq:equation1.50}	
+	k_{n}^{m} = \biggl[n \frac{m}{N}\biggl] < m \in \biggl\{-\frac{N}{2}, -\frac{N}{2}+1 \ldots , \frac{N}{2}-1 \biggl\}
+\end{equation}
+
+Для \ref{eq:equation1.50} мы определяем вектор $\textbf{k}^m = [k^m_0, k^m_1, \ldots, k^m_{N- 1}]^T$, и $k^m_n$ соответствует $k_n$ для данного $m$. Следовательно, существует $N$ векторов для $\textbf{k}^m$, соответствующих $N$ локальным решениям. Очевидно, $\textbf{k}^m$ соответствует сигналу с частотой $\frac{m}{N}$. Сначала мы проверяем $N$ решений, а затем находим лучшее решение с $N$ решениями. Для каждого $m$ ниже реализованы грубый поиск и точный поиск.
+
+Сначала делаем грубый поиск. Улучшенная функция суммы квадратов (ISSF) -- в \ref{eq:equation1.46} переопределяется как:
+
+\begin{equation}
+	\label{eq:equation1.51}	
+	S^m(f,\theta) =\sum^{N-1}_{N=0} r_N(y^m_ -\theta-fn)^2
+\end{equation}
+
+где $y^m_n = Y_n + k^m_n$ -- развернутая фаза для данного $m$. Частота и фаза получаются по:
+
+\begin{equation}
+	\label{eq:equation1.52}	
+	f(m) = \frac{(\sum^{N-1}_{N=0}r_n) (\sum^{N-1}_{N=0}n r_n y^m_n)- (\sum^{N-1}_{N=0}n r_n)(\sum^{N-1}_{N=0}r_n y^m_n) }                           {(\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n)-(\sum^{N-1}_{N=0}nr_n)}
+\end{equation}
+
+\begin{equation}
+	\label{eq:equation1.53}		
+	\theta(m) = \frac{(\sum^{N-1}_{N=0}nr_n) (\sum^{N-1}_{N=0}n r_n y^m_n)- (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n y^m_n) }                          {(\sum^{N-1}_{N=0}n r_n)^2 - (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n)}
+\end{equation}
+
+\ref{eq:equation1.52} и \ref{eq:equation1.53}	 соответствуют оценке частоты и фазы методом наименьших квадратов путем минимизации \ref{eq:equation1.51} с заданным $k_n$. Квадратная ошибка равна $S^m (f (m), \theta (m))$.
+
+Затем мы делаем точный поиск. С $f (m)$ и $\theta (m)$ у нас есть развернутая линейная фаза:
+
+\begin{equation}
+	\label{eq:equation1.54}	
+	p_n= \theta(m)+f(m)n
+\end{equation}
+
+Разворачиваем фазу вокруг $p_n$ как в формуле:
+
+\begin{equation}
+	\label{eq:equation1.55}	
+	\hat{y}^m_n =p_n +UW[Y_n-p_n]
+\end{equation}
+
+где
+
+\begin{equation}
+	\label{eq:equation1.56}	
+	UW[X] = \left\{ \begin{array}{ll}
+		UW[X-1], & \textrm{$X>1/2$}\\
+		UW[X+1], & \textrm{$X<-1/2$}\\
+		& \textrm{$X$}
+	\end{array} \right.
+\end{equation}
+
+
+
+Операция \ref{eq:equation1.56} может гарантировать, что $\hat{y}^m_n$ является развернутой фазой $Y_n$ вокруг $p_n$, что было показано в \cite{xu2013robust}. Улучшенная функция суммы квадратов (ISSF) -- в \ref{eq:equation1.46} переопределяется как:
+% Xu Z., Huang B., Xu S. Robust phase unwrapping algorithm //Electronics letters. – 2013. – Т. 49. – №. 24. – С. 1565-1567.		
+
+\begin{equation}
+	\label{eq:equation1.57}
+	\hat{S}^m(f,\theta) =\sum^{N-1}_{n=0} r_n(\hat{y}^m_n - \theta-fn)^2
+\end{equation}
+
+Точно так же частота и фаза получаются в
+
+\begin{equation}
+	\label{eq:equation1.58}
+	\theta(m) = \frac{(\sum^{N-1}_{N=0}r_n) (\sum^{N-1}_{N=0}n r_n \hat{y}^m_n)- (\sum^{N-1}_{N=0}n r_n)(\sum^{N-1}_{N=0}r_n \hat{y}^m_n) }                     {(\sum^{N-1}_{N=0}n^2 r_n) (\sum^{N-1}_{N=0}r_n)-(\sum^{N-1}_{N=0}nr_n)}
+\end{equation}
+
+\begin{equation}
+	\label{eq:equation1.59}
+	\theta(m) = \frac{(\sum^{N-1}_{N=0}n r_n) (\sum^{N-1}_{N=0}n r_n \hat{y}^m_n)- (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n \hat{y}^m_n) }                           {(\sum^{N-1}_{N=0}n r_n)^2 - (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n)}
+\end{equation}
+
+Квадратная ошибка равна $\hat{S}^m (\hat{f}(m), \hat{\theta}(m))$, и мы сравниваем $\hat{S}^m (\hat{f}(m),\hat{\theta}(m))$ с $S^m (f (m), \theta(m))$. Если
+
+\begin{equation}
+	\label{eq:equation1.60}
+	S^m(f(m),\theta(m))\leq \hat{S}^Mm (]hat{f}(m),\hat{\theta}(m))
+\end{equation}
+
+то мелкий поиск прекращается. Если $S^m(f(m), \theta (m)) > \hat{S}^m (\hat{f}(m),\hat{\theta}(m))$, получается лучшее решение и параметры обновляются следующим образом:
+
+\begin{equation}
+	\label{eq:equation1.61}
+	f(m)=\hat{f}(m),\theta(m)=\hat{\theta}(m)
+\end{equation}
+
+\begin{equation}
+	\label{eq:equation1.62}
+	S^m(f(m),\theta(m))=\hat{S}^m(\hat{f}(m),\hat{\theta}(m)
+\end{equation}
+
+Мы повторяем шаги с \ref{eq:equation1.54} по \ref{eq:equation1.62} до тех пор, пока не будет выполнена \ref{eq:equation1.60}. Это правильный поиск.
+
+Наконец, мы находим глобальный оптимальный параметр. Для каждого $m$ квадратная ошибка $S^m (f (m), \theta (m))$ была вычислена посредством грубого поиска и точного поиска, описанных выше. Следовательно, мы можем получить $m$, минимизируя $S^m (f (m), \theta (m))$
+
+\begin{equation}
+	\label{eq:equation1.63}
+	\acute{m}= arg_m min(S^m(f(m),\theta(m)))
+\end{equation}
+
+Оптимальные параметры равны:
+
+\begin{equation}
+	\label{eq:equation1.64}
+	\hat{f}=f(\acute{m}, \hat{\theta}(\acute{m)}
+\end{equation}
+
+Мы сравнили производительность шести моделей: алгоритм улучшения частоты путем развертывания фазы методом наименьших квадратов (ILSPUE), алгоритм  оценки развертывания фазы методом наименьших квадратов (LSPUE) \cite{7456233}, модель периодограммы \cite{1055282}, 
+модель PUMA \cite{7152983, 5356160}, 
+модель окна Кея \cite{kay1989fast} и наименьших квадратов фазы Фурье (LSFP) \cite{haniff1991least}. 
+% C. Qian, L. Huang, H. C. So, N. D. Sidiropoulos and J. Xie, "Unitary PUMA Algorithm for Estimating the Frequency of a Complex Sinusoid," in IEEE Transactions on Signal Processing, vol. 63, no. 20, pp. 5358-5368, Oct.15, 2015, doi: 10.1109/TSP.2015.2454471.
+% H. C. So, F. K. W. Chan, W. H. Lau and C. Chan, "An Efficient Approach for Two-Dimensional Parameter Estimation of a Single-Tone," in IEEE Transactions on Signal Processing, vol. 58, no. 4, pp. 1999-2009, April 2010, doi: 10.1109/TSP.2009.2038962.
+
+%Haniff C. A. Least-squares Fourier phase estimation from the modulo 2π bispectrum phase //JOSA A. – 1991. – Т. 8. – №. 1. – С. 134-140.
+Для обеспечения точности для каждого моделирования выполнялось $10000$ испытаний для каждого значения отношения сигнал/шум. Отношение сигнал/шум составляет $10log_{10} (A^2 / 2\sigma^2)$~дБ и варьируется от $-20$ до $20$~дБ. В моделировании $f$ и $\theta$ равны соответственно $0,1$ и $0$. Оценка периодограммы реализована методом итераций Ньютона. Мы используем последний двумерный унитарный метод PUMA из \cite{7152983} для реализации оценки PUMA. Модель наименьших квадратов фазы Фурье (LSFP) реализована методом развертывания фазы в \cite{haniff1991least}.
+
+В \cite{zhou2018improved} статье была предложена улучшенная оценка/модель развертки фазы методом наименьших квадратов для оценки частоты. Поскольку алгоритм улучшения частоты путем развертывания фазы методом наименьших квадратов (ILSPUE) основан на более точной фазовой модели, поэтому получим лучшую производительность. По сравнению с другими алгоритм  оценки развертывания фазы методом наименьших квадратов (LSPUE), пороговое значение отношения сигнал/шум и точность улучшаются с той же вычислительной сложностью. Среди всех моделей фазового разворачивания алгоритм улучшения частоты путем развертывания фазы методом наименьших квадратов (ILSPUE) имеет лучшую производительность.
+
+%\textbf{Оценка гармоник в реальном времени по мощности системы описана в статье} \cite{enayati2017real}.
 %% Enayati J., Moravej Z. Real-time harmonics estimation in power systems using a novel hybrid algorithm //IET Generation, Transmission & Distribution. – 2017. – Т. 11. – №. 14. – С. 3532-3538.
-%
-%Наличие искажений формы напряжения и тока обычно выражается через гармонические частоты, которые являются целыми кратными сгенерированной частоты \cite{arrillaga1997power, rodriguez2017novel}. 
+%Наличие искажений формы напряжения и тока выражается через гармонические частоты, которые являются целыми и кратными основной частоте \cite{arrillaga1997power, rodriguez2017novel}. 
 %% 1. Arrillaga J. et al. Power system harmonic analysis. – John Wiley & Sons, 1997.
 %% 2. Rodriguez-Guerrero M. A. et al. A novel methodology for modeling waveforms for power quality disturbance analysis //Electric Power Systems Research. – 2017. – Т. 143. – С. 14-24.
-%Применение синусоидального напряжения к электронным нагрузкам приводит к несинусоидальным падениям тока. Протекание этого тока через импеданс линий электропередач вызывает искажения напряжения на клеммах нагрузки. Кроме того, насыщение трансформаторов вызывает повышенное искажение тока/напряжения. Это представляет собой важную проблему качества электроэнергии, которая оказывает вредное воздействие на оборудование энергосистемы. Следовательно, уровни гармоник должны поддерживаться в стандартной точке с использованием разработанных фильтров, применяемых в источнике гармоник для предотвращения распространения гармоник. Предварительным этапом фильтрации нежелательных частот является вывод параметров гармоник.
-%Были проведены значительные исследования в области оценки гармоник с целью определения амплитуды и фазы гармоник в шумо-искаженном сигнале. В \cite{chen2013comparative} авторы представляют краткий обзор различных методов и их проблем в оценке гармоник.
+%
+%В статье были проведены исследования в области оценки гармоник с целью определения амплитуды и фазы гармоник в шумо-искаженном сигнале. В \cite{chen2013comparative} авторы представляют краткий обзор различных методов и проблем в оценке гармоник.
 %% 3. Chen C. I., Chen Y. C. Comparative study of harmonic and interharmonic estimation methods for stationary and time-varying signals //IEEE Transactions on Industrial Electronics. – 2013. – Т. 61. – №. 1. – С. 397-404.
-%ДПФ в его различных формах является наиболее распространенным методом частотной области для анализа формы волны \cite{guo2016method, 6919330, 7172520, beltran2017fast}. 
+%ДПФ является наиболее распространенным методом частотной области для анализа формы волны \cite{guo2016method, 6919330, 7172520, beltran2017fast}. 
 %% 4. Guo X. et al. Method for radial vibration modelling in switched reluctance motor //IET Electric Power Applications. – 2016. – Т. 10. – №. 9. – С. 834-842.
 %
 %% 5. H. Wen, J. Zhang, Z. Meng, S. Guo, F. Li and Y. Yang, "Harmonic Estimation Using Symmetrical Interpolation FFT Based on Triangular Self-Convolution Window," in IEEE Transactions on Industrial Informatics, vol. 11, no. 1, pp. 16-26, Feb. 2015, doi: 10.1109/TII.2014.2362491.
@@ -623,11 +875,9 @@ $V1$ – основная амплитуда напряжения.
 %
 %% 7. Beltran-Carbajal F., Silva-Navarro G. A fast parametric estimation approach of signals with multiple frequency harmonics //Electric Power Systems Research. – 2017. – Т. 144. – С. 157-162.
 %
-%Этот периодический метод имеет три основных проблемных момента: алиасинг (aliasing), утечка (leakage) и пикет (picket-fence) \cite{4102347}.
-%% 8. A. A. Girgis and F. M. Ham, "A Quantitative Study of Pitfalls in the FFT," in IEEE Transactions on Aerospace and Electronic Systems, vol. AES-16, no. 4, pp. 434-439, July 1980, doi: 10.1109/TAES.1980.308971.
-%Теоретически методы, основанные на ДПФ, точны при анализе периодических и стационарных сигналов, в которых частотные составляющие кратны разрешающей способности по частоте окна выборки. Однако основная частота энергосистемы имеет отклонения от номинального значения, что приводит к снижению точности ДПФ. Среди методов во временной области, применяемых к оценке гармоник, часто используется метод линейного фильтра Калмана (KF -- Kalman filter) \cite{dash1998fast}. 
+%Среди методов во временной области, применяемых к оценке гармоник, часто используется метод линейного фильтра Калмана (KF -- Kalman filter) \cite{dash1998fast}. 
 %% 9. Dash P. K. et al. Fast tracking of transient power system signals using fuzzy LMS algorithm //International Journal of Electrical Power & Energy Systems. – 1998. – Т. 20. – №. 8. – С. 555-561.
-%Задача оценки параметров гармоники (то есть амплитуды и фазы гармоник) является нелинейной задачей. Затем, в большом количестве гармоник, отслеживание фаз синусоид выходит за пределы возможностей линейного KF, особенно в присутствии интенсивного шума. В некоторых источниках вводятся адаптивные методы с переменным коэффициентом усиления, чтобы справиться с нелинейным характером проблемы \cite{1413428, ray2012ensemble, dash1996harmonic, singh2016several}.
+%Задача оценки параметров гармоники (то есть амплитуды и фазы гармоник) является нелинейной задачей. Отслеживание фаз синусоид выходит за пределы возможностей линейного фильтра Калмана, особенно при наличии шума. В некоторых источниках вводятся адаптивные методы с переменным коэффициентом усиления, чтобы справиться с нелинейным характером проблемы \cite{1413428, ray2012ensemble, dash1996harmonic, singh2016several}.
 %% 10. K. K. C. Yu, N. R. Watson and J. Arrillaga, "An adaptive Kalman filter for dynamic harmonic state estimation and harmonic injection tracking," in IEEE Transactions on Power Delivery, vol. 20, no. 2, pp. 1577-1584, April 2005, doi: 10.1109/TPWRD.2004.838643.
 %
 %% 11. P. K. Ray and B. Subudhi, "Ensemble-Kalman-Filter-Based Power System Harmonic Estimation," in IEEE Transactions on Instrumentation and Measurement, vol. 61, no. 12, pp. 3216-3224, Dec. 2012, doi: 10.1109/TIM.2012.2205515.
@@ -636,8 +886,9 @@ $V1$ – основная амплитуда напряжения.
 %
 %% 13. Singh S. K. et al. Several variants of Kalman Filter algorithm for power system harmonic estimation //International Journal of Electrical Power & Energy Systems. – 2016. – Т. 78. – С. 793-800.
 %
-%Методы адаптивной оценки чувствительны к настройке адаптивных факторов и скорости их изменения. Например, адаптивный KF требует точной настройки четырех свободных параметров, а также требует априорного знания шума \cite{ray2012ensemble}. Гармоники нелинейно связаны с выделенной фазой, что создает дополнительные препятствия для точного прогнозирования параметров гармоник.
-%Следовательно, искусственные нейронные сети (ИНС, ANNs-- artificial neural networks) применяются для получения нелинейных характеристик задачи \cite{6553247, 4084681, lin2016electromagnetic, joorabian2009harmonic}. 
+%Методы адаптивной оценки чувствительны к настройке адаптивных факторов и скорости их изменения. Например, адаптивный фильтр Калмана требует точной настройки четырех свободных параметров, а также требует знание шума \cite{ray2012ensemble}. Гармоники нелинейно связаны с выделенной фазой, что создает дополнительные препятствия для точного прогнозирования параметров гармоник.
+%
+%Искусственные нейронные сети (ИНС, ANNs-- artificial neural networks) применяются для получения нелинейных характеристик задачи \cite{6553247, 4084681, lin2016electromagnetic, joorabian2009harmonic}. 
 %% 14. M. Valtierra-Rodriguez, R. de Jesus Romero-Troncoso, R. A. Osornio-Rios and A. Garcia-Perez, "Detection and Classification of Single and Combined Power Quality Disturbances Using Neural Networks," in IEEE Transactions on Industrial Electronics, vol. 61, no. 5, pp. 2473-2482, May 2014, doi: 10.1109/TIE.2013.2272276.
 %
 %% 15. H. C. Lin, "Intelligent Neural Network-Based Fast Power System Harmonic Detection," in IEEE Transactions on Industrial Electronics, vol. 54, no. 1, pp. 43-52, Feb. 2007, doi: 10.1109/TIE.2006.888685.
@@ -645,53 +896,15 @@ $V1$ – основная амплитуда напряжения.
 %% 16. Lin F., Zuo S., Wu X. Electromagnetic vibration and noise analysis of permanent magnet synchronous motor with different slot-pole combinations //IET Electric Power Applications. – 2016. – Т. 10. – №. 9. – С. 900-908.
 %
 %% 17. Joorabian M., Mortazavi S. S., Khayyami A. A. Harmonic estimation in a power system using a novel hybrid Least Squares-Adaline algorithm //Electric power systems research. – 2009. – Т. 79. – №. 1. – С. 107-116.
-%Несмотря на простоту реализации, если параметры ИНС не установлены должным образом, процесс оценки ИНС будет ошибочный, что приведет к снижению точности результатов оценки \cite{moravej2014hybrid}. 
-%% 18. Moravej Z., Enayati J. A hybrid least squares–clonal selection based algorithm for harmonics estimation //International Transactions on Electrical Energy Systems. – 2014. – Т. 24. – №. 1. – С. 1-15.
+%
 %Алгоритмы стохастической оптимизации основаны на стохастическом поиске оптимального решения данной задачи. Эти методы неоднократно используются для оценки гармоник в качестве другой альтернативы \cite{1193852, 4469961, singh2016power}. 
 %% 19. M. Bettayeb and Uvais Qidwai, "A hybrid least squares-GA-based algorithm for harmonic estimation," in IEEE Transactions on Power Delivery, vol. 18, no. 2, pp. 377-382, April 2003, doi: 10.1109/TPWRD.2002.807458.
 %
 %% 20. Z. Lu, T. Y. Ji, W. H. Tang and Q. H. Wu, "Optimal Harmonic Estimation Using A Particle Swarm Optimizer," in IEEE Transactions on Power Delivery, vol. 23, no. 2, pp. 1166-1174, April 2008, doi: 10.1109/TPWRD.2008.917656.
 %
 %% 21. Singh S. K. et al. Power system harmonic estimation using biogeography hybridized recursive least square algorithm //International Journal of Electrical Power & Energy Systems. – 2016. – Т. 83. – С. 219-228.
-%Однако прямое применение алгоритмов стохастической оптимизации к практическим задачам крайне ограничено. Следующее объясняет причины ограниченной возможности стохастических алгоритмов в оценке гармоник:
-%\begin{itemize}
-%\item Поскольку амплитуды и фазы гармоник количественно различаются при разных масштабах, единицах и физической интерпретации, окончательное решение трудно получить \cite{4469961}.
 %
-%\item Стохастические методы испытывают трудности в тонкой настройке локального поиска; они проводят большую часть времени, соревнуясь между разными холмами, а не улучшая решение вдоль одного холма, на котором расположена оптимальная точка \cite{singh2016power}. Реальные модели сигналов энергосистемы являются нелинейными по фазе и линейными по амплитуде \cite{dash1998fast, singh2016several, 1413428, ray2012ensemble, dash1996harmonic, singh2016several}. Рассмотрение оценки гармоник как полностью нелинейной задачи снижает скорость сходимости алгоритма. Поэтому гибридные алгоритмы применяются для решения задачи оценки гармоник как отдельных задач оценки амплитуды и фазы \cite{joorabian2009harmonic, moravej2014hybrid, 1193852, 4469961, singh2016power, 6202692б, 6419813, nanda2016new}. Поскольку сигналы энергосистемы являются динамическими, было обнаружено, что некоторые недавние адаптивные методы \cite{6522142, 6908042} подходят для разложения многокомпонентных статических и динамических сигналов. Однако из-за использования базового быстрого преобразования Фурье точность разложения ближайших частотных компонентов может быть немного ниже.
-%\end{itemize}
-%% 21. Singh S. K. et al. Power system harmonic estimation using biogeography hybridized recursive least square algorithm //International Journal of Electrical Power & Energy Systems. – 2016. – Т. 83. – С. 219-228.
-%%%%%%%
-%% 9. Dash P. K. et al. Fast tracking of transient power system signals using fuzzy LMS algorithm //International Journal of Electrical Power & Energy Systems. – 1998. – Т. 20. – №. 8. – С. 555-561.
-%
-%% 10. K. K. C. Yu, N. R. Watson and J. Arrillaga, "An adaptive Kalman filter for dynamic harmonic state estimation and harmonic injection tracking," in IEEE Transactions on Power Delivery, vol. 20, no. 2, pp. 1577-1584, April 2005, doi: 10.1109/TPWRD.2004.838643.
-%
-%% 11. P. K. Ray and B. Subudhi, "Ensemble-Kalman-Filter-Based Power System Harmonic Estimation," in IEEE Transactions on Instrumentation and Measurement, vol. 61, no. 12, pp. 3216-3224, Dec. 2012, doi: 10.1109/TIM.2012.2205515.
-%
-%% 12. Dash P. K. et al. Harmonic estimation in a power system using adaptive perceptrons //IEE Proceedings-Generation, Transmission and Distribution. – 1996. – Т. 143. – №. 6. – С. 565-574.
-%
-%% 13. Singh S. K. et al. Several variants of Kalman Filter algorithm for power system harmonic estimation //International Journal of Electrical Power & Energy Systems. – 2016. – Т. 78. – С. 793-800.
-%%%%%%
-%% 17. Joorabian M., Mortazavi S. S., Khayyami A. A. Harmonic estimation in a power system using a novel hybrid Least Squares-Adaline algorithm //Electric power systems research. – 2009. – Т. 79. – №. 1. – С. 107-116.
-%
-%% 18. Moravej Z., Enayati J. A hybrid least squares–clonal selection based algorithm for harmonics estimation //International Transactions on Electrical Energy Systems. – 2014. – Т. 24. – №. 1. – С. 1-15.
-%
-%% 19. M. Bettayeb and Uvais Qidwai, "A hybrid least squares-GA-based algorithm for harmonic estimation," in IEEE Transactions on Power Delivery, vol. 18, no. 2, pp. 377-382, April 2003, doi: 10.1109/TPWRD.2002.807458.
-%
-%% 20. Z. Lu, T. Y. Ji, W. H. Tang and Q. H. Wu, "Optimal Harmonic Estimation Using A Particle Swarm Optimizer," in IEEE Transactions on Power Delivery, vol. 23, no. 2, pp. 1166-1174, April 2008, doi: 10.1109/TPWRD.2008.917656.
-%
-%% 21. Singh S. K. et al. Power system harmonic estimation using biogeography hybridized recursive least square algorithm //International Journal of Electrical Power & Energy Systems. – 2016. – Т. 83. – С. 219-228.
-%
-%% 22. S. K. Jain, S. N. Singh and J. G. Singh, "An Adaptive Time-Efficient Technique for Harmonic Estimation of Nonstationary Signals," in IEEE Transactions on Industrial Electronics, vol. 60, no. 8, pp. 3295-3303, Aug. 2013, doi: 10.1109/TIE.2012.2200218.
-%
-%% 23. S. K. Jain and S. N. Singh, "Low-Order Dominant Harmonic Estimation Using Adaptive Wavelet Neural Network," in IEEE Transactions on Industrial Electronics, vol. 61, no. 1, pp. 428-435, Jan. 2014, doi: 10.1109/TIE.2013.2242414.
-%
-%% 24. Nanda S., Chakravorty T., Dash P. K. A new Taylor-LMS adaptive filter for parameter estimation of power signals including distributed generation systems //Australian Journal of Electrical and Electronics Engineering. – 2016. – Т. 13. – №. 3. – С. 174-194.
-%%%%%%%%
-%% 25. J. Gilles, "Empirical Wavelet Transform," in IEEE Transactions on Signal Processing, vol. 61, no. 16, pp. 3999-4010, Aug.15, 2013, doi: 10.1109/TSP.2013.2265222.
-%
-%% 26. K. Thirumala, A. C. Umarikar and T. Jain, "Estimation of Single-Phase and Three-Phase Power-Quality Indices Using Empirical Wavelet Transform," in IEEE Transactions on Power Delivery, vol. 30, no. 1, pp. 445-454, Feb. 2015, doi: 10.1109/TPWRD.2014.2355296.
-%
-%В статье \cite{enayati2017real} для оценки фаз гармоник применяется алгоритм, основанный на фильтре Калмана, наряду с линейной оценкой на основе наименьших квадратов для оценки амплитуд. Повторный расширенный фильтр Калмана (IEKF -- iterated extended Kalman filter) применяется для решения нелинейных уравнений, которые описывают взаимосвязь фаз и исходной формы волны. Оценки амплитуд методом наименьших квадратов (LS -- least squares) рекурсивно вычисляются с использованием метода рекурсивных методов наименьших квадратов (RLS -- recursive least squares). Этот гибридный алгоритм оценивает амплитуды и фазы отдельно. Следовательно, различные масштабы, единицы и физические интерпретации исследуются отдельными алгоритмами, что приводит к меньшему количеству итераций, чтобы сходиться. 
+%В статье \cite{enayati2017real} для оценки фаз гармоник применяется алгоритм, основанный на фильтре Калмана, наряду с линейной оценкой на основе наименьших квадратов для оценки амплитуд. Повторный расширенный фильтр Калмана (IEKF -- iterated extended Kalman filter) применяется для решения нелинейных уравнений, которые описывают взаимосвязь фаз и исходной формы волны. Оценки амплитуд методом наименьших квадратов (LS -- least squares) рекурсивно вычисляются с использованием метода рекурсивных методов наименьших квадратов (RLS -- recursive least squares). Этот гибридный алгоритм оценивает амплитуды и фазы отдельно. 
 %% Enayati J., Moravej Z. Real-time harmonics estimation in power systems using a novel hybrid algorithm //IET Generation, Transmission & Distribution. – 2017. – Т. 11. – №. 14. – С. 3532-3538.
 %
 %Из-за наличия искажений в электрических формах волны, формы волны тока/напряжения обычно выражаются как периодические функции, частоты которых кратны сгенерированной частоте. Дискретная форма времени функции может быть записана как \cite{moravej2014hybrid, 1193852, 4469961}.
@@ -704,9 +917,14 @@ $V1$ – основная амплитуда напряжения.
 %\label{eq:equation1.19}
 %	Z_k = {\sum_{n=1}^{N} A_n \sin({2 \pi  f n  k  \tau_{s} + \theta_n}) + \sigma_v  randn(k)}
 %\end{equation}
-%где $n = 1, 2,\cdots, N$ представляет порядок гармоники; $A_n$, $\theta_n$ и $f$ -- амплитуда, фазовый угол и основная частота, $\sigma_v randn(k)$ аддитивный гауссов шум, а $\tau_s$ период дискретизации. Состояния, которые следует оценить как $A_n$, $\theta_n$.
 %
-%Как видно в статье \cite{enayati2017real}, полученная модель нелинейна по фазе синусоид, что приводит к дальнейшим препятствиям для точной оценки целевых состояний. Однако применение линейных алгоритмов для оценки амплитуды повышает скорость сходимости алгоритма. Следовательно, идея использования гибридных алгоритмов в качестве простых и гибких подходов стала популярной для получения гармонических параметров.
+%где $n = 1, 2,\cdots, N$ представляет порядок гармоники;
+%$A_n$ -- амплитуда;
+%$\theta_n$ -- фазовый угол;
+%$f$ -- основная частота;
+%$\sigma_v randn(k)$ -- аддитивный гауссов шум
+%$\tau_s$ -- период дискретизации. 
+%Состояния, которые следует оценить как $A_n$, $\theta_n$.
 %
 %Алгоритм оценки амплитуды, применяемый в \cite{enayati2017real} статье, основан на критерии наименьших квадратов. В этом разделе описывается рекурсивный метод для вычисления наименьших квадратов оценки амплитуд. В целом, линейная рекурсивная оценка может быть записана следующим образом:
 %\begin{equation}
@@ -754,7 +972,7 @@ $V1$ – основная амплитуда напряжения.
 %	X_{k+1,k} = \varphi (t_{k},t_{k+1}) X_{k,k}+ w_{k+1}
 %\end{equation}
 %
-%где матрица перехода $\varphi$ $(t_{k}$, $t_{k + 1})$ является $(n + 1 \times n + 1)$ единичной матрицей, а $w$ является шумом процесса. Основываясь на наших знаниях о динамике системы, состояния в повторном расширенном фильтре Калмана обновляются с использованием обновления времени (7). Для вычисления уравнения обновления времени ковариационной матрицы применяется следующая формулировка:
+%где матрица перехода $\varphi$ $(t_{k}$, $t_{k + 1})$ является $(n + 1 \times n + 1)$ единичной матрицей, а $w$ является шумом процесса. Основываясь на наших знаниях о динамике системы, состояния в повторном расширенном фильтре Калмана обновляются с использованием обновления времени \textbf{(7)}. Для вычисления уравнения обновления времени ковариационной матрицы применяется следующая формулировка:
 %\begin{equation}
 %\label{eq:equation1.27}	
 %	P_{k+1,k} = \varphi (t_{k},t_{k+1}) P_{k,k} \varphi (t_{k},t_{k+1})^{T}
@@ -817,246 +1035,8 @@ $V1$ – основная амплитуда напряжения.
 %\end{equation}
 %
 %На каждой итерации гибридный алгоритм применяет повторяющиеся расширенния
-%алгоритма фильтра Калмана для фазы предварительного расчета. Далее оценочные состояния повторных расширенных алгоритмов фильтра Калмана вставлены в структурную матрицу рекурсивных наименьших квадратов для оценки амплитуд гармоник. Процесс повторяется до тех пор, пока не будет достигнута приемлемая сходимость. \textbf{На рис. 1} представлена блок-схема для формулировки рекурсивного метода наименьших квадратов и повторного расширенного Алгоритм фильтра Калмана.
-%
-%% закончить рисунок
-%\begin{figure}[ht]
-%	\centering
-%	\includegraphics [scale=0.9] {Filter_Kalmana.pdf}
-%	\caption{Последовательность операций в алгоритме RLS – IEKF.}
-%	\label{img:picture1.3}
-%\end{figure}
-%
-%\section{Улчшенный алгоритм частоты путем развертывания фазы методом наименьших квадратов} \label{sec:ch1/sec6}
-%
-%Оценка частоты сложной синусоиды является фундаментальной проблемой в обработке сигналов и находит применение во многих областях. Общая модель сигнала:
-%\begin{equation}
-%	\label{eq:equation1.41}	
-%	y(n)=Ae^{j2 \pi(\theta+fn)}+ \omega(n) 
-%\end{equation}
-%
-%где частота $f$, фаза $\theta$ и амплитуда A являются детерминированными, но неизвестными константами, а N - количество выборок. $\omega(n) = \omega_I(n) + j\omega_Q(n)$ - это комплексный белый гауссовский шум с нулевым средним и дисперсией $2\sigma^2 \times \omega_I (n)$ и $\omega_Q(n)$ независимы и нормально распределены с нулевым средним и дисперсией $\sigma^2 \times f$ и $ \theta$ находятся в $[- 1 / 2,1 / 2)$. Проблема состоит в оценке $f$.
-%
-%Хорошо известно, что классическая оценка периодограммы [8] считается наиболее эффективной. Однако реализация этой модели очень сложна. Треттер [10] доказал, что фазовый шум приблизительно представляет собой белый гауссовский шум, и фаза может быть развернута. Затем, используя развернутую фазу, $f$ и $\theta$ можно оценить с помощью линейной регрессии. Одна общая оценка развертки фазы была впервые предложена Каем [4], и, вычисляя первые разности аргументов $y(n)$, оценка параметра может рассматриваться как линейная задача. Этот вид модели имеет простую структуру и хорошо работает при высоком Отношении Сигнал / Шум (SNR). Однако он плохо работает при низком SNR . По сравнению с другими моделями развертки фазы, модель развертки фазы наименьших квадратов (LSPUE) имеет гораздо лучшую производительность при низком SNR , что было изучено другими исследователями [6,12].
-%
-%В этой статье мы предлагаем Улучшенную Оценку Развертки Фазы Методом Наименьших Квадратов (ILSPUE). ILSPUE выполняет
-%развертывание фазы по методу наименьших квадратов на основе новой фазовой модели. Поскольку новая фазовая модель более точна, чем предыдущая модель, ILSPUE  имеет лучшую производительность, что будет показано ниже. Основной вклад этой статьи состоит в том, что мы вводим оптимальную линейную фазовую модель для развертывания фазы методом наименьших квадратов, выводим новую целевую функцию и и демонстрируем, что новая целевая функция более точна. Затем, на основе новой целевой функции, мы представляем ILSPUE , и производительность LSPUE  улучшается.
-%
-%Аргумент $y(n)$, обозначенный $\angle y(n)$, имеет вид:
-%
-%\begin{equation}
-%\label{eq:equation1.42}	
-%	\angle y(n)=2 \pi(\theta+fn+u_n)(mod2 \pi)
-%\end{equation}
-%
-%где $u_n$ - фазовый шум. Пусть $Y_n = y(n)/2 \pi$ , тогда:
-%
-%\begin{equation}
-%\label{eq:equation1.43}	
-%	Y_n =<\theta+fn+u_n>
-%\end{equation}
-%
-%где $<x> = x - [x]$- дробная часть $x$, а $[x]$ обозначает ближайшее к $x$ целое число. Формулу (3) можно записать как:
-%
-%\begin{equation}
-%\label{eq:equation1.44}	
-%	Y_n= \theta+fn+u_n-k_n
-%\end{equation}
-%
-%где $kn =[\theta + fn + un]$. Для LSPUE в [6,12] фазовая модель (4) основана на модели из [10], а фазовый шум $u_n$ аппроксимируется как: $u_n= \omega_Q(n)/(2 \pi A)$
-%
-%Поскольку $\omega_Q(n)$ - это белый гауссовский шум, а $A$ - константа, согласно (4) функция суммы квадратов (SSF) равна:
-%
-%\begin{equation}
-%\label{eq:equation1.45}		
-%	\sum_{n=0}^{N-1} (Y_n- \theta -fn +k_n)^2
-%\end{equation}
-%
-%LSPUE  должен найти оптимальные $f$ и $\theta$, минимизирующие (5).
-%
-%Усовершенствованная фазовая модель была дана в [1], которая оказалась более точной, чем модель в [10]. Используя эту фазовую модель для (4), $u_n$ аппроксимируется как $u_n = \omega_Q(n)/(2 \pi \sqrt{Arn})$, где $rn = | y (n) |$ - абсолютное значение $y(n)$. Учитывая, что $r_n$ является переменной, согласно (4) Улучшенная Функция Суммы Квадратов (ISSF) задается как:
-%
-%\begin{equation}
-%\label{eq:equation1.46}	
-%	S(f, \theta, k_n) = \sum_{n=0}^{N-1} r_n (Y_n- \theta -fn +k_n)^2
-%\end{equation}
-%
-%Аналогично, ILSPUE должен найти оптимальные $f$ и $\theta$, минимизирующие $S (f, \theta, kn)$. На основе улучшенной линейно-фазовой модели ISSF (6) является более точным и может быть получен лучший результат оценки.
-%
-%Теперь мы продемонстрируем, что целевая функция (Формула №6) более точна, чем функция (Формула №5) напрямую. Учитывая, что $y(n) = r_ne^{ j2\pi (Y_n + k_n)}$, согласно (1) SSF равна $J(f, \theta, k_n)$ и является:
-%
-%$$
-%J (f, \theta, k_n) = \sum_{n=0}^{N-1} (r_n \cos(2 \pi (Y_n+k_n)) -A\cos(2 \pi(\theta+fn)))^2
-%$$
-%
-%\begin{equation}
-%\label{eq:equation1.47}		
-%	+(r_n \sin(2\pi(Y_n+k_n))-A\sin(2\pi(\theta+fn)))^2 
-%\end{equation}
-%
-%$$ = \sum_{n=0}^{N-1} r_n^2+A^2-2Ar_n\cos(2\pi(Y_n-\theta-fn+k_n))$$
-%
-%$$ \infty \sum_{n=0}^{N-1} -Ar_n\cos(2\pi(Y_n-\theta-fn+k_n))$$
-%
-%В условиях комплексного белого гауссовского шума $\omega (n), J(f, \theta, k_n) = \sum_{n=0}^{N-1}-Ar_n\cos(2\pi$
-%$(Y_n-\theta-fn+k_n))$ 
-%является точной целевой функцией без какого-либо приближения. Поскольку $J(f, \theta, k_n)$ соответствует нелинейной модели, мы должны приближенно обозначать. Применяя разложение Тейлора второго порядка к $J(f, \theta, k_n)$, получаем:
-%
-%$$
-%J(f, \theta, k_n) \approx \sum_{n=0}^{N-1} -Ar_n+2\pi^2Ar_n(Y_n-\theta-fn+k_n)^2
-%$$
-%
-%\begin{equation}
-%\label{eq:equation1.48}	
-%	\infty \sum_{n=0}^{N-1} r_n (Y_N-\theta-FN+K_N)^2
-%\end{equation}
-%$$
-%=S(f,\theta,k_n)
-%$$
-%
-%
-%Следовательно, $S (f, \theta, k_n)$ - это приближение второго порядка для $J (f, \theta, k_n)$. В то время как для (5) приближение выглядит как:
-%
-%$$
-%J(f, \theta, k_n) \approx \sum_{n=0}^{N-1} -Ar_n+2\pi^2Ar_n(Y_n-\theta-fn+k_n)^2
-%$$
-%
-%$$
-%\infty \sum_{n=0}^{N-1} Ar_n (Y_N-\theta-FN+K_N)^2
-%$$
-%
-%\begin{equation}
-%\label{eq:equation1.49}	
-%	\approx \sum_{n=0}^{N-1} A^2(Y_n-\theta-fn+k_n)^2
-%\end{equation}
-%
-%$$
-%\infty \sum_{n=0}^{N-1} (Y_n-\theta-fn+k_n)^2
-%$$
-%
-%Очевидно, что для (5) делается другое приблизительное значение. Следовательно, по сравнению с (5), $S (f, \theta, k_nn)$ является более точной аппроксимацией (приблизительным значением) $J (f, \theta, k_n)$.
-%
-%Недавно было доказано, что быстрый LSPUE - Модуль Оценки Развёртки Фазы Методом Наименьших Квадратов - из [12] имеет ту же производительность, что и LSPUE из [6], а вычислительная сложность составляет $O(N^2)$. Мы реализуем ILSPUE - Улучшенную Оценку Развертки Фазы Методом Наименьших Квадратов, используя этот алгоритм. 
-%Для ILSPUE ключевая проблема состоит в том, как найти правильный $k_n$.
-%% Учитывая, что и $f$, и $\theta$ находятся в $[−1/2,1/2)$, получаем $- N / 2 \leq \theta  + fn < N / 2$. Поскольку $k_n$ увеличивается с увеличением $n$, когда $f > 0$, и $k_n$ уменьшается с увеличением $n$, когда $f < 0$, мы определяем:
-%
-%\begin{equation}
-%\label{eq:equation1.50}	
-%	k_{n}^{m} = \biggl[n \frac{m}{N}\biggl] < m \in \biggl\{-\frac{N}{2}, -\frac{N}{2}+1 \ldots , \frac{N}{2}-1 \biggl\}
-%\end{equation}
-%
-%Для (10) мы определяем вектор $\textbf{k}^m = [k^m_0, k^m_1, \ldots, k^m_{N- 1}]^T$, и $k^m_n$ соответствует $k_n$ для данного $m$. Следовательно, существует $N$ векторов для $\textbf{k}^m$, соответствующих $N$ локальным решениям. Очевидно, $\textbf{k}^m$ соответствует сигналу с частотой $\frac{m}{N}$. Сначала мы проверяем $N$ решений, а затем находим лучшее решение рядом с этими $N$ решениями. Для каждого m ниже реализованы грубый поиск и точный поиск.
-%
-%Сначала делаем грубый поиск. ISSF - Улучшенная Функция Суммы Квадратов - в (6) переопределяется как:
-%
-%\begin{equation}
-%\label{eq:equation1.51}	
-%	S^m(f,\theta) =\sum^{N-1}_{N=0} r_N(y^m_ -\theta-fn)^2
-%\end{equation}
-%
-%где $y^m_n = Y_n + k^m_n$ - развернутая фаза для данного $m$. Частота и фаза получаются по:
-%
-%\begin{equation}
-%\label{eq:equation1.52}	
-%	f(m) = \frac{(\sum^{N-1}_{N=0}r_n) (\sum^{N-1}_{N=0}n r_n y^m_n)- (\sum^{N-1}_{N=0}n r_n)(\sum^{N-1}_{N=0}r_n y^m_n) }                           {(\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n)-(\sum^{N-1}_{N=0}nr_n)}
-%\end{equation}
-%
-%\begin{equation}
-%\label{eq:equation1.53}		
-%	\theta(m) = \frac{(\sum^{N-1}_{N=0}nr_n) (\sum^{N-1}_{N=0}n r_n y^m_n)- (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n y^m_n) }                          {(\sum^{N-1}_{N=0}n r_n)^2 - (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n)}
-%\end{equation}
-%
-%(12) b (13) соответствуют оценке частоты и фазы методом наименьших квадратов путем минимизации (11) с заданным$k_n$. Квадратная ошибка равна $S^m (f (m), \theta (m))$.
-%
-%Затем мы делаем точный поиск. С $f (m)$ и $\theta (m)$ у нас есть развернутая линейная фаза
-%
-%\begin{equation}
-%\label{eq:equation1.54}	
-%	p_n= \theta(m)+f(m)n
-%\end{equation}
-%
-%Разворачиваем фазу вокруг $p_n$ как в формуле:
-%
-%\begin{equation}
-%\label{eq:equation1.55}	
-%	\hat{y}^m_n =p_n +UW[Y_n-p_n]
-%\end{equation}
-%
-%где
-%
-%\begin{equation}
-%\label{eq:equation1.56}	
-%	UW[X] = \left\{ \begin{array}{ll}
-%		UW[X-1], & \textrm{$X>1/2$}\\
-%		UW[X+1], & \textrm{$X<-1/2$}\\
-%		& \textrm{$X$}
-%	\end{array} \right.
-%\end{equation}
-%
-%
-%
-%Операция (16) может гарантировать, что $\hat{y}^m_n$ является развернутой фазой $Y_n$ вокруг $p_n$, что было показано в [11]. ISSF - Улучшенная Функция Суммы Квадратов - в (6) переопределяется как:
-%
-%
-%\begin{equation}
-%\label{eq:equation1.57}
-%	\hat{S}^m(f,\theta) =\sum^{N-1}_{n=0} r_n(\hat{y}^m_n - \theta-fn)^2
-%\end{equation}
-%
-%Точно так же частота и фаза получаются в
-%
-%\begin{equation}
-%\label{eq:equation1.58}
-%	\theta(m) = \frac{(\sum^{N-1}_{N=0}r_n) (\sum^{N-1}_{N=0}n r_n \hat{y}^m_n)- (\sum^{N-1}_{N=0}n r_n)(\sum^{N-1}_{N=0}r_n \hat{y}^m_n) }                     {(\sum^{N-1}_{N=0}n^2 r_n) (\sum^{N-1}_{N=0}r_n)-(\sum^{N-1}_{N=0}nr_n)}
-%\end{equation}
-%
-%\begin{equation}
-%\label{eq:equation1.59}
-%	\theta(m) = \frac{(\sum^{N-1}_{N=0}n r_n) (\sum^{N-1}_{N=0}n r_n \hat{y}^m_n)- (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n \hat{y}^m_n) }                           {(\sum^{N-1}_{N=0}n r_n)^2 - (\sum^{N-1}_{N=0}n^2 r_n)(\sum^{N-1}_{N=0}r_n)}
-%\end{equation}
-%
-%Квадратная ошибка равна $\hat{S}^m (\hat{f}(m), \hat{\theta}(m))$, и мы сравниваем $\hat{S}^m (\hat{f}(m),\hat{\theta}(m))$ с $S^m (f (m), \theta(m))$. Если
-%
-%\begin{equation}
-%\label{eq:equation1.60}
-%	S^m(f(m),\theta(m))\leq \hat{S}^Mm (]hat{f}(m),\hat{\theta}(m))
-%\end{equation}
-%
-%то мелкий поиск прекращается. Если $S^m(f(m), \theta (m)) > \hat{S}^m (\hat{f}(m),\hat{\theta}(m))$, получается лучшее решение и параметры обновляются следующим образом:
-%
-%\begin{equation}
-%\label{eq:equation1.61}
-%	f(m)=\hat{f}(m),\theta(m)=\hat{\theta}(m)
-%\end{equation}
-%
-%\begin{equation}
-%\label{eq:equation1.62}
-%	S^m(f(m),\theta(m))=\hat{S}^m(\hat{f}(m),\hat{\theta}(m)
-%\end{equation}
-%
-%Мы повторяем шаги с (14) по (22) до тех пор, пока не будет выполнена (20). Это правильный поиск.
-%
-%Наконец, мы находим глобальный оптимальный параметр. Для каждого m квадратная ошибка $S^m (f (m), \theta (m))$ была вычислена посредством грубого поиска и точного поиска, описанных выше. Следовательно, мы можем получить m, минимизируя $S^m (f (m), \theta (m))$
-%
-%\begin{equation}
-%\label{eq:equation1.63}
-%	\acute{m}= arg_m min(S^m(f(m),\theta(m)))
-%\end{equation}
-%
-%Глобальные оптимальные параметры равны
-%
-%\begin{equation}
-%\label{eq:equation1.64}
-%	\hat{f}=f(\acute{m}, \hat{\theta}(\acute{m)}
-%\end{equation}
-%
-%Мы сравнили производительность шести моделей: ILSPUE, LSPUE [12], модель периодограммы [8], модель PUMA [7,9], модель окна Кея [4] и модель фазы Фурье методом наименьших квадратов (LSFP) [3]. Для обеспечения точности для каждого моделирования выполнялось 10000 испытаний для каждого значения SNR. Отношение сигнал / шум составляет $10log_{10} (A^2 / 2\sigma^2)$ дБ, варьирующееся от -20 до 20 дБ. В нашем моделировании $f$ и $\theta$ равны соответственно 0,1 и 0. Оценка периодограммы реализована методом итераций Ньютона. Мы используем последний двумерный унитарный метод PUMA из [7] для реализации оценки PUMA. Модель LSFP реализована методом развертывания фазы в [3].
-%
-%На диаграммах 1 и 2 показана среднеквадратичная ошибка (MSE) различных оценок для $N = 64$ и $N = 256$. Можно видеть, что существует порог SNR, от которого MSE больше не сходится к границе Крамера – Рао (CRB) [5]. Для разных моделей более низкий порог SNR означает лучшую производительность. Модель периодограммы и ILSPUE дают наиболее статистически точные результаты, а модели LSPUE и PUMA лишь незначительно хуже. Модель Кея и Модель LSFP имеют сравнительно более высокий порог отношения сигнал / шум. На диаграмме 1 порог SNR для ILSPUE равен пороговому значению SNR для оценки периодограммы и на 2 дБ ниже, чем у LSPUE, показывая, что, когда количество выборок невелико, ILSPUE имеет более низкий порог SNR, чем LSPUE. На диаграмме 2 показано, что ILSPUE, LSPUE и средство оценки периодограммы имеют одинаковый порог SNR, когда количество выборок достаточно велико. Из диаграмм 1 и 2, также можно видеть, что при среднем SNR MSE LSPUE больше, чем CRB, в то время как MSE ILSPUE точно сходится к CRB. Очевидно, что ILSPUE имеет лучшую производительность, чем LSPUE, и обладает той же производительностью, что и средство оценки периодограммы. Результат согласуется с [6,12]. Поскольку ILSPUE реализован с использованием алгоритма из [12], вычислительная сложность по-прежнему составляет$ O(N^2$).
-%
-%
-%
-%
+%алгоритма фильтра Калмана для фазы предварительного расчета. Далее оценочные состояния повторных расширенных алгоритмов фильтра Калмана вставлены в структурную матрицу рекурсивных наименьших квадратов для оценки амплитуд гармоник. Процесс повторяется до тех пор, пока не будет достигнута приемлемая сходимость. 
+
 \section{Выводы по разделу} \label{sec:ch1/sec7} 
 В результате анализа, произведенного в первом разделе, можно сделать следующие выводы:
 \begin{itemize}
