@@ -1,0 +1,181 @@
+\documentclass{proc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{pgfplots}
+\usetikzlibrary{snakes}
+\usetikzlibrary{plotmarks}
+\usepackage[russian,english]{babel}
+\usepackage{mathtext}
+\usepackage{amsmath,amssymb,amsfonts,textcomp,latexsym,pb-diagram,amsopn}\usepackage[utf8]{inputenc}
+\pgfplotsset{compat=newest}
+\begin{document}
+\begin{center}
+\begin{tikzpicture}
+\draw (0,0) -- (13,0);
+\node[left,scale=1,font=\small] at (2.5,9.3){\large{ЭФФЕКТИВ-}};
+\node[left,scale=1,font=\small] at (2,8.7){\large{НОСТЬ}};
+
+% Значения осей
+% Ось Y
+\draw[dashed] (1,0.3)node[left,font=\tiny] {\large{$0$}};
+\draw[dashed] (1,2)node[left,font=\tiny] {\large{$5$}};
+\draw[dashed] (1,4)node[left,font=\tiny] {\large{$10$}};
+\draw[dashed] (1,6)node[left,font=\tiny] {\large{$15$}};
+\draw[dashed] (1,8)node[left,font=\tiny] {\large{$20$}};
+
+% Ось X
+\draw[dashed] (1,0)node[below,font=\tiny] {\large{$256$}};
+\draw[dashed] (2,0)node[below,font=\tiny] {\large{$512$}};
+\draw[dashed] (3,0)node[below,font=\tiny] {\large{$786$}};
+\draw[dashed] (4,0)node[below,font=\tiny] {\large{$1024$}};
+\draw[dashed] (5,0)node[below,font=\tiny] {\large{$2048$}};
+\draw[dashed] (6,0)node[below,font=\tiny] {\large{$3072$}};
+\draw[dashed] (7,0)node[below,font=\tiny] {\large{$4096$}};
+\draw[dashed] (8,0)node[below,font=\tiny] {\large{$5120$}};
+\draw[dashed] (9,0)node[below,font=\tiny] {\large{$6144$}};
+\draw[dashed] (10,0)node[below,font=\tiny] {\large{$7168$}};
+\draw[dashed] (11,0)node[below,font=\tiny] {\large{$8192$}};
+\draw[dashed] (12,0)node[below,font=\tiny] {\large{$9216$}};
+\draw[dashed] (13,0)node[below,font=\tiny] {\large{$10240$}};
+
+
+\node[below,scale=1, font=\small] at (6.5,-0.5){\large{РАЗМЕР ВВОДА}};
+\node[below,scale=1, font=\small] at (7.5,9.8){\large{SPIRAL: PRUNED DFT ОТНОСИТЕЛЬНО}};
+\node[below,scale=1, font=\small] at (8,9.3){\large{DFT  (4-СПОСОБ SSE)}};
+
+% Оси
+\draw[->] (1,0) -- (13.5,0) coordinate (x axis);
+\draw[->] (1,0) -- (1,8.3) coordinate (y axis);
+%График
+
+\draw[black] (1,0) -- (1,0.08);
+\draw[black] (2,0) -- (2,0.08);
+\draw[black] (3,0) -- (3,0.08);
+\draw[black] (4,0) -- (4,0.08);
+\draw[black] (5,0) -- (5,0.08);
+\draw[black] (6,0) -- (6,0.08);
+\draw[black] (7,0) -- (7,0.08);
+\draw[black] (8,0) -- (8,0.08);
+\draw[black] (9,0) -- (9,0.08);
+\draw[black] (10,0) -- (10,0.08);
+\draw[black] (11,0) -- (11,0.08);
+\draw[black] (12,0) -- (12,0.08);
+\draw[black] (13,0) -- (13,0.08);
+
+\draw[black] (0.95,1) -- (1.08,1);
+\draw[black] (0.95,2) -- (1.08,2);
+\draw[black] (0.95,3) -- (1.08,3);
+\draw[black] (0.95,4) -- (1.08,4);
+\draw[black] (0.95,5) -- (1.08,5);
+\draw[black] (0.95,6) -- (1.08,6);
+\draw[black] (0.95,7) -- (1.08,7);
+\draw[black] (0.95,8) -- (1.08,8);
+
+% ГРАФИКИ 
+% Синий
+\draw[ultra thick, cyan] (1,8) -- (2,7);
+\draw[ultra thick, cyan] (2,7) -- (3,6.9);
+\draw[ultra thick, cyan] (3,6.9) -- (4,7.3);
+\draw[ultra thick, cyan] (4,7.3) -- (5,5.8);
+\draw[ultra thick, cyan] (5,5.8) -- (6,5.9);
+\draw[ultra thick, cyan] (6,5.9) -- (7,5.8);
+\draw[ultra thick, cyan] (7,5.8) -- (8,5.5);
+\draw[ultra thick, cyan] (8,5.5) -- (9,5.7);
+\draw[ultra thick, cyan] (9,5.7) -- (10,5.25);
+\draw[ultra thick, cyan] (10,5.25) -- (11,5.35);
+\draw[ultra thick, cyan] ((11,5.35) -- (12,5.45);
+\draw[ultra thick, cyan] (12,5.45) -- (13,5.25);
+
+% Красный
+\draw[ultra thick, red] (1,6.3) -- (2,6);
+\draw[ultra thick, red] (2,6) -- (3,5.9);
+\draw[ultra thick, red] (3,5.9) -- (4,6.1);
+\draw[ultra thick, red] (4,6.1) -- (5,5.5);
+\draw[ultra thick, red] (5,5.5) -- (6,5.65);
+\draw[ultra thick, red] (6,5.65) -- (7,5.35);
+\draw[ultra thick, red] (7,5.35) -- (8,5.1);
+\draw[ultra thick, red] (8,5.1) -- (9,5.25);
+\draw[ultra thick, red] (9,5.25) -- (10,4.9);
+\draw[ultra thick, red] (10,4.9) -- (11,5.0);
+\draw[ultra thick, red] (11,5.0) -- (12,5.15);
+\draw[ultra thick, red] (12,5.15) -- (13,5.0);
+
+% Зеленый
+\draw[ultra thick, green] (1,5.7) -- (2,5.5);
+\draw[ultra thick, green] (2,5.5) -- (3,5.45);
+\draw[ultra thick, green] (3,5.45) -- (4,5.7);
+\draw[ultra thick, green] (4,5.7) -- (5,4.9);
+\draw[ultra thick, green] (5,4.9) -- (6,5.0);
+\draw[ultra thick, green] (6,5.0) -- (7,4.9);
+\draw[ultra thick, green] (7,4.9) -- (8,4.8);
+\draw[ultra thick, green] (8,4.8) -- (9,4.9);
+\draw[ultra thick, green] (9,4.9) -- (10,4.6);
+\draw[ultra thick, green] (10,4.6) -- (11,4.5);
+\draw[ultra thick, green] (11,4.5) -- (12,4.7);
+\draw[ultra thick, green] (12,4.7) -- (13,4.6);
+% Фиолетовый
+\draw[ultra thick, purple] (1,5.2) -- (2,5.4);
+\draw[ultra thick, purple] (2,5.4) -- (3,5.3);
+\draw[ultra thick, purple] (3,5.3) -- (4,5.38);
+\draw[ultra thick, purple] (4,5.38) -- (5,4.6);
+\draw[ultra thick, purple] (5,4.6) -- (6,4.7);
+\draw[ultra thick, purple] (6,4.7) -- (7,4.6);
+\draw[ultra thick, purple] (7,4.6) -- (8,4.4);
+\draw[ultra thick, purple] (8,4.4) -- (9,4.35);
+\draw[ultra thick, purple] (9,4.35) -- (10,4.1);
+\draw[ultra thick, purple] (10,4.1) -- (11,4.3);
+\draw[ultra thick, purple] (11,4.3) -- (12,4.5);
+\draw[ultra thick, purple] (12,4.5) -- (13,4.45);
+% Синий
+\draw[ultra thick, blue] (1,4.9) -- (2,5.2);
+\draw[ultra thick, blue] (2,5.2) -- (3,5.3);
+\draw[ultra thick, blue] (3,5.3) -- (4,5.2);
+\draw[ultra thick, blue] (4,5.2) -- (5,4.5);
+\draw[ultra thick, blue] (5,4.5) -- (6,4.55);
+\draw[ultra thick, blue] (6,4.55) -- (7,4.3);
+\draw[ultra thick, blue] (7,4.3) -- (8,4.4);
+\draw[ultra thick, blue] (8,4.4) -- (9,4.2);
+\draw[ultra thick, blue] (9,4.2) -- (10,4.1);
+\draw[ultra thick, blue] (10,4.1) -- (11,4.2);
+\draw[ultra thick, blue] (11,4.2) -- (12,4.5);
+\draw[ultra thick, blue] (12,4.5) -- (13,4.4);
+
+% Вертикальные линии 
+%\draw[black, dotted] (1,0) -- (1,8.3) coordinate (y axis);
+%\draw[black, dotted] (2,0) -- (2,8.3) coordinate (y axis);
+%\draw[black, dotted] (3,0) -- (3,8.3) coordinate (y axis);
+%\draw[black, dotted] (4,0) -- (4,8.3) coordinate (y axis);
+%\draw[black, dotted] (5,0) -- (5,8.3) coordinate (y axis);
+%\draw[black, dotted] (6,0) -- (6,8.3) coordinate (y axis);
+%\draw[black, dotted] (7,0) -- (7,8.3) coordinate (y axis);
+%\draw[black, dotted] (8,0) -- (8,8.3) coordinate (y axis);
+%\draw[black, dotted] (9,0) -- (9,8.3) coordinate (y axis);
+%\draw[black, dotted] (10,0) -- (10,8.3) coordinate (y axis);
+%\draw[black, dotted] (11,0) -- (11,8.3) coordinate (y axis);
+%\draw[black, dotted] (12,0) -- (12,8.3) coordinate (y axis);
+%\draw[black, dotted] (13,0) -- (13,8.3) coordinate (y axis);
+
+% Горизонтальные линии 
+%\draw[black, dotted] (1,1) -- (13.5,1) coordinate (x axis);
+%\draw[black, dotted] (1,2) -- (13.5,2) coordinate (x axis);
+%\draw[black, dotted] (1,3) -- (13.5,3) coordinate (x axis);
+%\draw[black, dotted] (1,4) -- (13.5,4) coordinate (x axis);
+%\draw[black, dotted] (1,5) -- (13.5,5) coordinate (x axis);
+%\draw[black, dotted] (1,6) -- (13.5,6) coordinate (x axis);
+%\draw[black, dotted] (1,7) -- (13.5,7) coordinate (x axis);
+%\draw[black, dotted] (1,8) -- (13.5,8) coordinate (x axis);
+
+
+% Легенда
+
+\draw[ultra thick, cyan]  (2, 3.4) -- (2.5, 3.4) node[right, black, font=\small] {-- \Large{Pruned DFT(первая $1/16$ ненулевая)}};
+\draw[ultra thick, red] (2, 2.9) -- (2.5, 2.9) node[right, black, font=\small] {-- \Large{Pruned DFT(центр $7/8$ нулевой)}};
+\draw[ultra thick, green] (2, 2.4) -- (2.5, 2.4) node[right, black, font=\small] {-- \Large{Pruned DFT(центр $1/4$ ненулевой)}};
+\draw[ultra thick, purple] (2, 1.9) -- (2.5, 1.9) node[right, black, font=\small] {-- \Large{Pruned DFT(вторая половина нулевая)}};
+\draw[ultra thick, blue] (2, 1.4) -- (2.5, 1.4) node[right, black, font=\small] {-- \Large{Spiral DFT}};
+
+\end{tikzpicture}
+\end{center}
+\end{document}

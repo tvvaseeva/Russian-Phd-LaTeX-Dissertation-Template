@@ -43,7 +43,7 @@
 \section{Математическая модель многотонального сигнала}
 \subsection{Ограничение ДПФ}
 \begin{frame}{Ограничение ДПФ}
-\begin{tabular}{m{0.5\linewidth}m{0.54\linewidth}}
+\begin{tabular}{m{0.5\linewidth}m{0.5\linewidth}}
 \textbf{Модель сигнала}:	
 \begin{equation}
 \label{eq:equation1}
@@ -74,17 +74,17 @@ s(t) = \displaystyle\sum_{k=0}^{N-1} A_k \cos \left({\frac{2 \pi}{T_s} f_{peak} 
 \begin{minipage}[t]{0.47\linewidth}
 	\centering 
 	\textbf{Прямоугольное окно}
-	\includegraphics[width=.9\linewidth]{Прямоугольное окно230421.png}
+	\includegraphics[width=.85\linewidth]{Прямоугольное окно040521.png}
 	\textbf{Окно Кайзера}
-	\includegraphics[width=.9\linewidth]{ОкноКазера230421.png}		
+	\includegraphics[width=.85\linewidth]{ОкноКазера040521.png}		
 \end{minipage}
 \hfill
 \begin{minipage}[t]{0.47\linewidth}
 	\centering 
 	\textbf{Спектр с прям-ым окном}
-	\includegraphics[width=.9\linewidth]{ПрямоугольныйСпект230421.png}
+	\includegraphics[width=.85\linewidth]{ПрямоугольныйСпект230421.png}
 	\textbf{Спектр с окном Кайзера}
-	\includegraphics[width=.9\linewidth]{СпектрОкняКайзера230421.png}
+	\includegraphics[width=.85\linewidth]{СпектрОкняКайзера230421.png}
 \end{minipage}
 \end{frame}
 
@@ -136,17 +136,17 @@ s(t) = \displaystyle\sum_{k=0}^{N-1} A_k \cos \left({\frac{2 \pi}{T_s} f_{peak} 
 	\begin{minipage}[t]{0.45\linewidth}
 		\centering 
 		\textbf{Сигнал (частота=5.2)}
-		\includegraphics[width=.9\linewidth]{signal}
+		\includegraphics[width=.85\linewidth]{signal}
 		\textbf{Экстраполированный сигнал }
-		\includegraphics[width=.9\linewidth]{interpolated_signal}		
+		\includegraphics[width=.85\linewidth]{interpolated_signal}		
 	\end{minipage}
 	\hfill
 	\begin{minipage}[t]{0.45\linewidth}
 		\centering 
 		\textbf{Спектр}
-		\includegraphics[width=.9\linewidth]{spectrum}
+		\includegraphics[width=.85\linewidth]{spectrum}
 		\textbf{Спектр экстр. сигнала}
-		\includegraphics[width=.9\linewidth]{spectrum_of_interpolated_signal}
+		\includegraphics[width=.85\linewidth]{spectrum_of_interpolated_signal}
 	\end{minipage}
 \end{frame}
 
@@ -281,14 +281,14 @@ $A$ – амплитуда гармоники.
 \begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.57] {Fundamental frequency offset versus noise level.pdf}
+	\includegraphics [scale=0.53] {Fundamental frequency offset versus noise level.pdf}
 	\caption{Графики зависимостей смещения основной частоты от уровня шума.}
 	\label{img:Fundamental_frequency_offset_versus_noise_level}
 \end{figure}
 &
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.45] {Dispersion in the estimation of the fundamental frequency of the voltage.pdf}
+	\includegraphics [scale=0.43] {Dispersion in the estimation of the fundamental frequency of the voltage.pdf}
 	\caption{Дисперсия при оценке основной частоты напряжения.}
 	\label{img:Dispersion_in_the_estimation_of_the_fundamental_frequency_of_the_voltage}
 \end{figure}
@@ -306,11 +306,11 @@ $A$ – амплитуда гармоники.
 \end{frame}
 
 \begin{frame}{Экспериментальная проверка формулы для оценки дисперсии}
-\begin{tabular}{m{0.32\linewidth}m{0.32\linewidth}m{0.32\linewidth}}
+\begin{tabular}{m{0.30\linewidth}m{0.32\linewidth}m{0.32\linewidth}}
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.25] {noise_win_var.png}
-	\caption{\scriptsize{Изменение дисперсии шума после наложении на него окна.}}
+	\includegraphics [scale=0.24] {noise_win_var.png}
+	\caption{\small{Зависимость дисперсии шума после наложении на него окна.}}
 	\label{img:noise_win_var}
 \end{figure}
 \scriptsize{\begin{equation}
@@ -320,8 +320,8 @@ $A$ – амплитуда гармоники.
 & 
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.25] {estimate_amp_sin_kaiser_beta.png}
-	\caption{\scriptsize{Зависимость дисперсии оценки амплитуды от параметра окна.}}
+	\includegraphics [scale=0.24] {estimate_amp_sin_kaiser_beta.png}
+	\caption{\footnotesize{Зависимость дисперсии оценки амплитуды от параметра окна.}}
 	\label{img:estimate_amp_sin_kaiser_beta}
 \end{figure}
 \scriptsize{\begin{equation}
@@ -332,7 +332,7 @@ $A$ – амплитуда гармоники.
 \begin{figure}[ht]
 	\centering
 	\includegraphics [scale=0.25] {estimate_amp_sin_kaiser_noise.png}
-	\caption{\scriptsize{Зависимость дисперсии оценки амплитуды от дисперсии шума.}}
+	\caption{\footnotesize{Зависимость дисперсии оценки амплитуды от дисперсии шума.}}
 	\label{img:estimate_amp_sin_kaiser_noise}
 \end{figure}
 \scriptsize{\begin{equation}
@@ -372,7 +372,7 @@ $A$ – амплитуда гармоники.
 \begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}	
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.45] {Jacobsen's_method.pdf}
+	\includegraphics [scale=0.4] {Jacobsen's_method1.pdf}
 	\caption{Интерполяция пиков.}
 	\label{img:Jacobsen's_method}
 \end{figure}
@@ -380,7 +380,7 @@ $A$ – амплитуда гармоники.
 &
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.2] {set_of_standards.pdf}
+	\includegraphics [scale=0.19] {set_of_standards1.pdf}
 	\caption{Пример построения наборов эталонов.}
 	\label{img:set_of_standards}
 \end{figure}	
@@ -391,17 +391,17 @@ $A$ – амплитуда гармоники.
 	\begin{minipage}[t]{0.43\linewidth}
 		\centering 
 		\textbf{Сигнал (частота=5.2)}
-		\includegraphics[width=.9\linewidth]{signal}
+		\includegraphics[width=.85\linewidth]{signal}
 		\textbf{Экстраполированный \\ сигнал ($k_{i1}=4$)}
-		\includegraphics[width=.9\linewidth]{interpolated_signal}		
+		\includegraphics[width=.85\linewidth]{interpolated_signal}		
 	\end{minipage}
 	\hfill
 	\begin{minipage}[t]{0.43\linewidth}
 		\centering 
 		\textbf{Спектр сигнала}
-		\includegraphics[width=.9\linewidth]{spectrum_double}
+		\includegraphics[width=.85\linewidth]{spectrum_double}
 		\textbf{Спектр с двойной интерполяцией ($k_{i2}=4$)}
-		\includegraphics[width=.9\linewidth]{spectrum_double_interpolated}
+		\includegraphics[width=.85\linewidth]{spectrum_double_interpolated}
 	\end{minipage}
 \end{frame}
 
@@ -421,7 +421,7 @@ $A$ – амплитуда гармоники.
 \begin{tabular}{m{0.45\linewidth}m{0.45\linewidth}}
 \begin{figure}[ht]
 	\centering
-	\includegraphics [scale=0.2] {Computer_program.jpg}
+	\includegraphics [scale=0.07] {Computer_program1.jpg}
 	\caption{Свидетельство.}
 	\label{img:Computer_program}
 \end{figure}
@@ -576,20 +576,20 @@ $f_{max}'$ -- частота гармоники ДПФ со 2 по величи�
 %\end{frame}
 
 \begin{frame}{Анализ быстродействия}
-	\begin{minipage}[t]{0.43\linewidth}
+	\begin{minipage}[t]{0.45\linewidth}
 	\centering 
 	\textbf{Быстрая корреляция}
-	\includegraphics[width=.9\linewidth]{Direct correlation.pdf}
+	\includegraphics[width=.745\linewidth]{Direct correlation.pdf}
 	\textbf{Pruned БПФ}
-	\includegraphics[width=.9\linewidth]{Pruned_DFT.PNG}		
+	\includegraphics[width=.745\linewidth]{Pruned DFT2.pdf}		
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.43\linewidth}
+\begin{minipage}[t]{0.45\linewidth}
 	\centering 
 	\textbf{Прямой метод}
 	\includegraphics[width=.9\linewidth]{CUDA.pdf}
 	\textbf{Sparse FFT}
-	\includegraphics[width=.9\linewidth]{Sparse Fourier Transform.pdf}
+	\includegraphics[width=.8\linewidth]{Sparse Fourier Transform2.pdf}
 \end{minipage}
 \end{frame}
 
