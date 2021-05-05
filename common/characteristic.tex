@@ -3,36 +3,83 @@
 
 Основным направлением в применении цифровой обработки сигналов (ЦОС) является спектральный анализ. Каждый сигнал, который изменяется во времени, имеет частотный спектр. Электрические сигналы можно анализировать в частотной области с помощью анализаторов спектра, во временной области с помощью осциллографов. 
 
-Преобразование Фурье уводит нас из временной области в частотную, и это
-влечет за собой огромное количество применений. Быстрое преобразование
-Фурье (БПФ) представляет собой алгоритм вычисления Дискретного преобразования Фурье (ДПФ). Спектр не содержит какой-либо информации о времени, а состоит из комплексных чисел (одно число для каждой синусоиды). В комплексном числе закодированы две вещи: амплитуда и угол. Спектр может содержать очень большие и  очень малые значения. Если взять логарифм этого спектра, то этот диапазон значений будет существенно сжат.
+Преобразование Фурье (Fourier transform) уводит нас из временной области в частотную, и это влечет за собой огромное количество применений. Быстрое преобразование
+Фурье (БПФ) представляет собой алгоритм вычисления Дискретного преобразования Фурье (ДПФ). Спектр не содержит какой-либо информации о времени, а состоит из комплексных чисел (одно число для каждой синусоиды). В комплексном числе закодированы две вещи: амплитуда и угол. 
 
-Процесс наложения окна на сигнал, представляет собой умножение неограниченной во времени функции на ограниченную весовую функцию окна. Основная цель наложения окна – получение ограниченной во времени функции, при минимальных спектральных искажениях.
+Эффективные алгоритмы преобразования Фурье описаны в работах J.~Cooley~\cite{cooley1965algorithm}, S.~Winograd~\cite{winograd1978computing}, R.~Blahut~\cite{1457487}, Г.~Нуссбаумера~\cite{nussbaumer1985fast}, Л.~М.~Гольденберга \cite{Digital_processing_Goldenberg_1985}, А.~Оппенгейма \cite{Oppenheim2018Digital} и другие ученые. 
 
-Классические оконные функции включают функции Ханна, Хемминга и Блэкмана.
-Оконная функция Кайзера – хорошая аппроксимация оптимального вытянутого сферического окна, концентрирующего большинство энергии в главном лепестке.
+%Cooley J. W., Tukey J. W. An algorithm for the machine calculation of complex Fourier series //Mathematics of computation. – 1965. – Т. 19. – №. 90. – С. 297-301.
+
+% Winograd S. On computing the discrete Fourier transform //Mathematics of computation. – 1978. – Т. 32. – №. 141. – С. 175-199.
+
+% R. E. Blahut, "Algebraic fields, signal processing, and error control," in Proceedings of the IEEE, vol. 73, no. 5, pp. 874-893, May 1985, doi: 10.1109/PROC.1985.13219.
+
+%Нуссбаумер Г. Быстрое преобразование Фурье и алгоритмы вычисления сверток. – Радио и связь, 1985.
+
+% Гольденберг Л. М. и др. Цифровая обработка сигналов: Справочник. – Радио и связь, 1985.
+
+% Оппенгейм А., Шафер Р. Цифровая обработка сигналов. – Litres, 2018.
+
+Цифровой сигнал можно представить из аналогового методом дискретизации. Дискретизация сигнала может производиться по времени (выборка) и по величине сигнала (квантованием). Преобразование из аналогово сигнала в цифровой называют аналогово-цифровым преобразованием (АЦП). 
+
+Существуют сигналы имеющие более одной независимой переменной. Такие сигналы называют одномерными. Например, сигнал изображения. Сигналы имеющие две независимые переменные называют -- двумерными.
+Наиболее популярный способ сравнения таких сигналов – это их корреляция или свертка. Корреляция может быть вычислена по алгоритмам циклической свертки, для этого необходимо прочитать один из двух сигналов в обратном порядке. Класс быстрых методов вычисления корреляции состоит в ее разложении на более короткие корреляции. Z.~J.~Mou \cite{MOU1987377}, Y.~Naito \cite{550562}, Л.~Рабинер \cite{Rabiner1978theory} и другие исследователи предложили и описали эти алгоритмы в своих работах.
+% Mou Z. J., Duhamel P. Fast FIR filtering: algorithms and implementations //Signal Processing. – 1987. – Т. 13. – №. 4. – С. 377-384.
+
+% Y. Naito, T. Miyazaki and I. Kuroda, "A fast full-search motion estimation method for programmable processors with a multiply-accumulator," 1996 IEEE International Conference on Acoustics, Speech, and Signal Processing Conference Proceedings, 1996, pp. 3221-3224 vol. 6, doi: 10.1109/ICASSP.1996.550562.
+
+%Рабинер Л., Гоулд Б. Теория и применение цифровой обработки сигналов. – Рипол Классик, 1978.
+
+Совокупность амплитуд гармоник ряда Фурье часто называют амплитудным спектром, а совокупность фаз -- фазовым спектром. Спектр амплитуд показывает как велика составляющая каждой гармоники внутри сигнала. Гармонический сигнал определяется тремя числовыми параметрами: амплитудой, частотой и фазой. Колебания самого большого периода называют колебанием основной частоты или колебанием первой гармоники. Первая гармоника является периодической функцией с периодом $2 \pi$. Ряд Фурье четной функции содержит только косинусы. Ряд Фурье нечетной функции содержит синусы.
+
+В ЦОС оконные функции широко используются для ограничения сигнала во времени. Классические оконные функции включают функции: Ханна, Хемминга, Блэкмана, Кайзера и другие. Оконная функция Кайзера – хорошая аппроксимация оптимального вытянутого сферического окна, концентрирующего большинство энергии в главном лепестке.
 Путем корректировки параметра $\beta$ мы можем выполнить настройку окна
 Кайзера.
 
 В диссертационной работе рассмотрены известны алгоритмы, описывающие способы оценки спектральных составляющих сигнала: интерполяционные методы, метод корреляционных функций, модернизированный метод корреляционных функций и метод рекомендованный в ГОСТ, прямой корреляционный метод с использованием быстрых алгоритмов обработки сигналов. 
 
-Эффективные алгоритмы преобразования Фурье описаны в работах J.~Cooley, S.~Winograd, R.~Blahut, Г.~Нуссбаумера, Л.~М.~Гольденберга, А.~Оппенгейма и другие ученые. Класс быстрых методов вычисления корреляции состоит в ее разложении на более короткие корреляции. Z.~J.~Mou, Y.~Naito, Л.~Рабинер и другие исследователи предложили и описали эти алгоритмы в своих работах \cite{MOU1987377, 550562, Rabiner1978theory}.
-
-Значительный вклад в решение вопросов по измерению оценки параметров гармоник внесли зарубежные ученые: Eric~Jacobsen's \cite{4205098, jacobsen1994local, jacobsen2007fast}, B.~G.~Quinn \cite{295186, 330402, 558515}, Cheng-I Chen, Shen Zhou, Zhang Shancong \cite{zhou2018improved}, Krzysztof Duda,  Dnyaneshwar D. Ahire, Javad Enayati, Zahra Moravej, Magnago Fernando, Reineri Claudio and Lovera Santiago, Zhengguang Xu, Tianqi Lu, and Benxiong Huang.      
-
-% B. G. Quinn, "Estimating frequency by interpolation using Fourier coefficients," in IEEE Transactions on Signal Processing, vol. 42, no. 5, pp. 1264-1268, May 1994, doi: 10.1109/78.295186.
-% B. G. Quinn and P. J. Kootsookos, "Threshold behavior of the maximum likelihood estimator of frequency," in IEEE Transactions on Signal Processing, vol. 42, no. 11, pp. 3291-3294, Nov. 1994, doi: 10.1109/78.330402.
-% B. G. Quinn, "Estimation of frequency, amplitude, and phase from the DFT of a time series," in IEEE Transactions on Signal Processing, vol. 45, no. 3, pp. 814-817, March 1997, doi: 10.1109/78.558515.
-
-% C. Chen and Y. Chen, "Comparative Study of Harmonic and Interharmonic Estimation Methods for Stationary and Time-Varying Signals," in IEEE Transactions on Industrial Electronics, vol. 61, no. 1, pp. 397-404, Jan. 2014, doi: 10.1109/TIE.2013.2242419.
-
+Значительный вклад в решение вопросов по измерению оценки параметров гармоник внесли Российские и зарубежные ученые: 
+В.~Н.~Горюнов \cite{Modeling_Questions_Lyutarevich2013, Goryunov2009definition}
+% Горюнов В. Н., Осипов Д. С., Лютаревич А. Г. Определение управляющего воздействия активного фильтра гармоник //Электро. Электротехника, электроэнергетика, электротехническая промышленность. – 2009. – №. 6. – С. 20-24.
+% Лютаревич, А. Г.; Горюнов, В. Н.; Долингер, С. Ю. & Хацевич, К. В. Вопросы моделирования устройств обеспечения качества электрической энергии. Омский научный вестник, Федеральное государственное бюджетное образовательное учреждение высшего ..., 2013
+И.~В.~Жежеленко \cite{Interharmonics_in_systems_Zhezhelenko_1999, zhezhelenko2010highest}
+%Жежеленко И. В., Саенко Ю. Л., Бараненко Т. К. Интергармоники в системах электроснабжения промпредприятий //Вестник Приазовского государственного технического университета. Серия: Технические науки. – 1999. – №. 8.
+% Жежеленко И. В. Высшие гармоники в системах электроснабжения промпредприятий. – 2010.
+В.~Т.~Черемисин \cite{Cheremisin1985method, Cheremisin2007method}
+% Черемисин В. Т., Дубовик Е. П. Способ расчета высших гармоник, генерируемых несколькими электротяговыми нагрузками //Динамика электрических машин. – 1985. – С. 150-153.
+% Черемисин В. Т., Грицутенко С. С. Способ повышения точности измерения гармонических составляющих тягового тока и напряжения //Вестник Ростовского государственного университета путей сообщения. – 2007. – №. 2. – С. 94-99.
+E.~Jacobsen \cite{4205098, jacobsen1994local, jacobsen2007fast}, 
+% E. Jacobsen and P. Kootsookos, "Fast, Accurate Frequency Estimators [DSP Tips & Tricks]," in IEEE Signal Processing Magazine, vol. 24, no. 3, pp. 123-125, May 2007, doi: 10.1109/MSP.2007.361611.
+%Jacobsen E. On local interpolation of DFT outputs //Available online: http://www. ericjacobsen. org/FTinterp. pdf.[Accessed January 2013]. – 1994.
+% Jacobsen, E. & Kootsookos, P. Fast, accurate frequency estimators [DSP Tips & Tricks] IEEE Signal Processing Magazine, IEEE, 2007, 24, 123-125
+M.~D.~Macleod \cite{651200, 1055282},
+% Macleod, M. Fast nearly ML estimation of the parameters of real or complex single tones or resolved multiple tones IEEE Transactions on Signal Processing, 1998, 46, 141-148
+% Rife, D. & Boorstyn, R. Single tone parameter estimation from discrete-time observations IEEE Transactions on Information Theory, 1974, 20, 591-598
+B.~G.~Quinn \cite{295186, 330402, 558515},
+% Quinn, B. Estimating frequency by interpolation using Fourier coefficients IEEE Transactions on Signal Processing, 1994, 42, 1264-1268
+% Quinn, B. & Kootsookos, P. Threshold behavior of the maximum likelihood estimator of frequency IEEE Transactions on Signal Processing, 1994, 42, 3291-3294
+% Quinn, B. G. Estimation of frequency, amplitude, and phase from the DFT of a time series IEEE Transactions on Signal Processing, 1997, 45, 814-817
+Thomas~Grandke \cite{4315077},
+% Grandke, T. Interpolation Algorithms for Discrete Fourier Transforms of Weighted Signals IEEE Transactions on Instrumentation and Measurement, 1983, 32, 350-355
+Cheng-I~Chen \cite{chen2013comparative},
+%C. Chen and Y. Chen, "Comparative Study of Harmonic and Interharmonic Estimation Methods for Stationary and Time-Varying Signals," in IEEE Transactions on Industrial Electronics, vol. 61, no. 1, pp. 397-404, Jan. 2014, doi: 10.1109/TIE.2013.2242419.
+Jiufei~Luo, Zhijiang~Xie, Ming~Xie \cite{luo2015phase, luo2016interpolated},
+% Luo, J. & Xie, M. Phase difference methods based on asymmetric windows. Mechanical Systems and Signal Processing, Elsevier, 2015, 54, 52-67
+% Luo J., Xie Z., Xie M. Interpolated DFT algorithms with zero padding for classic windows //Mechanical Systems and Signal Processing. – 2016. – Т. 70. – С. 1011-1025.
+Krzysztof~Duda \cite{duda2011dft},
+% Duda, K. DFT interpolation algorithm for Kaiser--Bessel and Dolph--Chebyshev windows. IEEE Transactions on Instrumentation and Measurement, IEEE, 2011, 60, 784-790
+Shen Zhou, Zhang Shancong \cite{zhou2018improved},
 % Zhou S., Shancong Z. Improved frequency estimation algorithm by least squares phase unwrapping //Circuits, Systems, and Signal Processing. – 2018. – Т. 37. – №. 12. – С. 5680-5687.
+Carlos~Joao~Ramos, Antonio~Pina~Martins, Adriano~da~Silva~Carvalho \cite{ramos2017power, ramos2005synchronizing, 7065248} и другие ученые.
+% Ramos, C. J.; Martins, A. P. & da Silva Carvalho, A. Power system frequency estimation using a least mean squares differentiator International Journal of Electrical Power & Energy Systems, Elsevier, 2017, 87, 166-175
+% Ramos, C.; Martins, A. & Carvalho, A. Synchronizing renewable energy sources in distributed generation systems Proc. Int. Conf. Renew. Energy Power Qual.(ICREPQ), Zaragoza, Spain, 2005, 1-5
+% Ramos, C. J.; Martins, A. P. & Carvalho, A. S. Frequency and Phase-Angle Estimation Using Ordinary Least Squares IEEE Transactions on Industrial Electronics, 2015, 62, 5677-5688
 
 {\aim} данной работы является совершенствование алгоритмов оценки параметров гармоник многотонального сигнала.
 
-{\researchObject} являются алгоритмы оценки параметров гармоник в силовых электрических сетях.
+%{\researchObject} являются алгоритмы оценки параметров гармоник в силовых электрических сетях.
 
-{\researchSubject} является точность и быстродействие алгоритмов оценки параметров гармоник.
+%{\researchSubject} является точность и быстродействие алгоритмов оценки параметров гармоник.
 
 Для~достижения поставленной цели необходимо было решить следующие {\tasks}:
 \begin{enumerate}

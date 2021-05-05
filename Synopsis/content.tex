@@ -41,6 +41,42 @@
 \item Для решения задачи построения оптимального алгоритма для анализа спектра сигнала в электрических сетях необходимо уточнение математической модели спектра сигналов в части, описывающей точность оценки (дисперсию) параметров гармоник спектра многотонального сигнала.
 \end{itemize}
 
+В первой главе рассматриваются алгоритмы оценки параметров гармоник и их применение для многотональных сигналов. Произведен литературный обзор по теме диссертационных исследований.
+
+В работе представлена математическая модель сигнала в электрической сети, обобщающая результаты исследований проблем качества электроэнергии и учитывающая требования регламентирующих документов. Она позволяет проводить исследования алгоритмов анализа электрических сигналов, а также средств измерений, построенных на их основе.
+Модель сигнала электрической сети с учетом \cite{GOST30804.4.7-2013}, раздел $3.1$, связывает гармоники, высшие гармоники и интергармоники тока и напряжения электрической сети при наличии шума: 
+%ГОСТ 30804.4.7-2013 (IEC 61000-4-7:2009) Совместимость технических средств электромагнитная. Общее руководство по средствам измерений и измерениям гармоник и интергармоник для систем электроснабжения и подключаемых к ним технических средств. 2013; Доступно по: http://docs.cntd.ru/document/1200103652
+\begin{equation}
+	\label{eq:equation6}
+	s_{t} = a_{0} \sin (\omega_{0} t + \varphi_{0}) + \displaystyle\sum_{p=0}^{p} a_p^{\upsilon} \sin (m_p^{\upsilon} \omega_{0} t + \varphi_p^{\upsilon}) + \displaystyle\sum_{q=0}^{q} a_q^i \sin  (\omega_q^i t + \varphi_q^{i})
+\end{equation}
+
+где $a_{0}$ – амплитуда первой гармоники;
+
+$\omega_{0}$ – угловая частота первой гармоники, $\omega_{1} = 2 \pi f_{H,1}$;
+
+$\varphi_{0}$ – фаза первой гармоники; 
+
+$p$ – число высших гармоник;
+
+$a_p^{\upsilon}$ – амплитуда высших гармоник;
+
+$m_p^{\upsilon}$ – номер высших гармоник;
+
+$\varphi_p^{\upsilon}$ – фаза высших гармоник;
+
+$q$– номер интергармоник;
+
+$a_q^i$ – амплитуда интергармоник;
+
+$\omega_q^i$ – угловая частота интергармоник, $\omega_q^i=2\pi f_{ig,h}$; 
+
+$f_{ig,h}$ – частота интергармонической подгруппы порядка $h$;
+
+$\eta$ – шум.
+
+В формулу \ref{eq:equation6} добавлены значения высших гармоник, интергармоник тока и напряжения электрической сети.
+
 
 \underline{\textbf{Вторая глава}} посвящена математическим основам построения алгоритмов оценки параметров гармоник:
 
@@ -58,25 +94,154 @@
 \item Алгоритмы для нахождения оптимальной несмещенной оценки параметров могут быть построены на основе методов оптимального приема, изучаемых в радиотехники, в частости, с помощью корреляционного анализа.
 \end{itemize}
 
-
-Спектральные составляющие на частотах, расположенных между двух последовательных гармонических частот, возникают при наличии в сигнале интергармонических составляющих. 
-Заметные интергармоники появляются в узком диапазоне частот: $35-75$ Гц, $150-160$ Гц. 
-Модель сигнала электрической сети с учетом , связывает гармоники, высшие гармоники и интергармоники тока и напряжения электрической сети при наличии шума: 
-
+Общая формула границы Крамера-Рао \cite{kay1993fundamentals, kay2013fundamentals}:
 \begin{equation}
-	\label{eq:equation13}
-	s_{t}=a_{0}\sin(\omega_{0}t + \phi_{0})
+	\label{eq:equation2}
+	var(\theta)\geq\frac{1}{I(\left.\theta)\right]}
 \end{equation}
 
+где $I(\theta)=-E\left[\frac{\delta^2 ln p(x;\theta)}{\delta\theta^2}\right]$ -- количество информации по Фишеру, получаемой в результате наблюдения.
+
+Общая оценка границы Крамера-Рао для сигналов в белом Гауссовом шуме:
+\begin{equation}
+	\label{eq:equation14}
+	x[n] = A + s[n;\theta] + w[n], n=0,1,...,N-1	
+\end{equation}
+
+$x[n]$ -- среднее значение;
+
+$A$ и $\theta$  -- оцениваемые параметры;
+
+$w[n]$ -- белый шум Гаусса;
+
+$s[n;\theta]$ -- детерминированный сигнал.
+\begin{equation}
+	\label{eq:equation14}
+	var(\hat{\theta}) \geq \frac{\sigma^2}{\displaystyle\sum_{n=0}^{N-1} \left(\frac{\partial s [n; \theta]}{\partial\theta}\right)^2} 
+\end{equation}
+
+Неравенство Крамера-Рао для амплитуды, частоты и фазы гармоник \cite{kay1993fundamentals}:
+\begin{equation}
+	\label{eq:equation16}
+	var(\hat{A})\geq \frac{2  \sigma^2}{N} 
+\end{equation}
+\begin{equation}
+	\label{eq:equation17}
+	var(\hat{f_0})\geq \frac{12}{(2\pi)^2 \eta  N(N^2 - 1)}  
+\end{equation}
+%(3.41), C.34
+\begin{equation}
+	\label{eq:equation18}
+	var(\hat{\varphi})\geq \frac{2(2N-1)}{\eta N(N+1)}  
+\end{equation}
+
+Математическая модель для оценки точности нахождения амплитуды гармоники \cite{altman2020boundary}:
+\begin{equation}
+	\label{eq:equation24}
+	var(A)\geq \frac{2\sigma^2}{N} \frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n \right)^2} 			  
+\end{equation}
+
+где $\sigma$ -- среднее квадратичное отклонение шума;
+
+$n$ – номер отчета.
+
+$N$ – число отсчетов в дискретном сигнале;
+
+$x(n;\theta)$ – наблюдаемый сигнал;
+
+$A$ – амплитуда гармоники. 
+
+Эта формула дает оценку дисперсии при использовании метода, вносящего оптимальную несмещенную оценку. 
+
+Эксперименты были проведены при различных входных параметрах (число точек, амплитуда, частота и фаза сигналов, дисперсия шума или коэффициент окна). Ни в одном случае не было зафиксировано отклонение результатов эксперимента от результатов, полученных по предложенной формуле.
+
+В работе \cite{altman2020boundary} ввели обозначение коэффициент окна:
+\begin{equation}
+	\label{eq:equation25}
+	F_{win}=\frac{\sum_{n=0}^{N-1}w_n^2}{\left(\sum_{n=0}^{N-1} w_n\right)^2}
+\end{equation}
+
+Данный коэффициент показывает, во сколько ухудшится оценка амплитуды гармоники при использовании окна $w$.
 
 
+Определим дисперсию этой случайной величины. Во всех $n\in 0,…,n-1$ отклонение от нуля будет нормально распределено со средним отклонением равным $w_n*\sigma$. Среднее квадратичное отклонение в каждой точке будет равно $w_n^2*\sigma^2$. Усредняя по всем $n$ получаем, что дисперсия случайной величины $w_n*wgn_n$ будет: 
+\begin{equation}
+	\label{eq:equation7}
+	\sigma^{'2}=\frac{\sum_{n=0}^{N-1} w_n^2}{N}*\sigma^2
+\end{equation}
+
+На графике \ref{img:noise_win_var} показано изменение дисперсии шума после наложении на него окна Кайзера с параметром $kaiser\_beta=5$. Из графика видно, что линии дисперсий практически совпадают:
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.5] {noise_win_var.png}
+	\caption{\small{Зависимость дисперсии шума после наложении на него окна.}}
+	\label{img:noise_win_var}
+\end{figure}
+
+Для рисунка \ref{img:estimate_amp_sin_kaiser_beta} использовалась формула \ref{eq:equation25} для дисперсии оценки амплитуды гармоники при использовании оконной функции. При увеличении числа тестов линии становятся все более похожими. 
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.5] {estimate_amp_sin_kaiser_beta.png}
+	\caption{\footnotesize{Зависимость дисперсии оценки амплитуды от параметра окна.}}
+	\label{img:estimate_amp_sin_kaiser_beta}
+\end{figure}
+
+Для рисунка \ref{img:estimate_amp_sin_kaiser_noise} использовалась формула \ref{eq:equation25} для дисперсии оценки амплитуды гармоники при использовании оконной функции.
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.5] {estimate_amp_sin_kaiser_noise.png}
+	\caption{\footnotesize{Зависимость дисперсии оценки амплитуды от дисперсии шума.}}
+	\label{img:estimate_amp_sin_kaiser_noise}
+\end{figure}
+
+Рассмотренили влияние различных оконных функций на границу Крамера-Рао амплитуды однотонального сигнала \cite{altman2020boundary}.
+Формула оценки дисперсии амплитуды \cite{altman2020boundary} дает наилучший результаты при выборе весовых функций: Кайзера ($\beta=4$), Хэмминга, Барлетта. Так как результаты расчетов по формуле и результаты моделирование близки к границе Крамера-Рао. Зависимость дисперсии оценки амплитуды от дисперсии шума показывают, что чем меньше коэффициент увеличения дисперсии, тем точнее результаты. Наихудший результат показало окно Кайзера с параметром $\beta=15$.
+
+Исследованы методы оценки спектральных составляющих:
+\begin{enumerate}
+	\item	Метод Якобсена (Jacobsen's Modified Quadratic Estimator)\cite{4205098, jacobsen1994local, jacobsen2007fast, ericjacobsen_cite};
+	\item	Два метода Квина (Quinn's Estimator, Quinn's Second Estimator)\cite{558515, 295186, 330402};
+	\item	Два метода Маклеода (Macleod's Estimator) \cite{651200, 1055282};
+	\item	Метод Грэндка (Grandke's method) \cite{4315077};
+	\item	Алгоритм параболической интерполяции (Parabolic Interpolation) \cite{Konopatskiy_2020, LACHANCE1991143, gasior2004improving, 7818824};
+	\item	Алгоритм интерполяции Гаусса (Gaussian Interpolation) \cite{gasior2004improving, gu2005leaf, gilboa2014image};
+	\item	Алгоритм, рекомендованный в ГОСТ 30804.4.7-2013 \cite{GOST30804.4.7-2013};
+	\item	Метод корреляционных функций (Correlation function method) \cite{Altman2012definition, Altman2012promotion, Altman2012improvement, WANG20175}.
+	\item Модернизированный метод корреляционных функций (Modernized method of correlation functions) \cite{Altman2012promotion, Elizarov2016analysis, Increase_Accuracy_Yelizarov2014}.
+\end{enumerate}
+%B. G. Quinn, "Estimation of frequency, amplitude, and phase from the DFT of a time series," in IEEE Transactions on Signal Processing, vol. 45, no. 3, pp. 814-817, March 1997, doi: 10.1109/78.558515.
+% B. G. Quinn, "Estimating frequency by interpolation using Fourier coefficients," in IEEE Transactions on Signal Processing, vol. 42, no. 5, pp. 1264-1268, May 1994, doi: 10.1109/78.295186.
+% B. G. Quinn and P. J. Kootsookos, "Threshold behavior of the maximum likelihood estimator of frequency," in IEEE Transactions on Signal Processing, vol. 42, no. 11, pp. 3291-3294, Nov. 1994, doi: 10.1109/78.330402.
+
+% D. Rife and R. Boorstyn, "Single tone parameter estimation from discrete-time observations," in IEEE Transactions on Information Theory, vol. 20, no. 5, pp. 591-598, September 1974, doi: 10.1109/TIT.1974.1055282.
+% M. D. Macleod, "Fast nearly ML estimation of the parameters of real or complex single tones or resolved multiple tones," in IEEE Transactions on Signal Processing, vol. 46, no. 1, pp. 141-148, Jan. 1998, doi: 10.1109/78.651200.
 
 
+%T. Grandke, "Interpolation Algorithms for Discrete Fourier Transforms of Weighted Signals," in IEEE Transactions on Instrumentation and Measurement, vol. 32, no. 2, pp. 350-355, June 1983, doi: 10.1109/TIM.1983.4315077.
+
+%Konopatskiy E. V., Bezditnyi A. A. Geometric modeling of multifactor processes and phenomena by the multidimensional parabolic interpolation method //Journal of Physics: Conference Series. – IOP Publishing, 2020. – Т. 1441. – №. 1. – С. 012063.
+% S. Djukanović, T. Popović and A. Mitrović, "Precise sinusoid frequency estimation based on parabolic interpolation," 2016 24th Telecommunications Forum (TELFOR), 2016, pp. 1-4, doi: 10.1109/TELFOR.2016.7818824.
+
+
+% Gasior M., Gonzalez J. L. Improving FFT frequency measurement resolution by parabolic and Gaussian spectrum interpolation //AIP Conference Proceedings. – American Institute of Physics, 2004. – Т. 732. – №. 1. – С. 276-285.
+% Gu X., Du JX., Wang XF. (2005) Leaf Recognition Based on the Combination of Wavelet Transform and Gaussian Interpolation. In: Huang DS., Zhang XP., Huang GB. (eds) Advances in Intelligent Computing. ICIC 2005. Lecture Notes in Computer Science, vol 3644. Springer, Berlin, Heidelberg. https://doi.org/10.1007/11538059_27
+% Gilboa E. et al. Image interpolation and denoising for division of focal plane sensors using Gaussian processes //Optics express. – 2014. – Т. 22. – №. 12. – С. 15277-15291.
+
+% Альтман Е. А., Елизаров Д. А. Повышение точности оценки параметров сигналов в электрической сети в системе тягового электроснабжения //Известия Транссиба. – 2012. – №. 3 (11).
+% Wang Z. et al. Nonlinearity-tolerant OSNR estimation method based on correlation function and statistical moments //Optical Fiber Technology. – 2017. – Т. 39. – С. 5-11.
+
+% Елизаров Д. А. Анализ методов оценки гармонических составляющих напряжения в электроэнергетических системах //Омский научный вестник. – 2016. – №. 2 (146).
+
+Алгоритмы являются интерполяционными для нахождения параметров гармоник, кроме трех последних методов (метод корреляционных функций, модернизированный метод корреляционных функций и метод по ГОСТу). Сутью метода интерполирования является нахождение промежуточных значений величины по имеющемуся дискретному набору известных значений, то есть кривая построенной функции должна точно пройти через имеющиеся точки данных.
+
+В результате анализа выявлено, что метод корреляционных функций
+наиболее точен, но использует большее количество математических операций,
+поэтому требует большего времени на выполнение.
 
 \underline{\textbf{Третья глава}} посвящена исследованию численных методов для нахождение оптимальной несмещенной оценки параметров гармоник:
 
 \begin{itemize}
-
 \item Методы, основанные на интерполировании смежных гармоник, позволяют достичь высокой точности, во многих случаях достаточной для практического применения, однако они не позволяют достичь точности оптимальной несмещенной оценки.
 
 \item Можно выделить два подхода к построению алгоритмов на основе корреляционного анализа: использование итерационного процесса для нахождения частоты, амплитуды и фазы каждой гармоники и использование техники дополнения нулями сигнала с целью уплотнения гармоник в спектре сигнала. Оба метода требуют существенно больших вычислительных ресурсов, чем методы основанные на интерполировании, но обеспечивают оптимальную несмещенную оценку.
@@ -87,6 +252,80 @@
 
 \item Реализация метода дополнение нулями сигнала при использовании разряженного преобразования Фурье имеет быстродействие менее чем на порядок худшее, чем итерационные методы, при этом быстродействие не зависит от числа обсчитываемых гармоник. Также нужно отметить больший объем памяти, требуемый для этого метода, который при этом не является критичным для современных вычислительных устройств.
 \end{itemize}
+
+Разработан прямой корреляционный метод с использованием быстрых алгоритмов обработки сигналов. Алгоритм поиска гармоник представлен на рисунке \ref{img:Diagram_GSA}:
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.5] {Diagram_GSA2.png}
+	\caption{ГСА алгоритма поиска гармоник.}
+	\label{img:Diagram_GSA}
+\end{figure}
+
+Рассмотрели применение метода разложения двумерной свертки при
+реализации цифровых фильтров. Линейная двумерная дискретная свертка определяется следующей формулой \cite{decomposition_method_application2017}:
+\begin{equation}
+	\label{eq:equation3.5.1}
+	CON_{j1,j2} = \sum_{i1 =0}^{n1-1} \sum_{i2 =0}^{n2-1} x_{i1,i2} \cdot y_{i1-j1,i2-j2}
+\end{equation} 
+
+Дискретная корреляция двух последовательностей определяется следующей формулой: 
+\begin{equation}
+	\label{eq:equation3.5.2}
+	COR_{j1,j2} = \sum_{i1 =0}^{n1-1} \sum_{i2 =0}^{n2-1} x_{i1,i2} \cdot y_{i1+j1,i2+j2}
+\end{equation}
+
+Будем рассматривать три варианта вычисления двумерной свертки. Первый вариант – вычисление двумерной свертки непосредственно по формуле \ref{eq:equation3.5.1}. Второй вариант – использование предложенного в \cite{550562} алгоритма разложения двумерной свертки в несколько двумерных сверток меньших размеров. Третий вариант – использование быстрых алгоритмов одномерной свертки \cite{MOU1987377} для вычисления двумерной свертки.
+$$
+	CON_{j1,j2} = 
+	\begin{bmatrix}
+		\left( {B_{j1,j2} + B_{j1,j2+1}} \right) X_{0,0} \\
+		\left( {B_{j1+1,j2} + B_{j1+1,j2+1}} \right) X_{1,0} \\
+		\left( {B_{j1,j2+1} + B_{j1,j2+2}} \right) X_{0,1} \\
+		\left( {B_{j1+1,j2+1} + B_{j1+1,j2+2}} \right) X_{1,1}
+	\end{bmatrix}
+	+
+$$
+$$
++
+	\begin{bmatrix}
+		-1 & 0 \\
+		0 & -1 \\
+		1 & 0  \\
+		0 & 1	
+	\end{bmatrix}
+	\cdot
+	\begin{bmatrix}
+		B_{j1,j2+1} \left( {X_{0,0} - X_{0,1}} \right) \\
+		B_{j1+1,j2+1} \left( {X_{1,0} - X_{1,1}} \right)	
+	\end{bmatrix}
+	+
+$$
+$$
+	+ 
+	\begin{bmatrix}
+		-1 & 0 \\
+		1 & 0 \\
+		0 & -1  \\
+		0 & 1	
+	\end{bmatrix}
+	\cdot
+	\begin{bmatrix}
+		\left(	{Y{j1+1,j2} + Y{j1+1,j2+1}} \right) \cdot A_0 \\
+		\left(	{Y{j1+1,j2+1} + Y{j1+1,j2+2}} \right) \cdot A_1	
+	\end{bmatrix}
+	+
+$$
+\begin{equation}
+\label{eq:equation3.5.13}
+	+
+	\begin{bmatrix}
+		1 \\ -1 \\ -1 \\ 1
+	\end{bmatrix}
+	\cdot
+	Y{j1+1,j2+1}
+	\cdot
+	(A_0 - A_1)
+\end{equation}
 
 %Можно сослаться на свои работы в автореферате. Для этого в файле
 %\verb!Synopsis/setup.tex! необходимо присвоить положительное значение
@@ -108,14 +347,21 @@
 \item Время расчета спектра реального сигнала этим методом на современном компьютере начального уровня составляет единицы секунд, что позволяет говорить о его приемлемом быстродействии для решения практических задач.
 \end{itemize}
 
+В четвертом разделе рассматривается понятие качество электрической энергии (КЭ) и описываются стандарты, определяющие состав показателей КЭ и методики измерений. По результатам анализа проводится сравнение российских и иностранных стандартов, описывающих требования и нормы КЭ.
 
+\begin{figure}[ht]
+	\centerfloat{
+		\includegraphics[scale=0.5]{picture1}
+	}
+	\caption{Развитие государственных стандартов в области контроля КЭ.}\label{img:picture1}
+\end{figure} 
 
 В \underline{\textbf{заключении}} приведены основные результаты работы, которые заключаются в следующем:
 \input{common/concl}
 
-При использовании пакета \verb!biblatex! список публикаций автора по теме
-диссертации формируется в разделе <<\publications>>\ файла
-\verb!common/characteristic.tex!  при помощи команды \verb!\nocite!
+%При использовании пакета \verb!biblatex! список публикаций автора по теме
+%диссертации формируется в разделе <<\publications>>\ файла
+%\verb!common/characteristic.tex!  при помощи команды \verb!\nocite!
 
 \ifdefmacro{\microtypesetup}{\microtypesetup{protrusion=false}}{} % не рекомендуется применять пакет микротипографики к автоматически генерируемому списку литературы
 \urlstyle{rm}                               % ссылки URL обычным шрифтом
