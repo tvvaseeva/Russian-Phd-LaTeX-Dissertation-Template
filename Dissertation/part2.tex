@@ -15,20 +15,17 @@
 
 Вторая глава посвящена математическим основам построения алгоритмов оценки параметров гармоник.
 
-Спектр сигнала определяется зависимостью сигнала от времени. Временная область и частотная связанны друг с другом с помощью преобразования Фурье. Практически преобразование Фурье определяется с помощью систем цифровой обработки сигналов (ЦОС). Точность гармонических моделей может обеспечить ЦОС, при условии, что математической основой является Дискретное преобразование Фурье (ДПФ, DFT -- Discrete Fourier Transform) или Быстрое преобразование Фурье (БПФ, FFT -- Fast Fourier Transform). 
+Спектр сигнала определяется зависимостью сигнала от времени. Временная область и частотная связанны друг с другом с помощью преобразования Фурье. Практически преобразование Фурье определяется с помощью систем цифровой обработки сигналов (ЦОС). Точность гармонических моделей может обеспечить ЦОС, при условии, что математической основой является Дискретное преобразование Фурье (ДПФ, DFT -- Discrete Fourier Transform) \cite{Digital_processing_Sergienko_2011} или Быстрое преобразование Фурье (БПФ, FFT -- Fast Fourier Transform). 
 \cite{Time-frequency_Avramchuk_2009,Optimization_Computational_Altman2008,Building_suboptimal_Altman_2017}
 %1. Аврамчук В. С., Гончаров В. И. Чан Вьет Тьяу. Частотно-временной корреляционный анализ цифровых сигналов //Известия Томского политехнического университета. – 2009. – Т. 315. – №. 5. – С. 112-115.
 %9. Альтман Е. А. Оптимизация вычислительной схемы быстрого преобразования Фурье //Омский научный вестник. – 2008. – №. 1 (64).
 %10. Альтман Е. А. Построение субоптимальных моделей алгоритмов БПФ по основанию 2 //Информационно-телекоммуникационные системы и технологии. – 2017. – С. 409-411.
 
-%ДПФ
-\cite{Digital_processing_Sergienko_2011}
-
 Методы цифровой фильтрации сигналов развивались динамично в последние годы. Появились новые математические методы (дискретное преобразование Фурье, быстрое преобразование Фурье, разряженное преобразование Фурье и др.), позволяющие создавать эффективные алгоритмы фильтрации. Фильтрация, в конечном счете, является не конечным этапом обработки сигналов, а предобработкой. Операции могут быть выполнены путем моделирования на персональных компьютерах или с помощью специализированной аппаратуры.
 Алгоритмы фильтрации сигналов условно разделяем на два класса:
 \begin{itemize}
-	\item Алгоритмы фильтрации в пространственной области.
-	\item Алгоритмы фильтрации в частотной области.
+\item алгоритмы фильтрации в пространственной области;
+\item алгоритмы фильтрации в частотной области.
 \end{itemize}
 
 
@@ -110,7 +107,7 @@ $N \bigtriangleup t$ -- основной период сигнала.
 Применение дополнительных методов для определения параметров напряжения обусловлено неспособностью ДПФ определить частоту сигнала. На рисунке \ref{img:Maximum_DFT.pdf} показано, что спектр сигнала не совпадает с максимумом спектра напряжения \cite{Definition_parameters_Altman_2012, Digital_processing_Sergienko_2011}. 
 \begin{figure}[p]
 	\centering
-	\includegraphics [scale=0.5] {Maximum_DFT.pdf}
+	\includegraphics [scale=0.7] {Maximum_DFT.pdf}
 	\caption{Несовпадение максимума спектра напряжения и максимума ДПФ.}
 	\label{img:Maximum_DFT.pdf}
 \end{figure}
@@ -120,7 +117,212 @@ $N \bigtriangleup t$ -- основной период сигнала.
 
 В настоящее время быстрым алгоритмом является БПф, который вычисляет ДПФ $n$-мерного сигнала за время $O(n \log n)$. Существование алгоритмов ДПФ быстрее, чем БПФ.
 
-\section{Нижняя граница Крамера-Рао} \label{sec:ch2/sec3} %АНТИПЛАГИАТ=
+\section{Алгоритмы оценки частот гармоник} \label{sec:ch2/sec3}
+Исследованы методы оценки спектральных составляющих:
+\begin{enumerate}
+	\item	Метод Якобсена (Jacobsen's Modified Quadratic Estimator)\cite{4205098, jacobsen1994local, jacobsen2007fast, ericjacobsen_cite};
+	\item	Два метода Квина (Quinn's Estimator, Quinn's Second Estimator)\cite{558515, 295186, 330402};
+	\item	Два метода Маклеода (Macleod's Estimator) \cite{651200, 1055282};
+	\item	Метод Грэндка (Grandke's method) \cite{4315077};
+	\item	Алгоритм параболической интерполяции (Parabolic Interpolation) \cite{Konopatskiy_2020, LACHANCE1991143, gasior2004improving, 7818824};
+	\item	Алгоритм интерполяции Гаусса (Gaussian Interpolation) \cite{gasior2004improving, gu2005leaf, gilboa2014image};
+	\item	Алгоритм, рекомендованный в ГОСТ 30804.4.7-2013 \cite{GOST30804.4.7-2013};
+	\item	Метод корреляционных функций (Correlation function method) \cite{Altman2012definition, Altman2012promotion, Altman2012improvement, WANG20175}.
+	\item Модернизированный метод корреляционных функций (Modernized method of correlation functions) \cite{Altman2012promotion, Elizarov2016analysis, Increase_Accuracy_Yelizarov2014}.
+\end{enumerate}
+%B. G. Quinn, "Estimation of frequency, amplitude, and phase from the DFT of a time series," in IEEE Transactions on Signal Processing, vol. 45, no. 3, pp. 814-817, March 1997, doi: 10.1109/78.558515.
+% B. G. Quinn, "Estimating frequency by interpolation using Fourier coefficients," in IEEE Transactions on Signal Processing, vol. 42, no. 5, pp. 1264-1268, May 1994, doi: 10.1109/78.295186.
+% B. G. Quinn and P. J. Kootsookos, "Threshold behavior of the maximum likelihood estimator of frequency," in IEEE Transactions on Signal Processing, vol. 42, no. 11, pp. 3291-3294, Nov. 1994, doi: 10.1109/78.330402.
+
+% D. Rife and R. Boorstyn, "Single tone parameter estimation from discrete-time observations," in IEEE Transactions on Information Theory, vol. 20, no. 5, pp. 591-598, September 1974, doi: 10.1109/TIT.1974.1055282.
+% M. D. Macleod, "Fast nearly ML estimation of the parameters of real or complex single tones or resolved multiple tones," in IEEE Transactions on Signal Processing, vol. 46, no. 1, pp. 141-148, Jan. 1998, doi: 10.1109/78.651200.
+
+
+%T. Grandke, "Interpolation Algorithms for Discrete Fourier Transforms of Weighted Signals," in IEEE Transactions on Instrumentation and Measurement, vol. 32, no. 2, pp. 350-355, June 1983, doi: 10.1109/TIM.1983.4315077.
+
+%Konopatskiy E. V., Bezditnyi A. A. Geometric modeling of multifactor processes and phenomena by the multidimensional parabolic interpolation method //Journal of Physics: Conference Series. – IOP Publishing, 2020. – Т. 1441. – №. 1. – С. 012063.
+% S. Djukanović, T. Popović and A. Mitrović, "Precise sinusoid frequency estimation based on parabolic interpolation," 2016 24th Telecommunications Forum (TELFOR), 2016, pp. 1-4, doi: 10.1109/TELFOR.2016.7818824.
+
+
+% Gasior M., Gonzalez J. L. Improving FFT frequency measurement resolution by parabolic and Gaussian spectrum interpolation //AIP Conference Proceedings. – American Institute of Physics, 2004. – Т. 732. – №. 1. – С. 276-285.
+% Gu X., Du JX., Wang XF. (2005) Leaf Recognition Based on the Combination of Wavelet Transform and Gaussian Interpolation. In: Huang DS., Zhang XP., Huang GB. (eds) Advances in Intelligent Computing. ICIC 2005. Lecture Notes in Computer Science, vol 3644. Springer, Berlin, Heidelberg. https://doi.org/10.1007/11538059_27
+% Gilboa E. et al. Image interpolation and denoising for division of focal plane sensors using Gaussian processes //Optics express. – 2014. – Т. 22. – №. 12. – С. 15277-15291.
+
+% Альтман Е. А., Елизаров Д. А. Повышение точности оценки параметров сигналов в электрической сети в системе тягового электроснабжения //Известия Транссиба. – 2012. – №. 3 (11).
+% Wang Z. et al. Nonlinearity-tolerant OSNR estimation method based on correlation function and statistical moments //Optical Fiber Technology. – 2017. – Т. 39. – С. 5-11.
+
+% Елизаров Д. А. Анализ методов оценки гармонических составляющих напряжения в электроэнергетических системах //Омский научный вестник. – 2016. – №. 2 (146).
+
+Алгоритмы являются интерполяционными для нахождения параметров гармоник, кроме трех последних методов (метод корреляционных функций, модернизированный метод корреляционных функций и метод по ГОСТу). Сутью метода интерполирования является нахождение промежуточных значений величины по имеющемуся дискретному набору известных значений, то есть кривая построенной функции должна точно пройти через имеющиеся точки данных.
+
+В результате анализа выявлено, что метод корреляционных функций
+наиболее точен, но использует большее количество математических операций,
+поэтому требует большего времени на выполнение.
+
+
+\section{Корреляция} \label{sec:ch2/sec4}
+
+Корреляционный анализ широко применим для решения технических задач \cite{Oppenheim2018Digital}. 
+% Оппенгейм А., Шафер Р. Цифровая обработка сигналов. – Litres, 2018.
+В работах \cite{Elizarov2012application, Altman2012improvement} описаны практические реализации подходов для решения задач оценки гармонических составляющих напряжения. 
+%Елизаров Д. А. Применение метода чисел Фибоначчи для поиска максимума корреляционной функции //В мире научных открытий. – 2012. – №. 1. – С. 28-38.
+
+% Альтман Е. А., Елизаров Д. А., Чижма С. Н. Совершенствование алгоритма определения параметров гармоник сигналов в электрической сети для оценки качества электроэнергии //Электротехнические комплексы и системы управления. – 2012. – №. 4. – С. 5-9.
+
+Базовым параметром метода корреляционных функций является коэффициент корреляции. Для исследуемой функции напряжения формируется набор эталонов. Далее производится анализ на наличие связи в точках между параметрами исследуемого напряжения и эталона. Наибольшее значение коэффициента корреляции показывает на эталон, параметр которого необходимо выбрать. 
+
+Для того чтобы сформировать набор эталонов необходимо определить базовую точку, вокруг которой будут создаваться эталоны (обозначим ее через $B$). Эта точка выбирается из ближайших целых значений основной частоты измеряемого напряжения. Также необходимо определить шаг, с которым будут формироваться эталоны (обозначим его через $h$ ). Затем на промежутке [$B - \sfrac{1}{2}$, $B + \sfrac{1}{2}$]   необходимо произвести формирование эталонов. Для этого спектр оконной функции необходимо сдвигать вправо и влево с шагом в пределе заданного промежутка и определять $5$ точек вокруг пика. 
+
+Расчет коэффициента корреляции производиться по $5$ точкам, так как для дискретного спектра энергия гармоники (порядка $80$ \%) сосредоточена в ближайших $3-5$ отсчетах в районе максимума амплитудного спектра. Возможность смещать спектр на заданную величину без изменения амплитудного спектра обеспечивается свойством ДПФ \cite{sergienko2011digital}.
+%Сергиенко А. Б. Цифровая обработка сигналов. – БХВ-Петербург, 2011.
+Согласно данному свойству необходимо спектр окна домножить на величину $e^{-j \cdot \frac{2 \cdot \pi (B \pm i \cdot h)}{T_w}}$
+
+Таким образом, получается набор эталонных множеств из $М$  точек $W_j = {W_{j0}, W_{j1}, \cdots, W_{jM-1} }$ , каждая точка которого вычисляется по правилу:
+\begin{equation}
+	\label{eq:equation3.1}
+	W_{ji} = W \left( {\frac{2 \cdot \pi}{T_w} \cdot (i + \bigtriangleup r_j)}\right) 
+\end{equation}
+
+где $- \frac{M}{2} < i < \frac{M}{2}$, $0 < \bigtriangleup r_j < 1$
+
+На рисунке \ref{img:set_of_standards} показан пример построения наборов эталонов (здесь представлено три набора). Первый набор не имеет смещения относительно базовой точки. Второй набор смещен влево относительно базовой точки на величину шага формирования эталона $h$  . Третий набор смещен вправо относительно базовой точки B на величину шага формирования эталона $h$. Также для первого набора эталона определены его отсчеты БПФ. 
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.6] {set_of_standards.pdf}
+	\caption{Пример построения набора эталонов.}
+	\label{img:set_of_standards}
+\end{figure}
+
+Пусть имеется напряжение $u'(t)$ с периодом $T_s$ и спектром, ограниченным  $N$-ой гармоникой, и белым шумом $\eta$. Для ограничения длительности напряжения накладывается некоторое окно $w(t)$, имеющее отличное от нуля значение на временном отрезке $[- \frac{T_w}{T_w}, - \frac{T_w}{T_w}] $ и спектром $W(\omega)$. 
+
+В качестве весовой функции для метода корреляционных функций применяется окно Кайзера с параметром $10$. Окно Кайзера на 2048 точек с параметром $10$ представлено на рисунке \ref{img:picture3.3.1}. Основные свойства весовой функции Кайзера, а также формула для определения коэффициентов приведены в таблице \ref{app:А}.
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=0.75] {Kaiser_window.png}
+	\caption{Окно Кайзера.}
+	\label{img:picture3.3.1}
+\end{figure}
+
+\begin{equation}
+	\label{eq:equation3.2}
+	u(t) = u'(t) \cdot w(t) = \displaystyle\sum_{\nu=0}^{\nu=N} A_\nu e^{j \cdot \varphi_\nu} w(t) e^{j \cdot \frac{2 \cdot \pi}{T_s} \cdot \nu \cdot t} + \eta (t) \cdot w(t) = 
+\end{equation}
+
+$$
+= \displaystyle\sum_{\nu=0}^{\nu=N} A_\nu e^{j \cdot \varphi_\nu} w(t) \cdot e^{j \cdot \frac{2 \cdot \pi}{T_s} \cdot \nu \cdot t} +\eta_w(t)
+$$
+Спектр сигнала $w(t) \cdot e^{j \cdot \frac{2 \cdot \pi}{T_s} \cdot \nu \cdot t}$, как известно из свойств преобразования Фурье, представляет собой смещенный на величину $\frac{2 \pi}{T_s} \cdot \nu$ спектр сигнала $w(t)$, a именно $W \left( {\omega - \frac{2 \cdot \pi}{T_s} \cdot \nu} \right)$.
+
+
+Спектр сигнала $\eta_w(t)$ есть произведение во временной области функции $\eta(t)$ и $w(t)$, то в частотной области спектр этого сигнала есть свертка спектров указанных функций \cite{Increase_Accuracy_Yelizarov2014}:
+
+\begin{equation}
+	\label{eq:equation3.3}
+	\Theta_w(\omega) = \int\limits_{- \infty}^{\infty} \Theta (\Omega) W(\omega - \Omega) \mathrm{d}\Omega
+\end{equation}
+
+Величина $\Theta_w(\omega)$, как и $\Theta(\omega)$, является случайной. Исходя из \cite{Increase_Accuracy_Yelizarov2014} дисперсия   не зависит от частоты   и равна \cite{Altman2012formation, Davenport1960introduction}:
+
+% 36. Давенпорт В. Б., Рут В. Л. Введение в теорию случайных сигналов и шумов. М.: ИЛ. – 1960.
+
+% 84. Альтман Е. А., Елизаров Д. А. Формирование эталонной функции с действительным спектром для оценки спектра сигнала электрической сети //Динамика систем, механизмов и машин. – 2012. – №. 1.
+
+\begin{equation}
+	\label{eq:equation3.4}
+	D[\Theta_w(\omega)] = D[\Theta(\omega)] \cdot \frac{1}{T_w} \cdot \int\limits_{- \sfrac{T_w}{2}}^{\sfrac{T_w}{2}} w^2 (t) \mathrm{d}t = const  
+\end{equation}
+
+Следовательно, спектр напряжения $u(t)$  представляет собой взвешенную сумму спектров наложенного окна $W\left( {\omega - \frac{2 \cdot \pi}{T_s} \cdot \nu}\right)$ и случайной величины $\Theta_w(\omega)$  
+\cite{Increase_Accuracy_Yelizarov2014}:
+
+\begin{equation}
+	\label{eq:equation3.5}
+	U(\omega) = \displaystyle\sum_{\nu=0}^{\nu=N} A_{\nu} e^{j \cdot \varphi_\nu} W\left( {\omega - \frac{2 \cdot \pi}{T_s} \cdot \nu}\right) + \Theta_w(\omega)  
+\end{equation}
+
+Задача измерения гармонических составляющих напряжения $u'(t)$, ограниченных во временной области окном $w(t)$ сводится к нахождению коэффициента $A_\nu$ по $M$ точкам функции $U(\omega)$ в области $v$-го пика. Шум $\Theta_w(\omega) $   определяет максимальную точность вычисления параметра гармонических составляющих напряжения в соответствии с теоретической границей Крамера-Рао. Нижняя граница Крамера-Рао является объективным показателем для определения границы дисперсии ошибки при оценке неизвестного параметра при использовании различных методов. 
+
+Найдем значение функции $U(\omega)$  в этих точках. Так как эти точки получаются при помощи вычисления БПФ дискретизированного сигнала на временном отрезке $T_w$ (ширина окна), то в результате применения этого алгоритма мы получаем значение спектра в равномерно отстоящих точках $ \omega = \frac{2 \cdot \pi}{T_w} \cdot n$. После подстановки   в \ref{eq:equation3.5} выражение в районе пика БПФ $\nu$ имеет вид:
+
+\begin{equation}
+	\label{eq:equation3.6}
+	U \left(\frac{2 \cdot \pi}{T_w} \cdot n \right) = \displaystyle\sum_{\nu=0}^{\nu=N} A_{\nu} e^{j \cdot \varphi_\nu} W\left( {\frac{2 \cdot \pi}{T_w} \cdot n - \frac{2 \cdot \pi}{T_s} \cdot \nu }\right) = 
+\end{equation}
+
+$$
+=  \displaystyle\sum_{\nu=0}^{\nu=N} A_{\nu} e^{j \cdot \varphi_\nu} W \left({\frac{2 \cdot \pi}{T_w} \cdot \left( {n - \frac{T_w}{T_s} \cdot \nu} \right) } \right) + \Theta_w(\omega)
+$$
+Пусть целая часть выражения в \ref{eq:equation3.6} $ n - \frac{T_w}{T_s} \cdot \nu$  равна $r$ , а дробная часть этого выражения равна $ \bigtriangleup r$ . Тогда: 
+
+\begin{equation}
+	\label{eq:equation3.7}
+	U \left(\frac{2 \cdot \pi}{T_w} \cdot n \right) = \displaystyle\sum_{\nu=0}^{\nu=N} A_{\nu} e^{j \cdot \varphi_\nu} W\left( {\frac{2 \cdot \pi}{T_w} \cdot (r + \bigtriangleup r ) }\right) + \Theta_w(\omega)
+\end{equation}
+
+Таким образом, получается реализация БПФ напряжения ограниченного окном, для которой: $U = {U_0, U_1, \cdots , U_M} $ – множество из $M$ точек этого БПФ в области пика $\nu$.
+Коэффициент корреляции между множеством $U$ и эталоном $W_j$ определяется по формуле:
+
+\begin{equation}
+	\label{eq:equation3.8}
+	\displaystyle\sum_{i=1}^{i=M} U_i W_{ji} = \displaystyle\sum_{i=1}^{i=M} A_{\nu} e^{j \cdot \varphi_\nu} W\left( {\frac{2 \cdot \pi}{T_w} \cdot (i + \bigtriangleup r ) }\right) \cdot W\left( {\frac{2 \cdot \pi}{T_w} \cdot (i + \bigtriangleup r_j ) }\right) =
+\end{equation}
+
+$$
+A_{\nu} e^{j \cdot \varphi_\nu} R (\bigtriangleup r - \bigtriangleup r_j) \Theta_w(\omega)
+$$
+
+где $R (\bigtriangleup r - \bigtriangleup r_j)$ – корреляционная функция $W\left( {\frac{2 \cdot \pi}{T_w} \cdot (i + \bigtriangleup r) }\right)$  и $W\left( {\frac{2 \cdot \pi}{T_w} \cdot (i + \bigtriangleup r_j) }\right)$. 
+
+При определении гармонических составляющих напряжения будет достаточно рассматривать $5$ гармоник возле максимальной гармоники спектра напряжения, т.~е. $M = 5$ \cite{Increase_Accuracy_Yelizarov2014}.
+
+Если в качестве окна выбирается симметричная функция, то функция $W(\omega)$  и множество ее значений $W_ji$  будут действительными. С учетом этого, модуль амплитуды  $\nu$-й гармоники определяется следующим образом \cite{Increase_Accuracy_Yelizarov2014}:
+
+\begin{equation}
+	\label{eq:equation3.9}
+	A_{\nu} = \frac{1}{R(\bigtriangleup r - \bigtriangleup r_j)} \cdot \sqrt{\left({\displaystyle\sum_{i=1}^{i=M}\mathrm{Re}(U_i) \cdot W_{ji}} \right)^2 + \left({\displaystyle\sum_{i=1}^{i=M}\mathrm{Im}(U_i) \cdot W_{ji}} \right)^2 - \frac{\Theta_w(\omega)}{R(\bigtriangleup r - \bigtriangleup r_j)}}
+\end{equation}
+
+Для случая, когда эталоны $W_{ji}$ формируются достаточно часто, корреляционную функцию $R(\bigtriangleup r - \bigtriangleup r_j) $  можно считать равной $1$, тогда параметр шума $\Theta_w(\omega)$ не учитывается, а считается теоретической погрешностью метода \cite{Increase_Accuracy_Yelizarov2014}. Тогда формулу для модуля амплитуды  $\nu$-й гармоники \ref{eq:equation3.9} можно переписать следующим образом:
+\begin{equation}
+	\label{eq:equation3.10}
+	A_{\nu} =  \sqrt{\left({\displaystyle\sum_{i=1}^{i=M}\mathrm{Re}(U_i) \cdot W_{ji}} \right)^2 + \left({\displaystyle\sum_{i=1}^{i=M}\mathrm{Im}(U_i) \cdot W_{ji}} \right)^2}
+\end{equation}
+
+Соответственно, необходимо из набора  эталонов $W_ji$ выбрать тот, который наиболее точно соответствует множеству $U$. В качестве критерия точности соответствия выберем минимум выражения $ \left|{\bigtriangleup r - \bigtriangleup r_j}\right| $. Очевидно, что чем меньше значение этого выражения, тем больше значение корреляционной функции $R(\bigtriangleup r - \bigtriangleup r_j)$ и вычисляемого модуля гармоники $A_\nu$ \cite{Increase_Accuracy_Yelizarov2014}. 
+
+Наибольшее значение модуля амплитуды гармоники показывает на пару эталон-сигнал и, соответственно, на величину отклонения $\delta$ от базовой точки $B$. Частота гармоник напряжения определяются как сумма значений $B$ и $\delta$.
+Оценка гармонических составляющих напряжения методом корреляционных функций выполняется по следующему алгоритму:
+
+\begin{enumerate}
+\item Вычисляется БПФ напряжения и грубо определяется местоположение основной гармоники по БПФ напряжения. Для этого необходимо определить БПФ в области $50 \pm 2$~Гц.
+	
+\item Если в области поиска высшей гармоники уровень составляющих амплитудного спектра ниже уровня шума, делается вывод об отсутствии соответствующей гармоники.
+	
+\item Из каждой области берется М точек и определяется по формуле \ref{eq:equation3.10} модуль $\nu$-ой гармоники $A_\nu$ для каждого из эталонов $W_{ji}$. Наиболее близким считается тот, который дал наибольший $A_\nu$.
+\end{enumerate}
+
+Граф-схема алгоритма метода корреляционных функций приведена на \ref{img:picture55}
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=1.5] {GSA_Cor_fanc}
+	\caption{ГСА метода корреляционных функций.}
+	\label{img:picture55}
+\end{figure}
+
+%Листинг программы, реализующий метод корреляционных функций, приведен в \textbf{приложении ?}. 
+
+На \ref{img:picture44} представлен график смещения оценки основной частоты напряжения в зависимости от уровня шума для метода корреляционных функций.
+
+Для метода корреляционных функций амплитуда  $\nu$-й гармоники напряжения определяется по формуле 	\ref{eq:equation3.10}. 
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics [scale=1.5] {Graph_estimating_an_offset_frequency_of_the_main_voltage}
+	\caption{График смещения оценки основной частоты напряжения в зависимости от уровня шума (метод корреляционных функций).}
+	\label{img:picture44}
+\end{figure}
+
+\section{Нижняя граница Крамера-Рао} \label{sec:ch2/sec5} %АНТИПЛАГИАТ=
 % Альтман Е. А., Васеева Т. В., Александров А. В. ГРАНИЦА КРАМЕРА-РАО ДЛЯ АМПЛИТУДЫ ГАРМОНИКИ ПРИ ИСПОЛЬЗОВАНИИ ОКОННЫХ ФУНКЦИЙ //Динамика систем, механизмов и машин. – 2020. – Т. 8. – №. 2. – С. 145-152.
 % ВВЕДЕНИЕ 
 Для определения точности полученных результатов алгоритмы можно проверить с помощью неравенства Крамера-Рао. В зарубежной литературе чаще встречается термин Cramer-Rao lower bound (CRLB), что обозначает <<нижняя граница Крамера-Рао>>. В неравенстве Крамера-Рао сигнал имеет наибольшую величину дисперсии при некоторых условиях. Если неравенство Крамера-Рао преобразуется в равенство, то оценка параметров считается наилучшей. Отсюда следует, что дисперсия данной оценки самая маленькая из возможных. 
@@ -136,7 +338,7 @@ $N \bigtriangleup t$ -- основной период сигнала.
 % 12. Kay S. M. Fundamentals of statistical signal processing. – Prentice Hall PTR, 1993.
 % 13. Kay S. M. Fundamentals of statistical signal processing: Practical algorithm development. – Pearson Education, 2013. – Т. 3.
 %МАТЕМАТИЧЕСКАЯ МОДЕЛЬ ДЛЯ ОЦЕНКИ ТОЧНОСТИ НАХОЖДЕНИЯ АМПЛИТУДЫ ГАРМОНИКИ
-В общем случае граница Крамера-Рао определяется следующим образом \cite{kay1993fundamentals, kay2013fundamentals}:
+В общем случае граница Крамера-Рао определяется следующим образом~\cite{kay1993fundamentals, kay2013fundamentals}:
 % 12. Kay S. M. Fundamentals of statistical signal processing. – Prentice Hall PTR, 1993.
 %13. Kay S. M. Fundamentals of statistical signal processing: Practical algorithm development. – Pearson Education, 2013. – Т. 3.
 
@@ -312,7 +514,7 @@ $A^{'}$ -- амплитуда гармоники исходного сигнал
 
 Используемый в работе подход для нахождения дисперсии результата алгоритма обработки сигналов может быть применен и для других задач обработки сигналов, в которых применяются оконные функции или другие предварительные преобразования сигнала.
 
-\section{Граница Крамера-Рао амплитуды однотонального сигнала для методов ее оценки с использованием оконных функций} \label{sec:ch2/sec4} %АНТИПЛАГИАТ=90,62%
+\section{Граница Крамера-Рао амплитуды однотонального сигнала для методов ее оценки с использованием оконных функций} \label{sec:ch2/sec6} %АНТИПЛАГИАТ=90,62%
 % Васеева Т. В., Альтман Е. А. ГРАНИЦА КРАМЕРА-РАО АМПЛИТУДЫ ОДНОТОНАЛЬНОГО СИГНАЛА ДЛЯ МЕТОДОВ ЕЕ ОЦЕНКИ С ИСПОЛЬЗОВАНИЕМ ОКОННЫХ ФУНКЦИЙ //Инновационные проекты и технологии в образовании, промышленности и на транспорте. – 2021. – С.
 
 Граница Крамера-Рао позволяет найти минимальную дисперсию оценки параметра сигнала. Для гармонических сигналов известны различные формулы, которые оценивают параметры: дисперсии амплитуды, частоты и фазы гармоник. Известные алгоритмы оценки показывают результаты выше границы Крамера-Рао. В проведенных исследованиях \cite{altman2020boundary} вывелась формула для оценки минимальной дисперсии амплитуды гармоник для методов, использующих оконные функции. В данной статье более подробно рассмотрели влияние различных окон на сигнал. Полученные результаты позволят решать задачи выбора оконной функции для спектрального анализа.
@@ -343,7 +545,7 @@ $T_{s}$ -- период.
 %2. Васеева Т. В., Альтман Е. А., Александров А. В. Сравнительное исследование гармонических и интергармонических методов оценки сигналов //Инновационные проекты и технологии в образовании, промышленности и на транспорте. – 2020. – С. 51-57.
 %3. Елизаров Д. А. Повышение точности оценки показателей несинусоидальности напряжения в электроэнергетических системах //Омск: дис.… канд. техн. наук. – 2014.
 
-\begin{figure}[ht]
+\begin{figure}[p]
 	\centerfloat{
 		\includegraphics[scale=0.9]{Windows.png}
 	}
@@ -359,7 +561,7 @@ $T_{s}$ -- период.
 Зависимость дисперсии сигнала с шумом от дисперсии сигнала с наложенным на него окном приведены на рисунке 3. Использовались параметры: $n\_point = 1000$ и $n\_test = 100$. Сплошной линией отображены результаты моделирования, штриховой -- результаты расчета по формуле \ref{eq:equation7}. Результаты моделирования при других параметрах аналогичны.
 
 
-\begin{figure}[ht]
+\begin{figure}[p]
 	\centerfloat{
 		\includegraphics[scale=0.9]{noise_win_var_hamming.png}
 	}
@@ -370,7 +572,7 @@ $T_{s}$ -- период.
 % 1. Альтман Е. А., Васеева Т. В., Александров А. В. Граница Крамера-Рао для амплитуды гармоники при использовании оконных функций //Динамика систем, механизмов и машин. – 2020. – Т. 8. – №. 2. – С. 145-152.
 
 Результаты моделирования приведены на графиках. 
-\begin{figure}[ht]
+\begin{figure}[p]
 	\centerfloat{
 		\includegraphics[scale=0.9]{estimate_amp_sin_barlett_noise.png}
 	}
@@ -459,50 +661,8 @@ $T_{s}$ -- период.
 Предложенная формула \ref{eq:equation7} оценки дисперсии белого шума после наложения на него окна \cite{altman2020boundary} может использоваться при выборе любой из рассмотренных оконных функций для решения задач спектрального анализа. Точность получаемой оценки амплитуды является наиболее значимым критерием.
 Формула \ref{eq:equation11} оценки дисперсии амплитуды \cite{altman2020boundary} дает наилучший результаты при выборе весовых функций: Кайзера ($\beta=4$), Хэмминга, Барлетта. Так как результаты расчетов по формуле и результаты моделирование близки к границе Крамера-Рао. Зависимость дисперсии оценки амплитуды от дисперсии шума (табл. 2) показывают, что чем меньше коэффициент увеличения дисперсии, тем точнее результаты. Наихудший результат показало окно Кайзера с параметром $\beta=15$.
 
-\section{Алгоритмы оценки частот гармоник} \label{sec:ch2/sec5}
-Исследованы методы оценки спектральных составляющих:
-\begin{enumerate}
-\item	Метод Якобсена (Jacobsen's Modified Quadratic Estimator)\cite{4205098, jacobsen1994local, jacobsen2007fast, ericjacobsen_cite};
-\item	Два метода Квина (Quinn's Estimator, Quinn's Second Estimator)\cite{558515, 295186, 330402};
-\item	Два метода Маклеода (Macleod's Estimator) \cite{651200, 1055282};
-\item	Метод Грэндка (Grandke's method) \cite{4315077};
-\item	Алгоритм параболической интерполяции (Parabolic Interpolation) \cite{Konopatskiy_2020, LACHANCE1991143, gasior2004improving, 7818824};
-\item	Алгоритм интерполяции Гаусса (Gaussian Interpolation) \cite{gasior2004improving, gu2005leaf, gilboa2014image};
-\item	Алгоритм, рекомендованный в ГОСТ 30804.4.7-2013 \cite{GOST30804.4.7-2013};
-\item	Метод корреляционных функций (Correlation function method) \cite{Altman2012definition, Altman2012promotion, Altman2012improvement, WANG20175}.
-\item Модернизированный метод корреляционных функций (Modernized method of correlation functions) \cite{Altman2012promotion, Elizarov2016analysis, Increase_Accuracy_Yelizarov2014}.
-\end{enumerate}
-%B. G. Quinn, "Estimation of frequency, amplitude, and phase from the DFT of a time series," in IEEE Transactions on Signal Processing, vol. 45, no. 3, pp. 814-817, March 1997, doi: 10.1109/78.558515.
-% B. G. Quinn, "Estimating frequency by interpolation using Fourier coefficients," in IEEE Transactions on Signal Processing, vol. 42, no. 5, pp. 1264-1268, May 1994, doi: 10.1109/78.295186.
-% B. G. Quinn and P. J. Kootsookos, "Threshold behavior of the maximum likelihood estimator of frequency," in IEEE Transactions on Signal Processing, vol. 42, no. 11, pp. 3291-3294, Nov. 1994, doi: 10.1109/78.330402.
-
-% D. Rife and R. Boorstyn, "Single tone parameter estimation from discrete-time observations," in IEEE Transactions on Information Theory, vol. 20, no. 5, pp. 591-598, September 1974, doi: 10.1109/TIT.1974.1055282.
-% M. D. Macleod, "Fast nearly ML estimation of the parameters of real or complex single tones or resolved multiple tones," in IEEE Transactions on Signal Processing, vol. 46, no. 1, pp. 141-148, Jan. 1998, doi: 10.1109/78.651200.
-
-
-%T. Grandke, "Interpolation Algorithms for Discrete Fourier Transforms of Weighted Signals," in IEEE Transactions on Instrumentation and Measurement, vol. 32, no. 2, pp. 350-355, June 1983, doi: 10.1109/TIM.1983.4315077.
-
-%Konopatskiy E. V., Bezditnyi A. A. Geometric modeling of multifactor processes and phenomena by the multidimensional parabolic interpolation method //Journal of Physics: Conference Series. – IOP Publishing, 2020. – Т. 1441. – №. 1. – С. 012063.
-% S. Djukanović, T. Popović and A. Mitrović, "Precise sinusoid frequency estimation based on parabolic interpolation," 2016 24th Telecommunications Forum (TELFOR), 2016, pp. 1-4, doi: 10.1109/TELFOR.2016.7818824.
-
-
-% Gasior M., Gonzalez J. L. Improving FFT frequency measurement resolution by parabolic and Gaussian spectrum interpolation //AIP Conference Proceedings. – American Institute of Physics, 2004. – Т. 732. – №. 1. – С. 276-285.
-% Gu X., Du JX., Wang XF. (2005) Leaf Recognition Based on the Combination of Wavelet Transform and Gaussian Interpolation. In: Huang DS., Zhang XP., Huang GB. (eds) Advances in Intelligent Computing. ICIC 2005. Lecture Notes in Computer Science, vol 3644. Springer, Berlin, Heidelberg. https://doi.org/10.1007/11538059_27
-% Gilboa E. et al. Image interpolation and denoising for division of focal plane sensors using Gaussian processes //Optics express. – 2014. – Т. 22. – №. 12. – С. 15277-15291.
-
-% Альтман Е. А., Елизаров Д. А. Повышение точности оценки параметров сигналов в электрической сети в системе тягового электроснабжения //Известия Транссиба. – 2012. – №. 3 (11).
-% Wang Z. et al. Nonlinearity-tolerant OSNR estimation method based on correlation function and statistical moments //Optical Fiber Technology. – 2017. – Т. 39. – С. 5-11.
-
-% Елизаров Д. А. Анализ методов оценки гармонических составляющих напряжения в электроэнергетических системах //Омский научный вестник. – 2016. – №. 2 (146).
-
-Алгоритмы являются интерполяционными для нахождения параметров гармоник, кроме трех последних методов (метод корреляционных функций, модернизированный метод корреляционных функций и метод по ГОСТу). Сутью метода интерполирования является нахождение промежуточных значений величины по имеющемуся дискретному набору известных значений, то есть кривая построенной функции должна точно пройти через имеющиеся точки данных.
-
-В результате анализа выявлено, что метод корреляционных функций
-наиболее точен, но использует большее количество математических операций,
-поэтому требует большего времени на выполнение.
-
-
-\section{Вывод по разделу} \label{sec:ch2/sec6}
+\section{Вывод по разделу} \label{sec:ch2/sec7}
+В результате анализа, произведенного во втором разделе, можно сделать следующие выводы:
 \begin{enumerate}
 \item  Математической основой для анализа спектра сигналов является преобразование Фурье. Для дискретных сигналов применяется дискретное преобразование Фурье.
 

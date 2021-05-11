@@ -1,6 +1,6 @@
 % Общие стили оформления.
 % Возможные варианты значений ищите в описании библиотеки beamer
-%\usecolortheme{whale}
+\usecolortheme{whale}
 %\usecolortheme{orchid}
 %\usecolortheme{wolverine}
 %\usecolortheme{lily}
@@ -39,12 +39,12 @@
 %\usetheme{Malmoe} 
 %\usetheme{Marburg}
 %\usetheme{Montpellier} 
-%\usetheme{Pittsburgh}
+\usetheme{Pittsburgh}
 %\usetheme{Rochester}
 %\usetheme{Singapore}
 %\usetheme{Szeged}
 
-\usetheme{Warsaw}
+%\usetheme{Warsaw}
 
 % \usetheme[secheader]{Boadilla}
 % \usecolortheme{seahorse}
@@ -63,7 +63,9 @@
 \setbeamerfont{bibliography entry title}{size=\small}
 \setbeamerfont{bibliography entry location}{size=\small}
 \setbeamerfont{bibliography entry note}{size=\small}
-\setbeamerfont{footline}{size=\bf\Large}
+%\setbeamerfont{footline}{size=\bf\Large}
+\setbeamerfont{footline}{size=\bf\small}
+
 % Аналогично можно настроить и другие размеры.
 % Названия классов элементов можно найти здесь
 % http://www.cpt.univ-mrs.fr/~masson/latex/Beamer-appearance-cheat-sheet.pdf
@@ -102,14 +104,15 @@
     \hbox{%
         \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
             % И. О. Фамилия, Организация кратко
-            \thesisAuthorShort, \thesisOrganizationShort
+            \thesisAuthorShort%, \thesisOrganizationShort
         \end{beamercolorbox}%
         \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
             % Город, 20XX
             \thesisCity, \thesisYear
         \end{beamercolorbox}%
         \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{}%
-            Стр. \insertframenumber{} из \inserttotalframenumber \hspace*{2ex}
+            %Стр.
+            {\Huge \insertframenumber{}} % из \inserttotalframenumber \hspace*{2ex}
         \end{beamercolorbox}}%
     \vskip0pt%
 }

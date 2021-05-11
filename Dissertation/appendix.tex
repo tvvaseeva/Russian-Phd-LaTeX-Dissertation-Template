@@ -446,7 +446,7 @@ show()
 \end{figure}
 
 \chapter{Оценка дисперсии белого шума после наложения на него окна}\label{app:Г}
-\begin{verbatim}
+\begin{lstlisting}
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -484,7 +484,7 @@ plt.xlabel("Дисперсия амплитуды")
 plt.legend()   # легенда для всего рисунка fig
 plt.grid()
 plt.show()
-\end{verbatim}
+\end{lstlisting}
 
 \chapter{Оценка амплитуды при использовании разных окон}\label{app:Д}
 \begin{lstlisting}
@@ -543,7 +543,7 @@ plt.show()
 \end{lstlisting}
 
 \chapter{Оценки амплитуды при различных уровнях шума}\label{app:Е}
-\begin{verbatim}
+\begin{lstlisting}
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -592,7 +592,7 @@ increase_variances = window_mean_2 / (window_factors * window_factors)
 print("increase_variances=", increase_variances)
 plt.legend()
 plt.show()	
-\end{verbatim}
+\end{lstlisting}
 
 
 \chapter{Алгоритм вычисления одномерной свертки}\label{app:Ж}
