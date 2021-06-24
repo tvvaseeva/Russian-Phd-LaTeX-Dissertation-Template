@@ -12,7 +12,7 @@
 \pagestyle{empty} % Отключить нумерацию странци
 
 \begin{document}
-\begin{center}
+%\begin{center}
 \begin{tikzpicture}[scale=3,decoration={brace,raise=5pt}]
 
 \draw[ultra thick, blue] (2.5,0) -- (2.5,5);
@@ -59,10 +59,11 @@
 
 
 % Легенда
-\draw[ultra thick, black!100, dashed] (4.3, 4.9) -- (4.6, 4.9) node[right, black, font=\small] {-- \huge{Результаты ДПФ (набор \# $1$)}};
-\draw[ultra thick, red] (4.3, 4.7) sin (4.6, 4.7) node[right, black, font=\small] {-- \huge{Набор эталонов \# $1$}};
-\draw[ultra thick, violet] (4.3, 4.5) sin (4.6, 4.5) node[right, black, font=\small] {-- \huge{Набор эталонов \# $2$}};
-\draw[ultra thick, cyan] (4.3, 4.3) sin (4.6, 4.3) node[right, black, font=\small] {-- \huge{Набор эталонов \# $3$}};
+%\draw[ultra thick, black!100, dashed] (4.3, 5.3) -- (4.6, 5.3) node[right, black, font=\small] {-- \Huge{Результаты ДПФ (набор \# $1$)}};
+\draw[ultra thick, black!100, dashed] (4.3, 5.3) -- (4.6, 5.3) node[right, black, font=\small] {-- \Huge{Результаты ДПФ}};
+\draw[ultra thick, red] (4.3, 5.0) sin (4.6, 5.0) node[right, black, font=\small] {-- \Huge{Набор эталонов \# $1$}};
+\draw[ultra thick, violet] (4.3, 4.7) sin (4.6, 4.7) node[right, black, font=\small] {-- \Huge{Набор эталонов \# $2$}};
+\draw[ultra thick, cyan] (4.3, 4.4) sin (4.6, 4.4) node[right, black, font=\small] {-- \Huge{Набор эталонов \# $3$}};
 \end{tikzpicture} 
-\end{center}
+%\end{center}
 \end{document}

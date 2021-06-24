@@ -72,6 +72,7 @@
 
 % Цвет элементов
 \setbeamercolor{footline}{fg=blue}
+%\setbeamercolor{footline}{fg=black}
 \setbeamercolor{bibliography item}{fg=black}
 \setbeamercolor{bibliography entry author}{fg=black}
 \setbeamercolor{bibliography entry title}{fg=black}
@@ -102,17 +103,17 @@
 \setbeamertemplate{footline}{
     \leavevmode%
     \hbox{%
-        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
+        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=2ex,center]{}%
             % И. О. Фамилия, Организация кратко
             \thesisAuthorShort%, \thesisOrganizationShort
         \end{beamercolorbox}%
-        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{}%
+        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=2ex,center]{}%
             % Город, 20XX
             \thesisCity, \thesisYear
         \end{beamercolorbox}%
-        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{}%
+        \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=2ex,right]{}%
             %Стр.
-            {\Huge \insertframenumber{}} % из \inserttotalframenumber \hspace*{2ex}
+            {\LARGE \insertframenumber{}\hspace*{2ex}} % из \inserttotalframenumber \hspace*{2ex}
         \end{beamercolorbox}}%
     \vskip0pt%
 }
